@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BarChart3, ExternalLink, Megaphone, MessageCircle, Package, Settings, ShoppingCart, Tag, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { BarChart3, ExternalLink, Lock, Megaphone, MessageCircle, Package, Settings, ShoppingCart, Tag, Users } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — MIRAVIKA" }, { name: "robots", content: "noindex" }] }),
@@ -7,6 +8,9 @@ export const Route = createFileRoute("/admin")({
 });
 
 const ADMIN = "https://admin.shopify.com/store/miravika-operating-system-ngwql";
+const GATE_KEY = "miravika_admin_gate_v1";
+// Owner-only passphrase. Change anytime from this file.
+const ADMIN_PASSPHRASE = "miravika-owner-2026";
 
 const tiles = [
   { icon: ShoppingCart, label: "Orders", desc: "View, fulfil, refund & invoice orders", href: `${ADMIN}/orders` },
@@ -20,6 +24,64 @@ const tiles = [
 ];
 
 function Admin() {
+  const [unlocked, setUnlocked] = useState(false);
+  const [input, setInput] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.localStorage.getItem(GATE_KEY) === "1") {
+      setUnlocked(true);
+    }
+  }, []);
+
+  if (!unlocked) {
+    return (
+      <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-10">
+        <div className="rounded-md border border-border/60 bg-card p-6">
+          <div className="flex items-center gap-3">
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-beige text-gold"><Lock className="h-5 w-5" /></span>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.24em] text-gold">Restricted</p>
+              <h1 className="font-display text-2xl">Owner Access</h1>
+            </div>
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground">
+            This dashboard is for the store owner. Enter the passphrase to continue.
+          </p>
+          <form
+            className="mt-5 space-y-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (input === ADMIN_PASSPHRASE) {
+                window.localStorage.setItem(GATE_KEY, "1");
+                setUnlocked(true);
+                setError("");
+              } else {
+                setError("Incorrect passphrase.");
+              }
+            }}
+          >
+            <input
+              type="password"
+              autoFocus
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Passphrase"
+              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-gold"
+            />
+            {error && <p className="text-xs text-red-600">{error}</p>}
+            <button type="submit" className="w-full rounded-full bg-foreground px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-ivory hover:bg-foreground/90">
+              Unlock
+            </button>
+          </form>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            <Link to="/" className="underline-offset-4 hover:underline">← Back to storefront</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">
       <div className="flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
@@ -30,9 +92,21 @@ function Admin() {
             Every part of MIRAVIKA — orders, inventory, customers, payments, marketing — runs on Shopify under the hood. Jump straight into the right section below.
           </p>
         </div>
-        <a href={ADMIN} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-ivory hover:bg-foreground/90">
-          Open Shopify Admin <ExternalLink className="h-3.5 w-3.5" />
-        </a>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              window.localStorage.removeItem(GATE_KEY);
+              setUnlocked(false);
+              setInput("");
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-[11px] uppercase tracking-[0.18em] hover:border-gold"
+          >
+            Lock
+          </button>
+          <a href={ADMIN} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-xs uppercase tracking-[0.18em] text-ivory hover:bg-foreground/90">
+            Open Shopify Admin <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
       </div>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

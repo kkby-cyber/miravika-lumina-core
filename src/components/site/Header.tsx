@@ -10,14 +10,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import logoAsset from "@/assets/miravika-logo.png.asset.json";
 
 const NAV = [
-  { label: "Shop All", to: "/shop" as const, search: undefined },
-  { label: "Scrunchies", to: "/collection/$slug" as const, params: { slug: "scrunchies" } },
-  { label: "Bows", to: "/collection/$slug" as const, params: { slug: "bows" } },
-  { label: "Clips", to: "/collection/$slug" as const, params: { slug: "clips" } },
-  { label: "Bands", to: "/collection/$slug" as const, params: { slug: "bands" } },
-  { label: "Accessories", to: "/collection/$slug" as const, params: { slug: "accessories" } },
+  { label: "Shop All", to: "/shop" as const, params: undefined },
+  { label: "Magnetic Earrings", to: "/collection/$slug" as const, params: { slug: "magnetic-earrings" } },
+  { label: "Fashion", to: "/collection/$slug" as const, params: { slug: "fashion-accessories" } },
+  { label: "Beauty", to: "/collection/$slug" as const, params: { slug: "beauty-accessories" } },
+  { label: "Hair", to: "/collection/$slug" as const, params: { slug: "hair-accessories" } },
+  { label: "Home Decor", to: "/collection/$slug" as const, params: { slug: "home-decor" } },
 ];
 
 export function Header() {
@@ -27,23 +28,23 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-ivory/85 backdrop-blur-md">
-      <div className="border-b border-border/40 bg-foreground/95 text-ivory">
-        <p className="mx-auto max-w-7xl px-4 py-1.5 text-center text-[11px] tracking-[0.18em] uppercase">
-          Free shipping on prepaid orders above ₹999 · COD available across India
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-ivory/90 backdrop-blur-md">
+      <div className="bg-noir text-ivory">
+        <p className="mx-auto max-w-7xl px-4 py-1.5 text-center text-[11px] tracking-[0.2em] uppercase">
+          Worldwide Shipping · Free Delivery Over ₹999 / $49 · COD in India
         </p>
       </div>
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 md:py-4">
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-2 md:flex-1">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <button aria-label="Open menu" className="-ml-2 p-2 md:hidden">
                 <Menu className="h-5 w-5" />
               </button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-72">
+            <SheetContent side="left" className="w-72 bg-ivory">
               <SheetHeader>
-                <SheetTitle className="font-display text-2xl">MIRAVIKA</SheetTitle>
+                <SheetTitle className="font-display text-2xl tracking-[0.28em]">MIRAVIKA</SheetTitle>
               </SheetHeader>
               <nav className="mt-6 flex flex-col gap-1">
                 {NAV.map((n) =>
@@ -76,32 +77,44 @@ export function Header() {
               </nav>
             </SheetContent>
           </Sheet>
+
+          <nav className="hidden items-center gap-6 md:flex">
+            {NAV.slice(0, 4).map((n) =>
+              n.params ? (
+                <Link
+                  key={n.label}
+                  to={n.to}
+                  params={n.params}
+                  className="text-[11px] uppercase tracking-[0.2em] text-foreground/80 hover:text-gold"
+                >
+                  {n.label}
+                </Link>
+              ) : (
+                <Link key={n.label} to="/shop" className="text-[11px] uppercase tracking-[0.2em] text-foreground/80 hover:text-gold">
+                  {n.label}
+                </Link>
+              ),
+            )}
+          </nav>
         </div>
 
-        <Link to="/" className="flex-1 text-center md:flex-none md:text-left">
-          <span className="font-display text-2xl tracking-[0.28em] md:text-3xl">MIRAVIKA</span>
+        <Link to="/" className="flex flex-shrink-0 items-center justify-center">
+          <img src={logoAsset.url} alt="MIRAVIKA — Luxury Redefined" className="h-12 w-auto md:h-16" />
         </Link>
 
-        <nav className="hidden flex-1 items-center justify-center gap-7 md:flex">
-          {NAV.map((n) =>
-            n.params ? (
+        <div className="flex items-center justify-end gap-1 md:flex-1">
+          <nav className="mr-2 hidden items-center gap-6 md:flex">
+            {NAV.slice(4).map((n) => (
               <Link
                 key={n.label}
                 to={n.to}
                 params={n.params}
-                className="text-[12px] uppercase tracking-[0.18em] text-foreground/80 hover:text-foreground"
+                className="text-[11px] uppercase tracking-[0.2em] text-foreground/80 hover:text-gold"
               >
                 {n.label}
               </Link>
-            ) : (
-              <Link key={n.label} to="/shop" className="text-[12px] uppercase tracking-[0.18em] text-foreground/80 hover:text-foreground">
-                {n.label}
-              </Link>
-            ),
-          )}
-        </nav>
-
-        <div className="flex items-center gap-1">
+            ))}
+          </nav>
           <Link to="/search" aria-label="Search" className="p-2 hover:text-gold">
             <Search className="h-5 w-5" />
           </Link>

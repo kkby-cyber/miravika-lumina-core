@@ -1,24 +1,38 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Award, ShieldCheck, Sparkles, Truck } from "lucide-react";
+import { ArrowRight, Award, Globe, Handshake, Heart, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/site/ProductCard";
+import logoAsset from "@/assets/miravika-logo.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "MIRAVIKA — Handcrafted Hair Accessories" },
-      { name: "description", content: "Luxury hair scrunchies, bows, clips & bands. Designed in India. Free shipping ₹999+. COD available." },
+      { title: "MIRAVIKA — Luxury Redefined | Premium Fashion, Beauty & Lifestyle" },
+      { name: "description", content: "Discover MIRAVIKA — premium fashion, beauty, hair and lifestyle accessories inspired by global trends. Worldwide shipping. Everyday luxury." },
+      { property: "og:title", content: "MIRAVIKA — Luxury Redefined" },
+      { property: "og:description", content: "Premium fashion, beauty and lifestyle accessories inspired by global trends." },
     ],
   }),
   component: Home,
 });
 
 const COLLECTIONS = [
-  { slug: "scrunchies", title: "Scrunchies", tag: "Everyday silk" },
-  { slug: "bows", title: "Bows", tag: "Romantic edits" },
-  { slug: "clips", title: "Clips", tag: "Sculpted shine" },
-  { slug: "bands", title: "Hair Bands", tag: "Quiet drama" },
+  { slug: "magnetic-earrings", title: "Magnetic Earrings", tag: "Pierce-free brilliance", img: "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=800&q=80" },
+  { slug: "fashion-accessories", title: "Fashion", tag: "Everyday statement", img: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80" },
+  { slug: "beauty-accessories", title: "Beauty", tag: "Ritual essentials", img: "https://images.unsplash.com/photo-1522335789203-aaa4e1ae2cb6?w=800&q=80" },
+  { slug: "hair-accessories", title: "Hair", tag: "Heirloom finishes", img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=800&q=80" },
+  { slug: "home-decor", title: "Home Decor", tag: "Curated living", img: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80" },
+  { slug: "trending", title: "Trending", tag: "This week's edit", img: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&q=80" },
 ] as const;
+
+const WHY = [
+  { icon: Award, title: "Premium Quality", desc: "Handpicked pieces, quality-checked in-house." },
+  { icon: Globe, title: "Worldwide Shipping", desc: "Delivered to India, US, UK, EU, Australia & more." },
+  { icon: ShieldCheck, title: "Secure Payments", desc: "SSL-protected checkout in your currency." },
+  { icon: Sparkles, title: "Handpicked Products", desc: "Curated by our style team from global trends." },
+  { icon: Heart, title: "Customer Satisfaction", desc: "10,000+ women trust the Miravika experience." },
+  { icon: Handshake, title: "Easy Returns", desc: "7-day hassle-free returns, worldwide." },
+];
 
 function Home() {
   const { data: products = [], isLoading } = useProducts(undefined, 8);
@@ -26,54 +40,49 @@ function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-10 md:grid-cols-2 md:gap-16 md:pb-24 md:pt-16">
-          <div className="order-2 md:order-1">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-gold">New · Spring Edit</p>
-            <h1 className="mt-4 font-display text-4xl leading-[1.05] md:text-6xl">
-              Heirloom hair, <em className="text-gold not-italic">made modern.</em>
+      <section className="relative overflow-hidden bg-noir text-ivory">
+        <div className="absolute inset-0 opacity-20">
+          <img
+            alt=""
+            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1800&q=80"
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/80 to-noir/40" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pb-20 pt-16 md:grid-cols-2 md:gap-16 md:pb-28 md:pt-24">
+          <div>
+            <img src={logoAsset.url} alt="MIRAVIKA" className="h-24 w-auto md:h-28" />
+            <p className="mt-8 text-[11px] uppercase tracking-[0.32em] text-gold">Everyday Luxury · Est. 2026</p>
+            <h1 className="mt-4 font-display text-5xl leading-[1.02] md:text-7xl">
+              Luxury <span className="gold-gradient-text italic">Redefined.</span>
             </h1>
-            <p className="mt-5 max-w-md text-sm leading-relaxed text-muted-foreground md:text-base">
-              Handcrafted in small batches with luxe fabrics, brass detailing and a forever-finish. MIRAVIKA is hair jewellery for the everyday muse.
+            <p className="mt-6 max-w-md text-sm leading-relaxed text-ivory/75 md:text-base">
+              Style that speaks before you do. Discover premium fashion, beauty and lifestyle accessories inspired by global trends — designed for the modern woman, worldwide.
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link to="/shop" className="inline-flex items-center gap-2 rounded-full bg-foreground px-6 py-3 text-xs uppercase tracking-[0.18em] text-ivory hover:bg-foreground/90">
-                Shop the Edit <ArrowRight className="h-3.5 w-3.5" />
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link to="/shop" className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 text-xs uppercase tracking-[0.22em] text-noir transition hover:bg-gold/90">
+                Shop Collection <ArrowRight className="h-3.5 w-3.5" />
               </Link>
-              <Link to="/about" className="text-xs uppercase tracking-[0.18em] underline-offset-4 hover:underline">
-                Our story
+              <Link to="/shop" className="inline-flex items-center gap-2 rounded-full border border-ivory/30 px-7 py-3.5 text-xs uppercase tracking-[0.22em] text-ivory hover:border-gold hover:text-gold">
+                Explore Best Sellers
               </Link>
             </div>
-          </div>
-          <div className="relative order-1 md:order-2">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-beige">
-              <img
-                alt="MIRAVIKA hair accessory campaign"
-                src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=1200&q=80"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute bottom-4 left-4 rounded-full bg-ivory/90 px-4 py-1.5 text-[11px] uppercase tracking-[0.18em] backdrop-blur">
-                Made in India
-              </div>
-            </div>
-            <div className="absolute -bottom-6 -left-6 hidden h-32 w-32 rounded-full border border-gold/40 md:block" />
-            <div className="absolute -right-4 -top-4 hidden h-24 w-24 rounded-full bg-gold/20 md:block" />
           </div>
         </div>
       </section>
 
       {/* Trust strip */}
-      <section className="border-y border-border/60 bg-beige/40">
+      <section className="border-b border-border/60 bg-beige">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 text-center md:grid-cols-4">
           {[
-            { icon: Truck, label: "Free Shipping ₹999+" },
+            { icon: Truck, label: "Worldwide Shipping" },
             { icon: ShieldCheck, label: "Secure Payments" },
-            { icon: Sparkles, label: "Handcrafted in India" },
-            { icon: Award, label: "Loved by 10,000+ women" },
+            { icon: Sparkles, label: "Premium Quality" },
+            { icon: Award, label: "Loved Worldwide" },
           ].map((t) => (
             <div key={t.label} className="flex flex-col items-center gap-1.5 md:flex-row md:justify-center md:gap-2">
               <t.icon className="h-4 w-4 text-gold" />
-              <span className="text-[11px] uppercase tracking-[0.16em] text-foreground/80">{t.label}</span>
+              <span className="text-[11px] uppercase tracking-[0.18em] text-foreground/80">{t.label}</span>
             </div>
           ))}
         </div>
@@ -81,47 +90,63 @@ function Home() {
 
       {/* Collections */}
       <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
-        <div className="mb-8 flex items-end justify-between">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-gold">Collections</p>
-            <h2 className="mt-2 font-display text-3xl md:text-4xl">Shop by category</h2>
-          </div>
-          <Link to="/shop" className="hidden text-xs uppercase tracking-[0.18em] hover:text-gold md:inline">
-            View all →
-          </Link>
+        <div className="mb-10 text-center">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-gold">Featured Collections</p>
+          <h2 className="mt-3 font-display text-4xl md:text-5xl">Shop the Universe</h2>
+          <div className="mx-auto mt-4 h-px w-24 gold-line" />
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
-          {COLLECTIONS.map((c, i) => (
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
+          {COLLECTIONS.map((c) => (
             <Link
               key={c.slug}
               to="/collection/$slug"
               params={{ slug: c.slug }}
               className="group relative aspect-[3/4] overflow-hidden rounded-md bg-beige"
             >
-              <img
-                src={`https://images.unsplash.com/photo-${["1611652022419-a9419f74343d","1522335789203-aaa4e1ae2cb6","1583292650898-7d22cd27ca6f","1571513722275-4b41940f54b8"][i]}?w=600&q=80`}
-                alt={c.title}
-                loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-3 text-ivory md:p-4">
-                <p className="text-[10px] uppercase tracking-[0.18em] opacity-80">{c.tag}</p>
-                <h3 className="font-display text-lg md:text-xl">{c.title}</h3>
+              <img src={c.img} alt={c.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-noir/80 via-noir/10 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-4 text-ivory md:p-6">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-gold">{c.tag}</p>
+                <h3 className="mt-1 font-display text-xl md:text-2xl">{c.title}</h3>
+                <span className="mt-2 inline-flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] opacity-0 transition-opacity group-hover:opacity-100">
+                  Explore <ArrowRight className="h-3 w-3" />
+                </span>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Featured products */}
-      <section className="mx-auto max-w-7xl px-4 pb-16 md:pb-24">
-        <div className="mb-8 flex items-end justify-between">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-gold">Bestsellers</p>
-            <h2 className="mt-2 font-display text-3xl md:text-4xl">The everyday icons</h2>
+      {/* Why MIRAVIKA */}
+      <section className="bg-beige">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:py-24">
+          <div className="mb-12 text-center">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-gold">The Miravika Promise</p>
+            <h2 className="mt-3 font-display text-4xl md:text-5xl">Why Miravika</h2>
+            <div className="mx-auto mt-4 h-px w-24 gold-line" />
           </div>
-          <Link to="/shop" className="text-xs uppercase tracking-[0.18em] hover:text-gold">View all →</Link>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+            {WHY.map((w) => (
+              <div key={w.title} className="rounded-md border border-border/60 bg-ivory p-6 text-center transition hover:border-gold">
+                <div className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-gold/40 bg-gold/10">
+                  <w.icon className="h-5 w-5 text-gold" />
+                </div>
+                <h3 className="mt-4 font-display text-lg">{w.title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{w.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Best sellers */}
+      <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
+        <div className="mb-10 flex items-end justify-between">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.28em] text-gold">Best Sellers</p>
+            <h2 className="mt-3 font-display text-3xl md:text-4xl">Loved by our community</h2>
+          </div>
+          <Link to="/shop" className="text-xs uppercase tracking-[0.2em] hover:text-gold">View all →</Link>
         </div>
 
         {isLoading ? (
@@ -131,10 +156,10 @@ function Home() {
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="rounded-md border border-dashed border-border/70 bg-beige/30 p-10 text-center">
-            <h3 className="font-display text-xl">No products yet</h3>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Tell the chat what product to create (name and price) and we'll publish it to your store instantly.
+          <div className="rounded-md border border-dashed border-border/70 bg-beige/50 p-12 text-center">
+            <h3 className="font-display text-xl">Curating your first collection</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              Products will appear here shortly. Tell the chat what to add — e.g. "Create a Magnetic Rose Earring set at ₹799".
             </p>
           </div>
         ) : (
@@ -146,19 +171,70 @@ function Home() {
         )}
       </section>
 
-      {/* Editorial */}
-      <section className="bg-beige/40">
-        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 md:grid-cols-2 md:py-24">
+      {/* Customer reviews (empty state honest) */}
+      <section className="bg-beige">
+        <div className="mx-auto max-w-7xl px-4 py-16 md:py-24">
+          <div className="mb-12 text-center">
+            <p className="text-[11px] uppercase tracking-[0.28em] text-gold">Loved Worldwide</p>
+            <h2 className="mt-3 font-display text-4xl md:text-5xl">Real Women. Real Style.</h2>
+            <div className="mx-auto mt-4 h-px w-24 gold-line" />
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="rounded-md border border-border/60 bg-ivory p-6">
+                <div className="flex items-center gap-1 text-gold">{"★★★★★".split("").map((s, k) => <span key={k}>{s}</span>)}</div>
+                <p className="mt-4 text-sm italic text-muted-foreground">
+                  "No reviews yet — be the first to share your Miravika moment. Tag <span className="text-gold">@miravika</span> on Instagram to be featured."
+                </p>
+                <div className="mt-4 border-t border-border/40 pt-4">
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Awaiting your story</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Video / Instagram showcase */}
+      <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
+        <div className="mb-10 text-center">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-gold">@miravika</p>
+          <h2 className="mt-3 font-display text-4xl md:text-5xl">Follow the Journey</h2>
+          <div className="mx-auto mt-4 h-px w-24 gold-line" />
+        </div>
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-3">
+          {[
+            "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80",
+            "https://images.unsplash.com/photo-1522335789203-aaa4e1ae2cb6?w=600&q=80",
+            "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80",
+            "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?w=600&q=80",
+          ].map((src) => (
+            <a key={src} href="https://instagram.com" target="_blank" rel="noreferrer" className="group relative aspect-square overflow-hidden rounded-md bg-beige">
+              <img src={src} alt="" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <div className="absolute inset-0 flex items-center justify-center bg-noir/40 opacity-0 transition group-hover:opacity-100">
+                <span className="text-xs uppercase tracking-[0.2em] text-ivory">View Reel</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* Brand story */}
+      <section className="bg-noir text-ivory">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-20 md:grid-cols-2 md:py-28">
           <div className="relative aspect-square overflow-hidden rounded-md">
-            <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=900&q=80" alt="MIRAVIKA atelier" className="h-full w-full object-cover" />
+            <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1000&q=80" alt="MIRAVIKA atelier" className="h-full w-full object-cover" />
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-[0.24em] text-gold">The Atelier</p>
-            <h2 className="mt-2 font-display text-3xl md:text-4xl">Small batch. Big love.</h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
-              Every piece is hand-finished by a tiny team of women artisans in Jaipur. We use mulberry silk, French satin and recycled brass — never plastic.
+            <p className="text-[11px] uppercase tracking-[0.28em] text-gold">Our Story</p>
+            <h2 className="mt-3 font-display text-4xl md:text-5xl">A brand built on <em className="not-italic gold-gradient-text">elegance.</em></h2>
+            <p className="mt-6 text-sm leading-relaxed text-ivory/75 md:text-base">
+              Miravika began with a simple idea — that luxury should feel personal, not distant. We travel the world's trend capitals to bring you carefully curated pieces in fashion, beauty and lifestyle, made for every moment of your day.
             </p>
-            <Link to="/about" className="mt-6 inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] hover:text-gold">
+            <p className="mt-4 text-sm leading-relaxed text-ivory/60">
+              From Paris ateliers to New York studios, every product is quality-checked and delivered with love — worldwide.
+            </p>
+            <Link to="/about" className="mt-8 inline-flex items-center gap-2 rounded-full border border-gold px-6 py-3 text-xs uppercase tracking-[0.22em] text-gold hover:bg-gold hover:text-noir">
               Read our story <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>

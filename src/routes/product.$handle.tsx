@@ -159,6 +159,26 @@ function ProductPage() {
             </button>
           </div>
 
+          {/* Marketplace buy options */}
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <a
+              href={`https://www.amazon.com/s?k=${encodeURIComponent(product.title + " Miravika")}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-ivory px-4 py-2.5 text-xs uppercase tracking-[0.18em] hover:border-gold hover:text-gold"
+            >
+              Buy on Amazon
+            </a>
+            <a
+              href={`https://www.flipkart.com/search?q=${encodeURIComponent(product.title + " Miravika")}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex items-center justify-center rounded-full border border-border bg-ivory px-4 py-2.5 text-xs uppercase tracking-[0.18em] hover:border-gold hover:text-gold"
+            >
+              Buy on Flipkart
+            </a>
+          </div>
+
           {/* Trust */}
           <div className="mt-6 grid grid-cols-3 gap-3 rounded-md border border-border/60 bg-beige/30 p-4 text-center">
             <div><Truck className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">Free over ₹999</p></div>

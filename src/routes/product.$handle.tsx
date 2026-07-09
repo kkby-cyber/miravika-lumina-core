@@ -159,25 +159,34 @@ function ProductPage() {
             </button>
           </div>
 
-          {/* Marketplace buy options */}
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <a
-              href={`https://www.amazon.com/s?k=${encodeURIComponent(product.title + " Miravika")}`}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="inline-flex items-center justify-center rounded-full border border-border bg-ivory px-4 py-2.5 text-xs uppercase tracking-[0.18em] hover:border-gold hover:text-gold"
-            >
-              Buy on Amazon
-            </a>
-            <a
-              href={`https://www.flipkart.com/search?q=${encodeURIComponent(product.title + " Miravika")}`}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="inline-flex items-center justify-center rounded-full border border-border bg-ivory px-4 py-2.5 text-xs uppercase tracking-[0.18em] hover:border-gold hover:text-gold"
-            >
-              Buy on Flipkart
-            </a>
-          </div>
+          {/* Marketplace buy options — controlled by Shopify tags: marketplace:amazon|flipkart|meesho */}
+          {(() => {
+            const tags = (product.tags ?? []).map((t) => t.toLowerCase());
+            const marketplaces = [
+              { key: "amazon", label: "Buy on Amazon", url: `https://www.amazon.in/s?k=${encodeURIComponent(product.title + " Miravika")}` },
+              { key: "flipkart", label: "Buy on Flipkart", url: `https://www.flipkart.com/search?q=${encodeURIComponent(product.title + " Miravika")}` },
+              { key: "meesho", label: "Buy on Meesho", url: `https://www.meesho.com/search?q=${encodeURIComponent(product.title + " Miravika")}` },
+            ].filter((m) => tags.includes(`marketplace:${m.key}`) || tags.includes(m.key));
+            if (marketplaces.length === 0) return null;
+            return (
+              <div className="mt-5">
+                <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Also available on</p>
+                <div className={`grid gap-2 ${marketplaces.length === 1 ? "grid-cols-1" : marketplaces.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+                  {marketplaces.map((m) => (
+                    <a
+                      key={m.key}
+                      href={m.url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="inline-flex items-center justify-center rounded-full border border-border bg-ivory px-4 py-2.5 text-[11px] uppercase tracking-[0.18em] hover:border-gold hover:text-gold"
+                    >
+                      {m.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Trust */}
           <div className="mt-6 grid grid-cols-3 gap-3 rounded-md border border-border/60 bg-beige/30 p-4 text-center">

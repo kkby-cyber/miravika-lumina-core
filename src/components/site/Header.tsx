@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Heart, Menu, Search, ShoppingBag, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import {
@@ -26,9 +26,27 @@ export function Header() {
   const setOpen = useCartStore((s) => s.setOpen);
   const wishlistCount = useWishlistStore((s) => s.handles.length);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isHome = pathname === "/";
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const transparent = isHome && !scrolled;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-ivory/90 backdrop-blur-md">
+    <header
+      className={`sticky top-0 z-40 transition-all duration-300 ${
+        transparent
+          ? "border-b border-transparent bg-transparent"
+          : "border-b border-border/60 bg-ivory/95 backdrop-blur-md"
+      }`}
+    >
       <div className="bg-noir text-ivory">
         <p className="mx-auto max-w-7xl px-4 py-1.5 text-center text-[11px] tracking-[0.2em] uppercase">
           Worldwide Shipping · Free Delivery Over ₹999 / $49 · COD in India

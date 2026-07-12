@@ -16,6 +16,9 @@ export interface ShopifyProduct {
     priceRange: {
       minVariantPrice: { amount: string; currencyCode: string };
     };
+    compareAtPriceRange?: {
+      minVariantPrice: { amount: string; currencyCode: string };
+    };
     images: {
       edges: Array<{ node: { url: string; altText: string | null } }>;
     };
@@ -25,6 +28,7 @@ export interface ShopifyProduct {
           id: string;
           title: string;
           price: { amount: string; currencyCode: string };
+          compareAtPrice?: { amount: string; currencyCode: string } | null;
           availableForSale: boolean;
           selectedOptions: Array<{ name: string; value: string }>;
         };
@@ -56,43 +60,75 @@ export async function storefrontApiRequest(query: string, variables: Record<stri
   return data;
 }
 
+const PRODUCT_FIELDS = `
+  id title description handle productType tags
+  priceRange { minVariantPrice { amount currencyCode } }
+  compareAtPriceRange { minVariantPrice { amount currencyCode } }
+  images(first: 8) { edges { node { url altText } } }
+  variants(first: 20) {
+    edges {
+      node {
+        id title
+        price { amount currencyCode }
+        compareAtPrice { amount currencyCode }
+        availableForSale
+        selectedOptions { name value }
+      }
+    }
+  }
+  options { name values }
+`;
+
 export const PRODUCTS_QUERY = `
   query GetProducts($first: Int!, $query: String) {
     products(first: $first, query: $query) {
-      edges {
-        node {
-          id title description handle productType tags
-          priceRange { minVariantPrice { amount currencyCode } }
-          images(first: 5) { edges { node { url altText } } }
-          variants(first: 20) {
-            edges { node { id title price { amount currencyCode } availableForSale selectedOptions { name value } } }
-          }
-          options { name values }
-        }
-      }
+      edges { node { ${PRODUCT_FIELDS} } }
     }
   }
 `;
 
 export const PRODUCT_BY_HANDLE_QUERY = `
   query GetProduct($handle: String!) {
-    product(handle: $handle) {
-      id title description handle productType tags
-      priceRange { minVariantPrice { amount currencyCode } }
-      images(first: 10) { edges { node { url altText } } }
-      variants(first: 20) {
-        edges { node { id title price { amount currencyCode } availableForSale selectedOptions { name value } } }
+    product(handle: $handle) { ${PRODUCT_FIELDS} }
+  }
+`;
+
+export const COLLECTION_PRODUCTS_QUERY = `
+  query GetCollection($handle: String!, $first: Int!) {
+    collection(handle: $handle) {
+      id
+      handle
+      title
+      description
+      image { url altText }
+      products(first: $first) {
+        edges { node { ${PRODUCT_FIELDS} } }
       }
-      options { name values }
     }
   }
 `;
 
 export function formatPrice(amount: string | number, currency = "INR") {
   const n = typeof amount === "string" ? parseFloat(amount) : amount;
+  const locale = currency === "INR" ? "en-IN" : "en-US";
   try {
-    return new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(n);
+    return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(n);
   } catch {
     return `${currency} ${n.toFixed(0)}`;
   }
+}
+
+/** Map legacy / friendly slugs → real Shopify collection handles */
+export const COLLECTION_SLUG_MAP: Record<string, string> = {
+  "magnetic-earrings": "jewelry-accessories",
+  "fashion-accessories": "womens-fashion",
+  "beauty-accessories": "beauty-personal-care",
+  "hair-accessories": "jewelry-accessories",
+  "home-decor": "home-kitchen",
+  luxury: "best-sellers",
+  bags: "womens-fashion",
+};
+
+export function resolveCollectionHandle(slug: string) {
+  return COLLECTION_SLUG_MAP[slug] ?? slug;
 }

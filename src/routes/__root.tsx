@@ -80,18 +80,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#F8F4EC" },
-      { title: "MIRAVIKA — Handcrafted Hair Accessories" },
-      { name: "description", content: "MIRAVIKA — premium handcrafted hair scrunchies, bows, clips and bands. Designed in India. Free shipping over ₹999. COD available." },
+      { name: "theme-color", content: "#111111" },
+      { title: "MIRAVIKA — Luxury Redefined" },
+      { name: "description", content: "MIRAVIKA — a premium international lifestyle house of fashion, jewelry, beauty and home essentials. Worldwide shipping. Cash on Delivery in India." },
       { name: "author", content: "MIRAVIKA" },
-      { property: "og:title", content: "MIRAVIKA — Handcrafted Hair Accessories" },
-      { property: "og:description", content: "MIRAVIKA — premium handcrafted hair scrunchies, bows, clips and bands. Designed in India. Free shipping over ₹999. COD available." },
+      { property: "og:site_name", content: "MIRAVIKA" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "MIRAVIKA — Handcrafted Hair Accessories" },
-      { name: "twitter:description", content: "MIRAVIKA — premium handcrafted hair scrunchies, bows, clips and bands. Designed in India. Free shipping over ₹999. COD available." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/65e789b5-b8db-48da-9fd6-895abadef62f/id-preview-19ed9332--17339b95-59ed-4508-9bdd-97f019c3b515.lovable.app-1782199158503.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/65e789b5-b8db-48da-9fd6-895abadef62f/id-preview-19ed9332--17339b95-59ed-4508-9bdd-97f019c3b515.lovable.app-1782199158503.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -100,6 +95,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "MIRAVIKA",
+          url: "https://miravika-lumina-core.lovable.app/",
+          sameAs: ["https://instagram.com/miravika", "https://facebook.com/miravika"],
+        }),
       },
     ],
   }),

@@ -76,12 +76,13 @@ export function Footer() {
           <div className="md:col-span-2">
             <img src={logoAsset.url} alt="MIRAVIKA" className="h-14 w-auto brightness-110" />
             <p className="mt-4 max-w-sm text-sm text-ivory/70">
-              A premium lifestyle brand — fashion, jewelry, beauty and home essentials, carefully curated for the modern global woman.
+              A premium global lifestyle brand — fashion, jewelry, beauty, home and lifestyle essentials, thoughtfully curated for the modern customer. Worldwide shipping.
             </p>
             <div className="mt-5 flex items-center gap-2">
               {[
-                { Icon: Instagram, href: "https://instagram.com/miravika", label: "Instagram" },
+                { Icon: Instagram, href: "https://instagram.com/miravika.india", label: "Instagram @miravika.india" },
                 { Icon: Facebook, href: "https://facebook.com/miravika", label: "Facebook" },
+                { Icon: PinterestIcon, href: "https://pinterest.com/miravika", label: "Pinterest" },
                 { Icon: MessageCircle, href: "https://wa.me/", label: "WhatsApp" },
                 { Icon: Mail, href: "mailto:hello@miravika.com", label: "Email" },
               ].map(({ Icon, href, label }) => (

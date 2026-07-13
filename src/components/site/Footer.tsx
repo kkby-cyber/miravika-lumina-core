@@ -4,6 +4,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import logoAsset from "@/assets/miravika-logo.png.asset.json";
 
+// Pinterest icon (lucide doesn't include it in the default export)
+const PinterestIcon = ({ className, strokeWidth = 1.5 }: { className?: string; strokeWidth?: number }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M8 20l4-9" />
+    <path d="M10 13c.5 1 1.5 1.5 2.5 1.5 2.5 0 4-2 4-4.5S14.8 6 12 6 8 8 8 10c0 1 .5 2 1.5 2.5" />
+  </svg>
+);
+
 const TRUST = [
   { icon: Truck, title: "Free Worldwide Shipping", sub: "On orders ₹2999+ / $49+" },
   { icon: Undo2, title: "Easy 7-Day Returns", sub: "No questions asked" },

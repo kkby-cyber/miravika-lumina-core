@@ -4,6 +4,15 @@ import { useState } from "react";
 import { toast } from "sonner";
 import logoAsset from "@/assets/miravika-logo.png.asset.json";
 
+// Pinterest icon (lucide doesn't include it in the default export)
+const PinterestIcon = ({ className, strokeWidth = 1.5 }: { className?: string; strokeWidth?: number }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M8 20l4-9" />
+    <path d="M10 13c.5 1 1.5 1.5 2.5 1.5 2.5 0 4-2 4-4.5S14.8 6 12 6 8 8 8 10c0 1 .5 2 1.5 2.5" />
+  </svg>
+);
+
 const TRUST = [
   { icon: Truck, title: "Free Worldwide Shipping", sub: "On orders ₹2999+ / $49+" },
   { icon: Undo2, title: "Easy 7-Day Returns", sub: "No questions asked" },
@@ -67,12 +76,13 @@ export function Footer() {
           <div className="md:col-span-2">
             <img src={logoAsset.url} alt="MIRAVIKA" className="h-14 w-auto brightness-110" />
             <p className="mt-4 max-w-sm text-sm text-ivory/70">
-              A premium lifestyle brand — fashion, jewelry, beauty and home essentials, carefully curated for the modern global woman.
+              A premium global lifestyle brand — fashion, jewelry, beauty, home and lifestyle essentials, thoughtfully curated for the modern customer. Worldwide shipping.
             </p>
             <div className="mt-5 flex items-center gap-2">
               {[
-                { Icon: Instagram, href: "https://instagram.com/miravika", label: "Instagram" },
+                { Icon: Instagram, href: "https://instagram.com/miravika.india", label: "Instagram @miravika.india" },
                 { Icon: Facebook, href: "https://facebook.com/miravika", label: "Facebook" },
+                { Icon: PinterestIcon, href: "https://pinterest.com/miravika", label: "Pinterest" },
                 { Icon: MessageCircle, href: "https://wa.me/", label: "WhatsApp" },
                 { Icon: Mail, href: "mailto:hello@miravika.com", label: "Email" },
               ].map(({ Icon, href, label }) => (

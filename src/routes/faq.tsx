@@ -17,7 +17,7 @@ const SECTIONS: { heading: string; items: [string, string][] }[] = [
     heading: "Orders",
     items: [
       ["How do I place an order?", "Add items to your bag, proceed to secure checkout, enter your shipping details and choose your preferred payment method. You'll receive an order confirmation by email and, in India, by WhatsApp."],
-      ["Can I modify or cancel my order?", "Reach us within 2 hours of placing your order at hello@miravika.com. Once dispatched, orders cannot be modified but can be returned per our return policy."],
+      ["Can I modify or cancel my order?", "Reach us within 2 hours of placing your order at support@miravika.com. Once dispatched, orders cannot be modified but can be returned per our return policy."],
       ["How do I know my order was successful?", "You'll receive an order confirmation email within minutes. If you don't, please check your spam folder or write to us with your registered email."],
       ["Do you offer gift wrapping?", "Yes — most items ship in our signature MIRAVIKA packaging. Add a gift note at checkout and we'll take care of the rest."],
     ],
@@ -44,7 +44,7 @@ const SECTIONS: { heading: string; items: [string, string][] }[] = [
     heading: "Returns & Refunds",
     items: [
       ["What is your return policy?", "We offer easy 7-day returns on unused items in their original packaging. Some categories (e.g. beauty, innerwear, personalised items) are non-returnable for hygiene and safety reasons."],
-      ["How do I initiate a return?", "Write to hello@miravika.com with your order number and reason. Our team will confirm eligibility and schedule a reverse pickup where available."],
+      ["How do I initiate a return?", "Write to support@miravika.com with your order number and reason. Our team will confirm eligibility and schedule a reverse pickup where available."],
       ["When will I receive my refund?", "Refunds are processed within 5–7 business days of the return being received and inspected. Bank credit timelines vary by method."],
       ["Can I exchange an item?", "Yes — exchanges for size or colour are supported on eligible items, subject to stock availability."],
     ],
@@ -61,7 +61,7 @@ const SECTIONS: { heading: string; items: [string, string][] }[] = [
     heading: "Account & Support",
     items: [
       ["Do I need an account to shop?", "No — guest checkout is available. Creating an account lets you track orders, save addresses and manage your wishlist."],
-      ["How do I contact customer care?", "Email hello@miravika.com, message us on Instagram @miravika.india, or reach us via the Contact page. We reply within 24 hours, Monday to Saturday."],
+      ["How do I contact customer care?", "Email support@miravika.com, message us on Instagram @miravika.india, or reach us via the Contact page. We reply within 24 hours, Monday to Saturday."],
       ["Do you have a physical store?", "MIRAVIKA is online-first and ships worldwide from our fulfilment partners."],
     ],
   },
@@ -74,7 +74,7 @@ function FAQ() {
       <h1 className="mt-3 font-display text-4xl md:text-5xl">Frequently asked</h1>
       <p className="mt-3 max-w-xl text-sm text-muted-foreground">
         Everything you need to know about shopping with MIRAVIKA. Can't find your answer? Write to us at{" "}
-        <a href="mailto:hello@miravika.com" className="text-foreground underline underline-offset-4">hello@miravika.com</a>.
+        <a href="mailto:support@miravika.com" className="text-foreground underline underline-offset-4">support@miravika.com</a>.
       </p>
       <div className="mt-10 space-y-10">
         {SECTIONS.map((section) => (

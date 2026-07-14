@@ -45,7 +45,7 @@ function Track() {
       <div className="mt-8 rounded-md border border-border/60 bg-ivory p-5 text-sm">
         <p className="font-medium">Need help with your order?</p>
         <div className="mt-3 flex flex-col gap-2 text-muted-foreground sm:flex-row sm:gap-6">
-          <a href="mailto:hello@miravika.com" className="flex items-center gap-2 hover:text-foreground"><Mail className="h-4 w-4 text-gold" /> hello@miravika.com</a>
+          <a href="mailto:support@miravika.com" className="flex items-center gap-2 hover:text-foreground"><Mail className="h-4 w-4 text-gold" /> support@miravika.com</a>
           <a href="https://wa.me/" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-foreground"><MessageCircle className="h-4 w-4 text-gold" /> Chat on WhatsApp</a>
         </div>
         <p className="mt-4 text-xs text-muted-foreground">

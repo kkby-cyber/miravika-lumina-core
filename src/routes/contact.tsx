@@ -51,7 +51,7 @@ function Contact() {
 
       <div className="mt-12 grid gap-10 md:grid-cols-2">
         <div className="space-y-5 text-sm">
-          <ContactRow icon={Mail} title="Email" value="hello@miravika.com" href="mailto:hello@miravika.com" />
+          <ContactRow icon={Mail} title="Email" value="support@miravika.com" href="mailto:support@miravika.com" />
           <ContactRow icon={MessageCircle} title="WhatsApp" value="Fastest replies — chat with us on WhatsApp" href="https://wa.me/" />
           <ContactRow icon={Instagram} title="Instagram" value="@miravika.india" href="https://instagram.com/miravika.india" />
           <ContactRow icon={Clock} title="Business hours" value="Mon–Sat · 10:00–18:00 IST" />

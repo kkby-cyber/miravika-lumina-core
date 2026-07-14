@@ -48,7 +48,7 @@ export const Route = createFileRoute("/terms")({
       </p>
       <h2>Contact</h2>
       <p>
-        Questions about these terms? Email <a href="mailto:hello@miravika.com">hello@miravika.com</a>.
+        Questions about these terms? Email <a href="mailto:support@miravika.com">support@miravika.com</a>.
       </p>
     </PolicyPage>
   ),

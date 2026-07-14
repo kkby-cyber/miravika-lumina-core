@@ -37,7 +37,7 @@ export const Route = createFileRoute("/shipping-policy")({
       </p>
       <h2>Lost or delayed shipments</h2>
       <p>
-        If your order hasn't arrived within the estimated timeline, please write to <a href="mailto:hello@miravika.com">hello@miravika.com</a> with your order number and we'll investigate immediately.
+        If your order hasn't arrived within the estimated timeline, please write to <a href="mailto:support@miravika.com">support@miravika.com</a> with your order number and we'll investigate immediately.
       </p>
     </PolicyPage>
   ),

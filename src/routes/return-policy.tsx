@@ -17,7 +17,7 @@ export const Route = createFileRoute("/return-policy")({
       </p>
       <h2>How to request a return</h2>
       <p>
-        Email <a href="mailto:hello@miravika.com">hello@miravika.com</a> with your order number and reason for return. Our team will confirm eligibility, share return instructions and — where serviceable — schedule a reverse pickup at no extra cost.
+        Email <a href="mailto:support@miravika.com">support@miravika.com</a> with your order number and reason for return. Our team will confirm eligibility, share return instructions and — where serviceable — schedule a reverse pickup at no extra cost.
       </p>
       <h2>Refunds</h2>
       <p>

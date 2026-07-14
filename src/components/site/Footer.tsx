@@ -84,7 +84,7 @@ export function Footer() {
                 { Icon: Facebook, href: "https://facebook.com/miravika", label: "Facebook" },
                 { Icon: PinterestIcon, href: "https://pinterest.com/miravika", label: "Pinterest" },
                 { Icon: MessageCircle, href: "https://wa.me/", label: "WhatsApp" },
-                { Icon: Mail, href: "mailto:hello@miravika.com", label: "Email" },
+                { Icon: Mail, href: "mailto:support@miravika.com", label: "Email" },
               ].map(({ Icon, href, label }) => (
                 <a
                   key={label}

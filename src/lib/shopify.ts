@@ -127,6 +127,17 @@ export const COLLECTION_SLUG_MAP: Record<string, string> = {
   "home-decor": "home-kitchen",
   luxury: "best-sellers",
   bags: "womens-fashion",
+  scrunchies: "jewelry-accessories",
+  bows: "jewelry-accessories",
+  clips: "jewelry-accessories",
+  bands: "jewelry-accessories",
+  accessories: "jewelry-accessories",
+  tech: "electronics-accessories",
+  electronics: "electronics-accessories",
+  women: "womens-fashion",
+  fashion: "womens-fashion",
+  beauty: "beauty-personal-care",
+  home: "home-kitchen",
 };
 
 export function resolveCollectionHandle(slug: string) {

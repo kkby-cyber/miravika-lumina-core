@@ -2,7 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/thank-you")({
-  head: () => ({ meta: [{ title: "Thank You — MIRAVIKA" }] }),
+  head: () => ({
+    meta: [
+      { title: "Thank You — MIRAVIKA" },
+      { name: "description", content: "Your MIRAVIKA order has been received. Watch your inbox for tracking updates." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: ThankYou,
 });
 

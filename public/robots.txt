@@ -1,2 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /cart
+Disallow: /wishlist
+Disallow: /account
+Disallow: /thank-you
+Disallow: /search
+
+Sitemap: https://miravika-lumina-core.lovable.app/sitemap.xml

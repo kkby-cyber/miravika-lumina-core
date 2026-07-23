@@ -35,10 +35,13 @@ function Contact() {
       return;
     }
     setSubmitting(true);
-    const text = `Name: ${r.data.name}%0AEmail: ${r.data.email}%0ASubject: ${r.data.subject ?? "General"}%0A%0A${encodeURIComponent(r.data.message)}`;
-    window.open(`https://wa.me/?text=${text}`, "_blank");
+    const subject = encodeURIComponent(r.data.subject || `MIRAVIKA enquiry — ${r.data.name}`);
+    const body = encodeURIComponent(
+      `Name: ${r.data.name}\nEmail: ${r.data.email}\n\n${r.data.message}`,
+    );
+    window.location.href = `mailto:support@miravika.com?subject=${subject}&body=${body}`;
     setSubmitting(false);
-    toast.success("Opening WhatsApp — we'll take it from here");
+    toast.success("Opening your mail app — we reply within 24 hours");
   };
 
   return (

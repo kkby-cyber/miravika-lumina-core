@@ -17,16 +17,45 @@ import {
 } from "@/components/ui/accordion";
 import { useProducts } from "@/hooks/useProducts";
 
+function titleCase(s: string) {
+  return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export const Route = createFileRoute("/product/$handle")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.handle.replace(/-/g, " ")} — MIRAVIKA` },
-      { name: "description", content: "Handcrafted luxury piece by MIRAVIKA. Worldwide shipping. Easy returns." },
-      { property: "og:url", content: `https://miravika-lumina-core.lovable.app/product/${params.handle}` },
-      { property: "og:type", content: "product" },
-    ],
-    links: [{ rel: "canonical", href: `https://miravika-lumina-core.lovable.app/product/${params.handle}` }],
-  }),
+  head: ({ params }) => {
+    const readable = titleCase(params.handle);
+    const url = `https://miravika-lumina-core.lovable.app/product/${params.handle}`;
+    // Unique description per product handle so no two PDPs share the same meta description
+    const description = `Shop ${readable} at MIRAVIKA — a curated piece from our premium global lifestyle edit. Worldwide shipping, 7-day easy returns and Cash on Delivery across India.`;
+    return {
+      meta: [
+        { title: `${readable} | MIRAVIKA` },
+        { name: "description", content: description },
+        { property: "og:title", content: `${readable} — MIRAVIKA` },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "product" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: `${readable} — MIRAVIKA` },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://miravika-lumina-core.lovable.app/" },
+              { "@type": "ListItem", position: 2, name: "Shop", item: "https://miravika-lumina-core.lovable.app/shop" },
+              { "@type": "ListItem", position: 3, name: readable, item: url },
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: ProductPage,
 });
 
@@ -146,29 +175,67 @@ function ProductPage() {
   const related = (bestSellers?.products ?? recentProducts).filter((p) => p.node.handle !== handle).slice(0, 4);
   const fbt = related.slice(0, 3);
 
-  // JSON-LD Product schema
+  // GMC / Performance Max friendly Product schema (rendered at document head via useEffect below)
+  const priceValidUntil = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().slice(0, 10);
+  })();
   const productJsonLd = {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: product.title,
-    description: product.description?.slice(0, 500),
+    description: (product.description || "A signature MIRAVIKA piece — premium materials, considered design.").slice(0, 5000),
     image: images.map((i) => i.node.url),
-    sku: variant?.id,
+    sku: variant?.id?.split("/").pop() ?? handle,
+    mpn: handle,
+    productID: `shopify_IN_${handle}`,
     brand: { "@type": "Brand", name: "MIRAVIKA" },
+    category: product.productType ?? "Fashion & Lifestyle",
+    url: `https://miravika-lumina-core.lovable.app/product/${handle}`,
     offers: {
       "@type": "Offer",
       priceCurrency: variant?.price.currencyCode ?? "INR",
-      price: priceAmt,
+      price: priceAmt.toFixed(2),
+      priceValidUntil,
+      itemCondition: "https://schema.org/NewCondition",
       availability: variant?.availableForSale
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
       url: `https://miravika-lumina-core.lovable.app/product/${handle}`,
+      seller: { "@type": "Organization", name: "MIRAVIKA" },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "IN",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "0",
+          currency: variant?.price.currencyCode ?? "INR",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "IN",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 2, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 7, unitCode: "DAY" },
+        },
+      },
     },
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+
 
       <div className="mx-auto max-w-7xl px-4 py-6 pb-24 md:py-12 md:pb-16">
         {/* Breadcrumb */}

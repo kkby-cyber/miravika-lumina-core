@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "https://miravika-lumina-core.lovable.app/" },
-      { rel: "preload", as: "image", href: heroChampagne.url, fetchpriority: "high" },
+      { rel: "preload", as: "image", href: heroChampagne.url, fetchPriority: "high" },
     ],
     scripts: [
       {
@@ -354,7 +354,7 @@ function Home() {
           {[streetBeige.url, jewelry.url, emerald.url, corridor.url, cream.url, heroBoutique.url, streetScarf.url, heroBlackGold.url].map((src, i) => (
             <a
               key={src + i}
-              href="https://instagram.com/miravika"
+              href="https://instagram.com/miravika.india"
               target="_blank"
               rel="noreferrer"
               className={`group relative overflow-hidden rounded-md bg-beige ${i > 3 ? "hidden md:block" : ""} aspect-square`}

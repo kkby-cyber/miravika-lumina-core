@@ -23,15 +23,50 @@ export const Route = createFileRoute("/collection/$slug")({
   head: ({ params }) => {
     const handle = resolveCollectionHandle(params.slug);
     const copy = HANDLE_COPY[handle] ?? { title: params.slug.replace(/-/g, " "), sub: "Curated by Miravika." };
+    // Canonicalize to the resolved handle so legacy slug variants never create duplicate content
+    const canonical = `https://miravika-lumina-core.lovable.app/collection/${handle}`;
     return {
       meta: [
-        { title: `${copy.title} — MIRAVIKA` },
+        { title: `${copy.title} — Shop the Edit | MIRAVIKA` },
         { name: "description", content: copy.sub },
         { property: "og:title", content: `${copy.title} — MIRAVIKA` },
         { property: "og:description", content: copy.sub },
-        { property: "og:url", content: `https://miravika-lumina-core.lovable.app/collection/${params.slug}` },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: canonical },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: `${copy.title} — MIRAVIKA` },
+        { name: "twitter:description", content: copy.sub },
       ],
-      links: [{ rel: "canonical", href: `https://miravika-lumina-core.lovable.app/collection/${params.slug}` }],
+      links: [{ rel: "canonical", href: canonical }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://miravika-lumina-core.lovable.app/" },
+              { "@type": "ListItem", position: 2, name: "Shop", item: "https://miravika-lumina-core.lovable.app/shop" },
+              { "@type": "ListItem", position: 3, name: copy.title, item: canonical },
+            ],
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: `${copy.title} — MIRAVIKA`,
+            description: copy.sub,
+            url: canonical,
+            isPartOf: {
+              "@type": "WebSite",
+              name: "MIRAVIKA",
+              url: "https://miravika-lumina-core.lovable.app/",
+            },
+          }),
+        },
+      ],
     };
   },
   component: CollectionPage,

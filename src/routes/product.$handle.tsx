@@ -175,29 +175,67 @@ function ProductPage() {
   const related = (bestSellers?.products ?? recentProducts).filter((p) => p.node.handle !== handle).slice(0, 4);
   const fbt = related.slice(0, 3);
 
-  // JSON-LD Product schema
+  // GMC / Performance Max friendly Product schema (rendered at document head via useEffect below)
+  const priceValidUntil = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().slice(0, 10);
+  })();
   const productJsonLd = {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: product.title,
-    description: product.description?.slice(0, 500),
+    description: (product.description || "A signature MIRAVIKA piece — premium materials, considered design.").slice(0, 5000),
     image: images.map((i) => i.node.url),
-    sku: variant?.id,
+    sku: variant?.id?.split("/").pop() ?? handle,
+    mpn: handle,
+    productID: `shopify_IN_${handle}`,
     brand: { "@type": "Brand", name: "MIRAVIKA" },
+    category: product.productType ?? "Fashion & Lifestyle",
+    url: `https://miravika-lumina-core.lovable.app/product/${handle}`,
     offers: {
       "@type": "Offer",
       priceCurrency: variant?.price.currencyCode ?? "INR",
-      price: priceAmt,
+      price: priceAmt.toFixed(2),
+      priceValidUntil,
+      itemCondition: "https://schema.org/NewCondition",
       availability: variant?.availableForSale
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
       url: `https://miravika-lumina-core.lovable.app/product/${handle}`,
+      seller: { "@type": "Organization", name: "MIRAVIKA" },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "IN",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "0",
+          currency: variant?.price.currencyCode ?? "INR",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "IN",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 2, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 7, unitCode: "DAY" },
+        },
+      },
     },
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+
 
       <div className="mx-auto max-w-7xl px-4 py-6 pb-24 md:py-12 md:pb-16">
         {/* Breadcrumb */}

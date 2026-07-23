@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const [busy, setBusy] = useState(false);
   const wished = useWishlistStore((s) => s.has(p.handle));
   const toggleWish = useWishlistStore((s) => s.toggle);
+  const navigate = useNavigate();
 
   const compareAmt = variant?.compareAtPrice?.amount
     ? parseFloat(variant.compareAtPrice.amount)
@@ -34,8 +35,8 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
     e.stopPropagation();
     if (!variant) return;
     if (hasVariants) {
-      // Direct to PDP for variant selection
-      window.location.href = `/product/${p.handle}`;
+      // Direct to PDP for variant selection (SPA nav, preserves scroll & preload)
+      navigate({ to: "/product/$handle", params: { handle: p.handle } });
       return;
     }
     setBusy(true);
@@ -51,6 +52,7 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
     toast.success("Added to bag", { position: "top-center" });
     setOpen(true);
   };
+
 
   return (
     <Link to="/product/$handle" params={{ handle: p.handle }} className="group block">

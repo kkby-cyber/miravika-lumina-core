@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [
       { rel: "canonical", href: "https://miravika-lumina-core.lovable.app/" },
-      { rel: "preload", as: "image", href: heroChampagne.url, fetchpriority: "high" },
+      { rel: "preload", as: "image", href: heroChampagne.url, fetchPriority: "high" },
     ],
     scripts: [
       {

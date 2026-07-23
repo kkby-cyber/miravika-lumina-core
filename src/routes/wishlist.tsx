@@ -5,7 +5,13 @@ import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/site/ProductCard";
 
 export const Route = createFileRoute("/wishlist")({
-  head: () => ({ meta: [{ title: "Wishlist — MIRAVIKA" }] }),
+  head: () => ({
+    meta: [
+      { title: "Your Wishlist — MIRAVIKA" },
+      { name: "description", content: "The MIRAVIKA pieces you've saved for later." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: Wishlist,
 });
 

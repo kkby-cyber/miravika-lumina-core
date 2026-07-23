@@ -17,16 +17,45 @@ import {
 } from "@/components/ui/accordion";
 import { useProducts } from "@/hooks/useProducts";
 
+function titleCase(s: string) {
+  return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export const Route = createFileRoute("/product/$handle")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.handle.replace(/-/g, " ")} — MIRAVIKA` },
-      { name: "description", content: "Handcrafted luxury piece by MIRAVIKA. Worldwide shipping. Easy returns." },
-      { property: "og:url", content: `https://miravika-lumina-core.lovable.app/product/${params.handle}` },
-      { property: "og:type", content: "product" },
-    ],
-    links: [{ rel: "canonical", href: `https://miravika-lumina-core.lovable.app/product/${params.handle}` }],
-  }),
+  head: ({ params }) => {
+    const readable = titleCase(params.handle);
+    const url = `https://miravika-lumina-core.lovable.app/product/${params.handle}`;
+    // Unique description per product handle so no two PDPs share the same meta description
+    const description = `Shop ${readable} at MIRAVIKA — a curated piece from our premium global lifestyle edit. Worldwide shipping, 7-day easy returns and Cash on Delivery across India.`;
+    return {
+      meta: [
+        { title: `${readable} | MIRAVIKA` },
+        { name: "description", content: description },
+        { property: "og:title", content: `${readable} — MIRAVIKA` },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "product" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: `${readable} — MIRAVIKA` },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://miravika-lumina-core.lovable.app/" },
+              { "@type": "ListItem", position: 2, name: "Shop", item: "https://miravika-lumina-core.lovable.app/shop" },
+              { "@type": "ListItem", position: 3, name: readable, item: url },
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: ProductPage,
 });
 

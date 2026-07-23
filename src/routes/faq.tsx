@@ -2,13 +2,44 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/faq")({
-  head: () => ({
-    meta: [
-      { title: "FAQs — MIRAVIKA Customer Care" },
-      { name: "description", content: "Answers to common questions about MIRAVIKA orders, shipping, returns, payments and product care." },
-    ],
-    links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/faq" }],
-  }),
+  head: () => {
+    const allQAs = SECTIONS.flatMap((s) => s.items);
+    return {
+      meta: [
+        { title: "FAQs — Shipping, Returns & Payments | MIRAVIKA" },
+        { name: "description", content: "Answers to common questions about MIRAVIKA orders, shipping, returns, payments and product care." },
+        { property: "og:title", content: "MIRAVIKA — Customer Care FAQs" },
+        { property: "og:description", content: "Everything you need to know about shopping with MIRAVIKA." },
+        { property: "og:url", content: "https://miravika-lumina-core.lovable.app/faq" },
+      ],
+      links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/faq" }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: allQAs.map(([q, a]) => ({
+              "@type": "Question",
+              name: q,
+              acceptedAnswer: { "@type": "Answer", text: a },
+            })),
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://miravika-lumina-core.lovable.app/" },
+              { "@type": "ListItem", position: 2, name: "FAQs", item: "https://miravika-lumina-core.lovable.app/faq" },
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: FAQ,
 });
 

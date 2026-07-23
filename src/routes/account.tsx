@@ -3,7 +3,13 @@ import { ExternalLink, Package, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/account")({
-  head: () => ({ meta: [{ title: "Account — MIRAVIKA" }] }),
+  head: () => ({
+    meta: [
+      { title: "Your Account — MIRAVIKA" },
+      { name: "description", content: "Access your MIRAVIKA account — orders, addresses, wishlist and reorders in one secure place." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: Account,
 });
 

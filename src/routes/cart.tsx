@@ -5,7 +5,13 @@ import { formatPrice } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Cart — MIRAVIKA" }] }),
+  head: () => ({
+    meta: [
+      { title: "Your Bag — MIRAVIKA" },
+      { name: "description", content: "Review the items in your MIRAVIKA shopping bag and proceed to secure checkout." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: CartPage,
 });
 

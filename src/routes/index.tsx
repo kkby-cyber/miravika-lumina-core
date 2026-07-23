@@ -354,7 +354,7 @@ function Home() {
           {[streetBeige.url, jewelry.url, emerald.url, corridor.url, cream.url, heroBoutique.url, streetScarf.url, heroBlackGold.url].map((src, i) => (
             <a
               key={src + i}
-              href="https://instagram.com/miravika"
+              href="https://instagram.com/miravika.india"
               target="_blank"
               rel="noreferrer"
               className={`group relative overflow-hidden rounded-md bg-beige ${i > 3 ? "hidden md:block" : ""} aspect-square`}

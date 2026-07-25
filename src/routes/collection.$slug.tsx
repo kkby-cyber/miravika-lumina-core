@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useCollection, useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/site/ProductCard";
 import { resolveCollectionHandle } from "@/lib/shopify";
 import type { ShopifyProduct } from "@/lib/shopify";
+import { itemFromProduct, trackViewItemList } from "@/lib/analytics";
 
 // Fallback friendly copy for known handles
 const HANDLE_COPY: Record<string, { title: string; sub: string }> = {
@@ -113,6 +114,16 @@ function CollectionPage() {
     if (sort === "title") arr.sort((a, b) => a.node.title.localeCompare(b.node.title));
     return arr;
   }, [source, sort, band, inStock]);
+
+  useEffect(() => {
+    if (!filtered.length) return;
+    trackViewItemList(
+      filtered.slice(0, 24).map((p, i) => itemFromProduct(p.node, { index: i })),
+      handle,
+      copy.title,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handle, filtered.length]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-12">

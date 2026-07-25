@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sheet";
 import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/shopify";
+import { itemFromProduct, trackBeginCheckout, trackViewCart } from "@/lib/analytics";
 
 const FREE_SHIP_INR = 2999;
 const FREE_SHIP_USD = 49;
@@ -23,13 +24,23 @@ export function CartDrawer() {
   const remaining = Math.max(0, threshold - total);
   const progress = Math.min(100, (total / threshold) * 100);
 
+  const ga4Items = () =>
+    items.map((i, idx) =>
+      itemFromProduct(i.product.node, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx }),
+    );
+
   useEffect(() => {
-    if (isOpen) syncCart();
+    if (isOpen) {
+      syncCart();
+      if (items.length) trackViewCart(ga4Items(), currency);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, syncCart]);
 
   const checkout = () => {
     const url = getCheckoutUrl();
     if (url) {
+      trackBeginCheckout(ga4Items(), currency);
       window.open(url, "_blank");
       setOpen(false);
     }

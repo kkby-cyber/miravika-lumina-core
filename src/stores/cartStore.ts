@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { storefrontApiRequest, type ShopifyProduct } from "@/lib/shopify";
+import { itemFromProduct, trackAddToCart, trackRemoveFromCart } from "@/lib/analytics";
 
 export interface CartItem {
   lineId: string | null;
@@ -102,25 +103,39 @@ export const useCartStore = create<CartStore>()(
         const { items, cartId, clearCart } = get();
         const existing = items.find((i) => i.variantId === item.variantId);
         set({ isLoading: true });
+        let added = false;
         try {
           if (!cartId) {
             const r = await createShopifyCart({ ...item, lineId: null });
-            if (r) set({ cartId: r.cartId, checkoutUrl: r.checkoutUrl, items: [{ ...item, lineId: r.lineId ?? null }] });
+            if (r) {
+              set({ cartId: r.cartId, checkoutUrl: r.checkoutUrl, items: [{ ...item, lineId: r.lineId ?? null }] });
+              added = true;
+            }
           } else if (existing) {
             if (!existing.lineId) return;
             const newQ = existing.quantity + item.quantity;
             const r = await updateLine(cartId, existing.lineId, newQ);
-            if (r.success) set({ items: get().items.map((i) => (i.variantId === item.variantId ? { ...i, quantity: newQ } : i)) });
-            else if (r.cartNotFound) clearCart();
+            if (r.success) {
+              set({ items: get().items.map((i) => (i.variantId === item.variantId ? { ...i, quantity: newQ } : i)) });
+              added = true;
+            } else if (r.cartNotFound) clearCart();
           } else {
             const r = await addLine(cartId, { ...item, lineId: null });
-            if (r.success) set({ items: [...get().items, { ...item, lineId: r.lineId ?? null }] });
-            else if (r.cartNotFound) clearCart();
+            if (r.success) {
+              set({ items: [...get().items, { ...item, lineId: r.lineId ?? null }] });
+              added = true;
+            } else if (r.cartNotFound) clearCart();
           }
         } catch (e) {
           console.error(e);
         } finally {
           set({ isLoading: false });
+        }
+        if (added) {
+          trackAddToCart(
+            [itemFromProduct(item.product.node, { variantId: item.variantId, variantTitle: item.variantTitle, price: item.price.amount, quantity: item.quantity })],
+            item.price.currencyCode,
+          );
         }
       },
 
@@ -129,11 +144,17 @@ export const useCartStore = create<CartStore>()(
         const { items, cartId, clearCart } = get();
         const item = items.find((i) => i.variantId === variantId);
         if (!item?.lineId || !cartId) return;
+        const delta = quantity - item.quantity;
         set({ isLoading: true });
         try {
           const r = await updateLine(cartId, item.lineId, quantity);
-          if (r.success) set({ items: get().items.map((i) => (i.variantId === variantId ? { ...i, quantity } : i)) });
-          else if (r.cartNotFound) clearCart();
+          if (r.success) {
+            set({ items: get().items.map((i) => (i.variantId === variantId ? { ...i, quantity } : i)) });
+            if (delta !== 0) {
+              const ga = [itemFromProduct(item.product.node, { variantId, variantTitle: item.variantTitle, price: item.price.amount, quantity: Math.abs(delta) })];
+              delta > 0 ? trackAddToCart(ga, item.price.currencyCode) : trackRemoveFromCart(ga, item.price.currencyCode);
+            }
+          } else if (r.cartNotFound) clearCart();
         } finally {
           set({ isLoading: false });
         }
@@ -147,6 +168,10 @@ export const useCartStore = create<CartStore>()(
         try {
           const r = await removeLine(cartId, item.lineId);
           if (r.success) {
+            trackRemoveFromCart(
+              [itemFromProduct(item.product.node, { variantId, variantTitle: item.variantTitle, price: item.price.amount, quantity: item.quantity })],
+              item.price.currencyCode,
+            );
             const next = get().items.filter((i) => i.variantId !== variantId);
             next.length === 0 ? clearCart() : set({ items: next });
           } else if (r.cartNotFound) clearCart();
@@ -154,6 +179,7 @@ export const useCartStore = create<CartStore>()(
           set({ isLoading: false });
         }
       },
+
 
       clearCart: () => set({ items: [], cartId: null, checkoutUrl: null }),
       getCheckoutUrl: () => get().checkoutUrl,

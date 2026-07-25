@@ -3,6 +3,7 @@ import { Instagram, Mail, MessageCircle, Facebook, ShieldCheck, Truck, Undo2, He
 import { useState } from "react";
 import { toast } from "sonner";
 import logoAsset from "@/assets/miravika-logo.png.asset.json";
+import { trackGenerateLead, trackSignUp } from "@/lib/analytics";
 
 // Pinterest icon (lucide doesn't include it in the default export)
 const PinterestIcon = ({ className, strokeWidth = 1.5 }: { className?: string; strokeWidth?: number }) => (
@@ -25,6 +26,8 @@ export function Footer() {
   const onSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+    trackGenerateLead("newsletter_footer");
+    trackSignUp("newsletter");
     toast.success("Welcome to Miravika", { description: "Check your inbox for 10% off your first order." });
     setEmail("");
   };

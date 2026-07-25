@@ -10,6 +10,8 @@ import {
 import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/shopify";
 import { itemFromProduct, trackBeginCheckout, trackViewCart } from "@/lib/analytics";
+import { CartSuggestions, CouponField } from "@/components/site/CartSuggestions";
+
 
 const FREE_SHIP_INR = 2999;
 const FREE_SHIP_USD = 49;
@@ -175,17 +177,26 @@ export function CartDrawer() {
                     </div>
                   );
                 })}
+
+                {/* Cross-sell, upsell and gift suggestions */}
+                <div className="-mx-6">
+                  <CartSuggestions compact />
+                </div>
               </div>
+
+
 
               {/* Summary */}
               <div className="flex-shrink-0 border-t border-border/60 bg-ivory px-6 py-5">
-                <div className="flex items-center justify-between text-sm">
+                <CouponField />
+                <div className="mt-4 flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-display text-xl">{formatPrice(total, currency)}</span>
                 </div>
                 <p className="mt-1 text-[11px] text-muted-foreground">
                   Taxes and shipping calculated at checkout.
                 </p>
+
                 <Button
                   onClick={checkout}
                   disabled={isLoading || isSyncing}

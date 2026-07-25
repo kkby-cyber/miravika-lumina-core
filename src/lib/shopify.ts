@@ -35,6 +35,17 @@ export interface ShopifyProduct {
       }>;
     };
     options: Array<{ name: string; values: string[] }>;
+    media?: {
+      edges: Array<{
+        node: {
+          mediaContentType: string;
+          previewImage?: { url: string } | null;
+          sources?: Array<{ url: string; mimeType: string }>;
+          embeddedUrl?: string;
+        };
+      }>;
+    };
+
   };
 }
 
@@ -89,9 +100,28 @@ export const PRODUCTS_QUERY = `
 
 export const PRODUCT_BY_HANDLE_QUERY = `
   query GetProduct($handle: String!) {
-    product(handle: $handle) { ${PRODUCT_FIELDS} }
+    product(handle: $handle) {
+      ${PRODUCT_FIELDS}
+      media(first: 12) {
+        edges {
+          node {
+            mediaContentType
+            ... on Video {
+              previewImage { url }
+              sources { url mimeType }
+            }
+            ... on ExternalVideo {
+              previewImage { url }
+              embeddedUrl
+            }
+          }
+        }
+      }
+    }
   }
 `;
+
+
 
 export const COLLECTION_PRODUCTS_QUERY = `
   query GetCollection($handle: String!, $first: Int!) {

@@ -6,6 +6,8 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { resolveCollectionHandle } from "@/lib/shopify";
 import type { ShopifyProduct } from "@/lib/shopify";
 import { itemFromProduct, trackViewItemList } from "@/lib/analytics";
+import { useShopRatings } from "@/hooks/useReviews";
+
 
 // Fallback friendly copy for known handles
 const HANDLE_COPY: Record<string, { title: string; sub: string }> = {
@@ -73,7 +75,7 @@ export const Route = createFileRoute("/collection/$slug")({
   component: CollectionPage,
 });
 
-type Sort = "featured" | "price-asc" | "price-desc" | "title";
+type Sort = "featured" | "price-asc" | "price-desc" | "title" | "rating";
 type PriceBand = "all" | "under-2500" | "2500-7500" | "7500-15000" | "over-15000";
 
 function CollectionPage() {
@@ -94,11 +96,25 @@ function CollectionPage() {
   const [sort, setSort] = useState<Sort>("featured");
   const [band, setBand] = useState<PriceBand>("all");
   const [inStock, setInStock] = useState(false);
+  const [category, setCategory] = useState<string>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const { data: shopRatings } = useShopRatings();
+
+  // Category options come from the real Shopify product types inside this collection
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    source.forEach((p) => p.node.productType && set.add(p.node.productType));
+    return [...set].sort();
+  }, [source]);
+
+  useEffect(() => {
+    setCategory("all");
+  }, [handle]);
 
   const filtered = useMemo(() => {
     let arr = [...source];
     if (inStock) arr = arr.filter((p) => p.node.variants.edges.some((v) => v.node.availableForSale));
+    if (category !== "all") arr = arr.filter((p) => p.node.productType === category);
     if (band !== "all") {
       arr = arr.filter((p) => {
         const price = parseFloat(p.node.priceRange.minVariantPrice.amount);
@@ -112,8 +128,13 @@ function CollectionPage() {
     if (sort === "price-asc") arr.sort((a, b) => parseFloat(a.node.priceRange.minVariantPrice.amount) - parseFloat(b.node.priceRange.minVariantPrice.amount));
     if (sort === "price-desc") arr.sort((a, b) => parseFloat(b.node.priceRange.minVariantPrice.amount) - parseFloat(a.node.priceRange.minVariantPrice.amount));
     if (sort === "title") arr.sort((a, b) => a.node.title.localeCompare(b.node.title));
+    if (sort === "rating") {
+      const score = (h: string) => shopRatings?.ratings?.[h]?.average ?? -1;
+      arr.sort((a, b) => score(b.node.handle) - score(a.node.handle));
+    }
     return arr;
-  }, [source, sort, band, inStock]);
+  }, [source, sort, band, inStock, category, shopRatings]);
+
 
   useEffect(() => {
     if (!filtered.length) return;
@@ -179,6 +200,24 @@ function CollectionPage() {
               ))}
             </div>
           </div>
+          {categories.length > 1 && (
+            <div className="mt-6">
+              <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-gold">Category</p>
+              <div className="flex flex-col gap-2 text-sm">
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="category" checked={category === "all"} onChange={() => setCategory("all")} className="accent-foreground" />
+                  All categories
+                </label>
+                {categories.map((c) => (
+                  <label key={c} className="flex items-center gap-2">
+                    <input type="radio" name="category" checked={category === c} onChange={() => setCategory(c)} className="accent-foreground" />
+                    {c}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           {filtersOpen && (
             <button
               onClick={() => setFiltersOpen(false)}
@@ -211,6 +250,8 @@ function CollectionPage() {
                 <option value="price-asc">Price: Low → High</option>
                 <option value="price-desc">Price: High → Low</option>
                 <option value="title">A → Z</option>
+                <option value="rating">Top Rated</option>
+
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             </div>

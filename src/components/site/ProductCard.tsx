@@ -5,6 +5,9 @@ import { toast } from "sonner";
 import { formatPrice, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
+import { useProductRating } from "@/hooks/useReviews";
+import { InlineRating } from "@/components/site/Stars";
+
 
 export function ProductCard({ product, priority = false }: { product: ShopifyProduct; priority?: boolean }) {
   const p = product.node;
@@ -17,6 +20,8 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const wished = useWishlistStore((s) => s.has(p.handle));
   const toggleWish = useWishlistStore((s) => s.toggle);
   const navigate = useNavigate();
+  const rating = useProductRating(p.handle);
+
 
   const compareAmt = variant?.compareAtPrice?.amount
     ? parseFloat(variant.compareAtPrice.amount)
@@ -122,6 +127,8 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
 
       <div className="mt-3 px-0.5">
         <h3 className="line-clamp-1 text-[13px] font-medium text-foreground md:text-sm">{p.title}</h3>
+        <InlineRating average={rating?.average} count={rating?.count} />
+
         <div className="mt-1 flex items-baseline gap-2">
           <p className="text-[13px] text-foreground md:text-sm">
             {formatPrice(priceAmt, currency)}

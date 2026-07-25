@@ -27,6 +27,9 @@ interface CartStore {
   clearCart: () => void;
   syncCart: () => Promise<void>;
   getCheckoutUrl: () => string | null;
+  discountCode: string | null;
+  setDiscountCode: (code: string | null) => void;
+
 }
 
 const CART_QUERY = `query cart($id: ID!) { cart(id: $id) { id totalQuantity } }`;
@@ -182,7 +185,19 @@ export const useCartStore = create<CartStore>()(
 
 
       clearCart: () => set({ items: [], cartId: null, checkoutUrl: null }),
-      getCheckoutUrl: () => get().checkoutUrl,
+
+      discountCode: null,
+      setDiscountCode: (code) => set({ discountCode: code ? code.trim().toUpperCase() : null }),
+
+      // Shopify applies the code on its hosted checkout via the discount param
+      getCheckoutUrl: () => {
+        const { checkoutUrl, discountCode } = get();
+        if (!checkoutUrl) return null;
+        if (!discountCode) return checkoutUrl;
+        const sep = checkoutUrl.includes("?") ? "&" : "?";
+        return `${checkoutUrl}${sep}discount=${encodeURIComponent(discountCode)}`;
+      },
+
 
       syncCart: async () => {
         const { cartId, isSyncing, clearCart } = get();
@@ -203,7 +218,7 @@ export const useCartStore = create<CartStore>()(
     {
       name: "miravika-cart",
       storage: createJSONStorage(() => localStorage),
-      partialize: (s) => ({ items: s.items, cartId: s.cartId, checkoutUrl: s.checkoutUrl }),
+      partialize: (s) => ({ items: s.items, cartId: s.cartId, checkoutUrl: s.checkoutUrl, discountCode: s.discountCode }),
     },
   ),
 );

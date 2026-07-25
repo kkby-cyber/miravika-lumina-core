@@ -4,6 +4,9 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
 import { itemFromProduct, trackBeginCheckout } from "@/lib/analytics";
+import { CartSuggestions, CouponField } from "@/components/site/CartSuggestions";
+import { SecurePaymentIcons } from "@/components/site/SecurePaymentIcons";
+
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -58,6 +61,11 @@ function CartPage() {
                 </div>
               );
             })}
+
+            {/* Cross-sell, upsell and gift suggestions */}
+            <div className="rounded-md border border-border/60 bg-card">
+              <CartSuggestions />
+            </div>
           </div>
           <aside className="h-fit rounded-md border border-border/60 bg-card p-6">
             <h3 className="font-display text-xl">Summary</h3>
@@ -65,6 +73,7 @@ function CartPage() {
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatPrice(subtotal, currency)}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>Calculated at checkout</span></div>
             </div>
+            <CouponField />
             <div className="my-4 gold-line" />
             <Button onClick={() => {
               trackBeginCheckout(
@@ -77,7 +86,9 @@ function CartPage() {
               Secure Checkout
             </Button>
             <p className="mt-3 text-center text-[11px] text-muted-foreground">UPI · Cards · COD · Net Banking</p>
+            <SecurePaymentIcons className="mt-4" />
           </aside>
+
         </div>
       )}
     </div>

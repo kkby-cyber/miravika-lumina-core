@@ -16,6 +16,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { useCartSync } from "@/hooks/useCartSync";
+import { trackPageView } from "@/lib/analytics";
 
 function NotFoundComponent() {
   return (
@@ -182,4 +183,13 @@ function SiteShell() {
       <Toaster position="top-center" richColors />
     </div>
   );
+}
+
+function usePageViewTracking() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const id = window.setTimeout(() => trackPageView(pathname, document.title), 60);
+    return () => window.clearTimeout(id);
+  }, [pathname]);
 }

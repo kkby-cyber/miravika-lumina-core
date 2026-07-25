@@ -4,6 +4,9 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
 import { itemFromProduct, trackBeginCheckout } from "@/lib/analytics";
+import { CartSuggestions, CouponField } from "@/components/site/CartSuggestions";
+import { SecurePaymentIcons } from "@/components/site/SecurePaymentIcons";
+
 
 export const Route = createFileRoute("/cart")({
   head: () => ({

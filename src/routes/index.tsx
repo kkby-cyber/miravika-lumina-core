@@ -313,7 +313,14 @@ function Home() {
         </div>
       </section>
 
+      {/* CUSTOMER TESTIMONIALS (genuine published reviews only) */}
+      <Testimonials />
+
+      {/* CUSTOMER PHOTOS (from real photo reviews only) */}
+      <CustomerGallery />
+
       {/* GIFTS EDITORIAL */}
+
       <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-24">
         <div className="mb-10 text-center">
           <p className="text-[10px] uppercase tracking-[0.32em] text-gold">The Gift Edit</p>

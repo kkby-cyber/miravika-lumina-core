@@ -18,6 +18,8 @@ import { Footer } from "@/components/site/Footer";
 import { CartDrawer } from "@/components/site/CartDrawer";
 import { useCartSync } from "@/hooks/useCartSync";
 import { trackPageView } from "@/lib/analytics";
+import { loadMarketingPixels } from "@/lib/pixels";
+import { ExitIntent } from "@/components/site/ExitIntent";
 
 function NotFoundComponent() {
   return (
@@ -172,6 +174,9 @@ function RootComponent() {
 function SiteShell() {
   useCartSync();
   usePageViewTracking();
+  useEffect(() => {
+    loadMarketingPixels();
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -181,6 +186,7 @@ function SiteShell() {
       </main>
       <Footer />
       <CartDrawer />
+      <ExitIntent />
       <Toaster position="top-center" richColors />
     </div>
   );

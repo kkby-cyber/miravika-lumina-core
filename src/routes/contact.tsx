@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Instagram, Mail, MessageCircle, Clock, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { trackContact, trackGenerateLead } from "@/lib/analytics";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -35,6 +36,8 @@ function Contact() {
       return;
     }
     setSubmitting(true);
+    trackGenerateLead("contact_form");
+    trackContact("email");
     const subject = encodeURIComponent(r.data.subject || `MIRAVIKA enquiry — ${r.data.name}`);
     const body = encodeURIComponent(
       `Name: ${r.data.name}\nEmail: ${r.data.email}\n\n${r.data.message}`,

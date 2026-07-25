@@ -43,12 +43,15 @@ export function itemFromProduct(p: ShopifyProduct["node"], opts: { variantId?: s
 }
 
 const value = (items: GA4Item[]) => items.reduce((s, i) => s + i.price * (i.quantity ?? 1), 0);
+const contentIds = (items: GA4Item[]) => items.map((i) => i.item_id);
 
 export const trackPageView = (path: string, title: string) =>
   pushDL({ event: "page_view", page_path: path, page_title: title, page_location: typeof window !== "undefined" ? window.location.href : path });
 
-export const trackViewItem = (items: GA4Item[], currency: string) =>
+export const trackViewItem = (items: GA4Item[], currency: string) => {
   pushDL({ event: "view_item", ecommerce: { currency, value: value(items), items } });
+  pixelEvent("ViewContent", { content_ids: contentIds(items), content_type: "product", currency, value: value(items) });
+};
 
 export const trackViewItemList = (items: GA4Item[], listId: string, listName: string) =>
   pushDL({ event: "view_item_list", ecommerce: { item_list_id: listId, item_list_name: listName, items } });
@@ -56,8 +59,10 @@ export const trackViewItemList = (items: GA4Item[], listId: string, listName: st
 export const trackSelectItem = (item: GA4Item, listId: string, listName: string) =>
   pushDL({ event: "select_item", ecommerce: { item_list_id: listId, item_list_name: listName, items: [item] } });
 
-export const trackAddToCart = (items: GA4Item[], currency: string) =>
+export const trackAddToCart = (items: GA4Item[], currency: string) => {
   pushDL({ event: "add_to_cart", ecommerce: { currency, value: value(items), items } });
+  pixelEvent("AddToCart", { content_ids: contentIds(items), content_type: "product", currency, value: value(items) });
+};
 
 export const trackRemoveFromCart = (items: GA4Item[], currency: string) =>
   pushDL({ event: "remove_from_cart", ecommerce: { currency, value: value(items), items } });
@@ -65,15 +70,72 @@ export const trackRemoveFromCart = (items: GA4Item[], currency: string) =>
 export const trackViewCart = (items: GA4Item[], currency: string) =>
   pushDL({ event: "view_cart", ecommerce: { currency, value: value(items), items } });
 
-export const trackBeginCheckout = (items: GA4Item[], currency: string) =>
+export const trackBeginCheckout = (items: GA4Item[], currency: string) => {
   pushDL({ event: "begin_checkout", ecommerce: { currency, value: value(items), items } });
+  pixelEvent("InitiateCheckout", { content_ids: contentIds(items), content_type: "product", currency, value: value(items) });
+};
 
-export const trackSearch = (term: string, results: number) =>
+/**
+ * Purchase / conversion event.
+ * Shopify hosts checkout, so this fires on the MIRAVIKA thank-you page when
+ * Shopify passes order details back, and is de-duplicated per transaction id.
+ */
+export function trackPurchase(order: {
+  transaction_id: string;
+  value: number;
+  currency: string;
+  shipping?: number;
+  tax?: number;
+  coupon?: string;
+  items?: GA4Item[];
+}) {
+  if (typeof window === "undefined" || !order.transaction_id) return;
+  const key = `miravika_purchase_${order.transaction_id}`;
+  try {
+    if (window.sessionStorage.getItem(key)) return; // never double-count
+    window.sessionStorage.setItem(key, "1");
+  } catch {
+    /* private mode — still send once per page load */
+  }
+  pushDL({
+    event: "purchase",
+    ecommerce: {
+      transaction_id: order.transaction_id,
+      value: order.value,
+      currency: order.currency,
+      shipping: order.shipping ?? 0,
+      tax: order.tax ?? 0,
+      coupon: order.coupon,
+      items: order.items ?? [],
+    },
+  });
+  pixelEvent("Purchase", { value: order.value, currency: order.currency, content_type: "product" });
+}
+
+export const trackSearch = (term: string, results: number) => {
   pushDL({ event: "search", search_term: term, search_results: results });
+  pixelEvent("Search", { search_string: term });
+};
 
-export const trackAddToWishlist = (items: GA4Item[], currency: string) =>
+export const trackAddToWishlist = (items: GA4Item[], currency: string) => {
   pushDL({ event: "add_to_wishlist", ecommerce: { currency, value: value(items), items } });
+  pixelEvent("AddToWishlist", { content_ids: contentIds(items), currency, value: value(items) });
+};
 
-export const trackGenerateLead = (method: string) => pushDL({ event: "generate_lead", lead_method: method });
+export const trackRemoveFromWishlist = (items: GA4Item[], currency: string) =>
+  pushDL({ event: "remove_from_wishlist", ecommerce: { currency, value: value(items), items } });
+
+export const trackGenerateLead = (method: string, params: Record<string, unknown> = {}) => {
+  pushDL({ event: "generate_lead", lead_method: method, ...params });
+  pixelEvent("Lead", { content_name: method });
+};
+
+export const trackContact = (method: string) => pushDL({ event: "contact", contact_method: method });
+
 export const trackLogin = (method: string) => pushDL({ event: "login", method });
-export const trackSignUp = (method: string) => pushDL({ event: "sign_up", method });
+
+export const trackSignUp = (method: string) => {
+  pushDL({ event: "sign_up", method });
+  pixelEvent("CompleteRegistration", { content_name: method });
+};
+

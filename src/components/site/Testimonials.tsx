@@ -29,7 +29,7 @@ export function Testimonials() {
               </blockquote>
               <figcaption className="mt-4 flex items-center gap-2 text-[11px] uppercase tracking-[0.16em]">
                 <span>{r.reviewerName}</span>
-                {r.verified && <span className="text-gold">· Verified Buyer</span>}
+                {r.verifiedBuyer && <span className="text-gold">· Verified Buyer</span>}
               </figcaption>
               {r.productHandle && (
                 <Link

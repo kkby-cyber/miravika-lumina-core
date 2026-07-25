@@ -200,6 +200,24 @@ function CollectionPage() {
               ))}
             </div>
           </div>
+          {categories.length > 1 && (
+            <div className="mt-6">
+              <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-gold">Category</p>
+              <div className="flex flex-col gap-2 text-sm">
+                <label className="flex items-center gap-2">
+                  <input type="radio" name="category" checked={category === "all"} onChange={() => setCategory("all")} className="accent-foreground" />
+                  All categories
+                </label>
+                {categories.map((c) => (
+                  <label key={c} className="flex items-center gap-2">
+                    <input type="radio" name="category" checked={category === c} onChange={() => setCategory(c)} className="accent-foreground" />
+                    {c}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           {filtersOpen && (
             <button
               onClick={() => setFiltersOpen(false)}
@@ -232,6 +250,8 @@ function CollectionPage() {
                 <option value="price-asc">Price: Low → High</option>
                 <option value="price-desc">Price: High → Low</option>
                 <option value="title">A → Z</option>
+                <option value="rating">Top Rated</option>
+
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             </div>

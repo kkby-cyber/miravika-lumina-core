@@ -98,8 +98,12 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
           onClick={(e) => {
             e.preventDefault();
+            const ga = [itemFromProduct(p)];
+            const cur = p.priceRange.minVariantPrice.currencyCode;
+            wished ? trackRemoveFromWishlist(ga, cur) : trackAddToWishlist(ga, cur);
             toggleWish(p.handle);
           }}
+
           className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-ivory/90 backdrop-blur transition hover:bg-ivory"
         >
           <Heart className={`h-4 w-4 ${wished ? "fill-gold text-gold" : "text-foreground/70"}`} strokeWidth={1.5} />

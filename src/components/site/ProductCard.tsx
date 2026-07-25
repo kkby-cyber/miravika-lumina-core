@@ -7,6 +7,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useProductRating } from "@/hooks/useReviews";
 import { InlineRating } from "@/components/site/Stars";
+import { itemFromProduct, trackAddToWishlist, trackRemoveFromWishlist } from "@/lib/analytics";
 
 
 export function ProductCard({ product, priority = false }: { product: ShopifyProduct; priority?: boolean }) {

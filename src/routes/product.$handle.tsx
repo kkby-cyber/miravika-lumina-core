@@ -16,7 +16,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useProducts } from "@/hooks/useProducts";
-import { itemFromProduct, trackViewItem } from "@/lib/analytics";
+import { itemFromProduct, trackViewItem, trackAddToWishlist, trackRemoveFromWishlist } from "@/lib/analytics";
 import { ZoomableImage } from "@/components/site/ZoomableImage";
 import { SecurePaymentIcons } from "@/components/site/SecurePaymentIcons";
 import { SizeGuide } from "@/components/site/SizeGuide";

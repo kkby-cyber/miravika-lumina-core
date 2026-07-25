@@ -73,7 +73,7 @@ export const Route = createFileRoute("/collection/$slug")({
   component: CollectionPage,
 });
 
-type Sort = "featured" | "price-asc" | "price-desc" | "title";
+type Sort = "featured" | "price-asc" | "price-desc" | "title" | "rating";
 type PriceBand = "all" | "under-2500" | "2500-7500" | "7500-15000" | "over-15000";
 
 function CollectionPage() {
@@ -94,11 +94,25 @@ function CollectionPage() {
   const [sort, setSort] = useState<Sort>("featured");
   const [band, setBand] = useState<PriceBand>("all");
   const [inStock, setInStock] = useState(false);
+  const [category, setCategory] = useState<string>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const { data: shopRatings } = useShopRatings();
+
+  // Category options come from the real Shopify product types inside this collection
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    source.forEach((p) => p.node.productType && set.add(p.node.productType));
+    return [...set].sort();
+  }, [source]);
+
+  useEffect(() => {
+    setCategory("all");
+  }, [handle]);
 
   const filtered = useMemo(() => {
     let arr = [...source];
     if (inStock) arr = arr.filter((p) => p.node.variants.edges.some((v) => v.node.availableForSale));
+    if (category !== "all") arr = arr.filter((p) => p.node.productType === category);
     if (band !== "all") {
       arr = arr.filter((p) => {
         const price = parseFloat(p.node.priceRange.minVariantPrice.amount);
@@ -112,8 +126,13 @@ function CollectionPage() {
     if (sort === "price-asc") arr.sort((a, b) => parseFloat(a.node.priceRange.minVariantPrice.amount) - parseFloat(b.node.priceRange.minVariantPrice.amount));
     if (sort === "price-desc") arr.sort((a, b) => parseFloat(b.node.priceRange.minVariantPrice.amount) - parseFloat(a.node.priceRange.minVariantPrice.amount));
     if (sort === "title") arr.sort((a, b) => a.node.title.localeCompare(b.node.title));
+    if (sort === "rating") {
+      const score = (h: string) => shopRatings?.ratings?.[h]?.average ?? -1;
+      arr.sort((a, b) => score(b.node.handle) - score(a.node.handle));
+    }
     return arr;
-  }, [source, sort, band, inStock]);
+  }, [source, sort, band, inStock, category, shopRatings]);
+
 
   useEffect(() => {
     if (!filtered.length) return;

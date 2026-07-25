@@ -12,6 +12,8 @@ import cream from "@/assets/IMG-20260709-WA0012.jpg.asset.json";
 import corridor from "@/assets/IMG-20260709-WA0015.jpg.asset.json";
 import emerald from "@/assets/IMG-20260709-WA0009.jpg.asset.json";
 import type { ShopifyProduct } from "@/lib/shopify";
+import { CustomerGallery, Testimonials } from "@/components/site/Testimonials";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({

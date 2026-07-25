@@ -177,10 +177,14 @@ export function CartDrawer() {
                     </div>
                   );
                 })}
+
+                {/* Cross-sell, upsell and gift suggestions */}
+                <div className="-mx-6">
+                  <CartSuggestions compact />
+                </div>
               </div>
 
-              {/* Cross-sell, upsell and gift suggestions */}
-              <CartSuggestions compact />
+
 
               {/* Summary */}
               <div className="flex-shrink-0 border-t border-border/60 bg-ivory px-6 py-5">

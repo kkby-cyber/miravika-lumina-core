@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
-import { Heart, Loader2, Minus, Plus, ShieldCheck, Truck, Undo2, Share2 } from "lucide-react";
+import { Heart, Loader2, Minus, Plus, ShieldCheck, Truck, Undo2, Share2, Play } from "lucide-react";
 import { useProduct, useCollection } from "@/hooks/useProducts";
 import { formatPrice } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
@@ -17,6 +17,19 @@ import {
 } from "@/components/ui/accordion";
 import { useProducts } from "@/hooks/useProducts";
 import { itemFromProduct, trackViewItem } from "@/lib/analytics";
+import { ZoomableImage } from "@/components/site/ZoomableImage";
+import { SecurePaymentIcons } from "@/components/site/SecurePaymentIcons";
+import { SizeGuide } from "@/components/site/SizeGuide";
+import { ReviewsSection } from "@/components/site/ReviewsSection";
+import { ProductFaq, faqsForProduct } from "@/components/site/ProductFaq";
+import {
+  EstimatedDelivery,
+  LuxuryProductStory,
+  ProductHighlights,
+  highlightsForProduct,
+} from "@/components/site/ProductStory";
+import { Stars } from "@/components/site/Stars";
+import { useProductReviews } from "@/hooks/useReviews";
 
 function titleCase(s: string) {
   return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -65,6 +78,7 @@ function ProductPage() {
   const { data: product, isLoading } = useProduct(handle);
   const { data: bestSellers } = useCollection("best-sellers", 8);
   const { data: recentProducts = [] } = useProducts(undefined, 30);
+  const { data: reviewData } = useProductReviews(handle);
 
   useRecordView(handle);
   const { handles: recentHandles } = useRecentlyViewed(handle);
@@ -72,6 +86,7 @@ function ProductPage() {
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [qty, setQty] = useState(1);
   const [activeImg, setActiveImg] = useState(0);
+  const [showVideo, setShowVideo] = useState(false);
 
   const addItem = useCartStore((s) => s.addItem);
   const setOpen = useCartStore((s) => s.setOpen);
@@ -80,7 +95,10 @@ function ProductPage() {
   const wished = useWishlistStore((s) => s.has(handle));
   const toggleWish = useWishlistStore((s) => s.toggle);
 
-  useEffect(() => { setActiveImg(0); }, [handle]);
+  useEffect(() => {
+    setActiveImg(0);
+    setShowVideo(false);
+  }, [handle]);
 
   const variant = useMemo(() => {
     if (!product) return null;
@@ -113,6 +131,14 @@ function ProductPage() {
     [recentHandles, recentProducts],
   );
 
+  // Similar products — same Shopify product type
+  const similar = useMemo(() => {
+    if (!product?.productType) return [];
+    return recentProducts
+      .filter((p) => p.node.productType === product.productType && p.node.handle !== handle)
+      .slice(0, 4);
+  }, [recentProducts, product?.productType, handle]);
+
   if (isLoading) {
     return (
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 md:grid-cols-2 md:py-16">
@@ -139,6 +165,18 @@ function ProductPage() {
   }
 
   const images = product.images.edges;
+  const aggregate = reviewData?.aggregate ?? null;
+
+  // Product video (Shopify-hosted or embedded), when the merchandiser added one
+  const videoNode = product.media?.edges
+    ?.map((e) => e.node)
+    .find((n) => n.mediaContentType === "VIDEO" || n.mediaContentType === "EXTERNAL_VIDEO");
+  const videoSrc = videoNode?.sources?.find((s) => s.mimeType === "video/mp4")?.url ?? null;
+  const videoEmbed = videoNode?.embeddedUrl ?? null;
+
+  const sizeOption = product.options.find((o) => /size/i.test(o.name));
+  const highlights = highlightsForProduct(product.tags);
+  const faqs = faqsForProduct(product.tags, !!sizeOption);
 
   const handleAdd = async () => {
     if (!variant) return;
@@ -186,7 +224,7 @@ function ProductPage() {
   const related = (bestSellers?.products ?? recentProducts).filter((p) => p.node.handle !== handle).slice(0, 4);
   const fbt = related.slice(0, 3);
 
-  // GMC / Performance Max friendly Product schema (rendered at document head via useEffect below)
+  // GMC / Performance Max friendly Product schema
   const priceValidUntil = (() => {
     const d = new Date();
     d.setFullYear(d.getFullYear() + 1);
@@ -204,6 +242,26 @@ function ProductPage() {
     brand: { "@type": "Brand", name: "MIRAVIKA" },
     category: product.productType ?? "Fashion & Lifestyle",
     url: `https://miravika-lumina-core.lovable.app/product/${handle}`,
+    // Only emitted when genuine, published reviews exist
+    ...(aggregate
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: aggregate.average.toFixed(1),
+            reviewCount: aggregate.count,
+            bestRating: "5",
+            worstRating: "1",
+          },
+          review: (reviewData?.reviews ?? []).slice(0, 5).map((r) => ({
+            "@type": "Review",
+            reviewRating: { "@type": "Rating", ratingValue: String(r.rating), bestRating: "5", worstRating: "1" },
+            author: { "@type": "Person", name: r.reviewerName },
+            datePublished: r.createdAt?.slice(0, 10),
+            name: r.title || undefined,
+            reviewBody: r.body,
+          })),
+        }
+      : {}),
     offers: {
       "@type": "Offer",
       priceCurrency: variant?.price.currencyCode ?? "INR",
@@ -243,10 +301,20 @@ function ProductPage() {
     },
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
-
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <div className="mx-auto max-w-7xl px-4 py-6 pb-24 md:py-12 md:pb-16">
         {/* Breadcrumb */}
@@ -261,30 +329,60 @@ function ProductPage() {
         <div className="grid gap-8 md:grid-cols-2 md:gap-14">
           {/* Gallery */}
           <div>
-            <div className="aspect-square overflow-hidden rounded-lg bg-beige">
-              {images[activeImg] && (
-                <img
+            {showVideo && (videoSrc || videoEmbed) ? (
+              <div className="aspect-square overflow-hidden rounded-lg bg-noir">
+                {videoSrc ? (
+                  <video src={videoSrc} controls autoPlay playsInline className="h-full w-full object-cover" />
+                ) : (
+                  <iframe
+                    src={videoEmbed!}
+                    title={`${product.title} video`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="h-full w-full"
+                  />
+                )}
+              </div>
+            ) : (
+              images[activeImg] && (
+                <ZoomableImage
                   src={images[activeImg].node.url}
-                  alt={images[activeImg].node.altText ?? product.title}
-                  className="h-full w-full object-cover"
-                  fetchPriority="high"
+                  alt={images[activeImg].node.altText ?? `${product.title} — MIRAVIKA`}
+                  priority
                 />
-              )}
-            </div>
-            {images.length > 1 && (
+              )
+            )}
+
+            {(images.length > 1 || videoNode) && (
               <div className="mt-3 grid grid-cols-5 gap-2">
-                {images.slice(0, 10).map((img, i) => (
+                {images.slice(0, 9).map((img, i) => (
                   <button
                     key={img.node.url}
-                    onClick={() => setActiveImg(i)}
+                    onClick={() => { setActiveImg(i); setShowVideo(false); }}
                     aria-label={`View image ${i + 1}`}
                     className={`aspect-square overflow-hidden rounded transition ${
-                      i === activeImg ? "ring-2 ring-gold" : "ring-1 ring-border hover:ring-foreground/40"
+                      i === activeImg && !showVideo ? "ring-2 ring-gold" : "ring-1 ring-border hover:ring-foreground/40"
                     }`}
                   >
-                    <img src={img.node.url} alt="" loading="lazy" className="h-full w-full object-cover" />
+                    <img src={img.node.url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
                   </button>
                 ))}
+                {videoNode && (
+                  <button
+                    onClick={() => setShowVideo(true)}
+                    aria-label="Play product video"
+                    className={`relative aspect-square overflow-hidden rounded bg-beige transition ${
+                      showVideo ? "ring-2 ring-gold" : "ring-1 ring-border hover:ring-foreground/40"
+                    }`}
+                  >
+                    {videoNode.previewImage?.url && (
+                      <img src={videoNode.previewImage.url} alt="" loading="lazy" className="h-full w-full object-cover" />
+                    )}
+                    <span className="absolute inset-0 grid place-items-center bg-noir/35">
+                      <Play className="h-5 w-5 fill-ivory text-ivory" />
+                    </span>
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -293,6 +391,16 @@ function ProductPage() {
           <div className="md:pl-4">
             <p className="text-[10px] uppercase tracking-[0.32em] text-gold">MIRAVIKA</p>
             <h1 className="mt-2 font-display text-3xl leading-tight md:text-4xl">{product.title}</h1>
+
+            {/* Review summary at the top of the PDP (only with genuine reviews) */}
+            {aggregate && (
+              <a href="#reviews" className="mt-2 inline-flex items-center gap-2 hover:text-gold">
+                <Stars rating={aggregate.average} size={14} />
+                <span className="text-xs text-muted-foreground">
+                  {aggregate.average.toFixed(1)} · {aggregate.count} {aggregate.count === 1 ? "review" : "reviews"}
+                </span>
+              </a>
+            )}
 
             <div className="mt-4 flex items-baseline gap-3">
               <p className="font-display text-2xl">
@@ -337,6 +445,8 @@ function ProductPage() {
                 </div>
               </div>
             ))}
+
+            {sizeOption && <SizeGuide optionValues={sizeOption.values} />}
 
             {/* Qty + CTAs (desktop) */}
             <div className="mt-7 hidden items-center gap-3 md:flex">
@@ -396,12 +506,21 @@ function ProductPage() {
               </div>
             )}
 
+            {/* Estimated delivery */}
+            <EstimatedDelivery />
+
+            {/* Highlights */}
+            <ProductHighlights highlights={highlights} />
+
             {/* Trust */}
             <div className="mt-6 grid grid-cols-3 gap-3 rounded-lg border border-border/60 bg-beige/40 p-4 text-center">
               <div><Truck className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">Free ₹2999+</p></div>
               <div><Undo2 className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">7-day returns</p></div>
               <div><ShieldCheck className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">Secure · COD</p></div>
             </div>
+
+            {/* Secure payment icons */}
+            <SecurePaymentIcons className="mt-4" />
 
             {/* Details */}
             <Accordion type="single" collapsible defaultValue="details" className="mt-6">
@@ -431,12 +550,22 @@ function ProductPage() {
               <AccordionItem value="reviews">
                 <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">Reviews</AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground">
-                  No reviews yet. Be the first to share your Miravika moment.
+                  {aggregate ? (
+                    <a href="#reviews" className="hover:text-gold">
+                      {aggregate.average.toFixed(1)} out of 5 from {aggregate.count}{" "}
+                      {aggregate.count === 1 ? "review" : "reviews"} — read them below.
+                    </a>
+                  ) : (
+                    "No reviews yet. Be the first to share your Miravika moment."
+                  )}
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
           </div>
         </div>
+
+        {/* LUXURY PRODUCT STORY */}
+        <LuxuryProductStory title={product.title} />
 
         {/* FREQUENTLY BOUGHT TOGETHER */}
         {fbt.length >= 2 && (
@@ -452,6 +581,27 @@ function ProductPage() {
             </div>
           </section>
         )}
+
+        {/* SIMILAR PRODUCTS */}
+        {similar.length > 0 && (
+          <section className="mt-20 border-t border-border/50 pt-14">
+            <div className="mb-8 text-center">
+              <p className="text-[10px] uppercase tracking-[0.32em] text-gold">In the same family</p>
+              <h2 className="mt-2 font-display text-2xl md:text-3xl">Similar Products</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
+              {similar.map((p) => (
+                <ProductCard key={p.node.id} product={p} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* REVIEWS */}
+        <ReviewsSection handle={handle} productId={product.id?.split("/").pop()} productTitle={product.title} />
+
+        {/* PRODUCT FAQ */}
+        <ProductFaq faqs={faqs} />
 
         {/* RECENTLY VIEWED */}
         {recentlyViewed.length > 0 && (

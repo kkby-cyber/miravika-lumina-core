@@ -16,6 +16,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useProducts } from "@/hooks/useProducts";
+import { itemFromProduct, trackViewItem } from "@/lib/analytics";
 
 function titleCase(s: string) {
   return s.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -95,6 +96,16 @@ function ProductPage() {
   const compareAmt = variant?.compareAtPrice?.amount ? parseFloat(variant.compareAtPrice.amount) : null;
   const priceAmt = variant ? parseFloat(variant.price.amount) : 0;
   const onSale = compareAmt !== null && compareAmt > priceAmt;
+
+  // GA4 / Google Ads: view_item (fires once per product)
+  useEffect(() => {
+    if (!product) return;
+    trackViewItem(
+      [itemFromProduct(product, { variantId: variant?.id, variantTitle: variant?.title, price: variant?.price.amount })],
+      variant?.price.currencyCode ?? product.priceRange.minVariantPrice.currencyCode,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id]);
 
   // Recently-viewed products list
   const recentlyViewed = useMemo(

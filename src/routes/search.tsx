@@ -4,6 +4,7 @@ import { Search as SearchIcon, X } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/site/ProductCard";
 import { formatPrice } from "@/lib/shopify";
+import { itemFromProduct, trackSearch, trackViewItemList } from "@/lib/analytics";
 
 export const Route = createFileRoute("/search")({
   head: () => ({
@@ -43,6 +44,20 @@ function SearchPage() {
       p.node.tags?.some((t) => t.toLowerCase().includes(term)),
     );
   }, [products, debounced]);
+
+  useEffect(() => {
+    const term = debounced.trim();
+    if (!term) return;
+    trackSearch(term, results.length);
+    if (results.length) {
+      trackViewItemList(
+        results.slice(0, 20).map((p, i) => itemFromProduct(p.node, { index: i })),
+        "search_results",
+        `Search: ${term}`,
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debounced, results.length]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:py-14">

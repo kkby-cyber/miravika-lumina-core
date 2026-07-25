@@ -3,6 +3,7 @@ import { ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
+import { itemFromProduct, trackBeginCheckout } from "@/lib/analytics";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -65,7 +66,14 @@ function CartPage() {
               <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span>Calculated at checkout</span></div>
             </div>
             <div className="my-4 gold-line" />
-            <Button onClick={() => { const u = getCheckoutUrl(); if (u) window.open(u, "_blank"); }} size="lg" className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90">
+            <Button onClick={() => {
+              trackBeginCheckout(
+                items.map((i, idx) => itemFromProduct(i.product.node, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx })),
+                currency,
+              );
+              const u = getCheckoutUrl();
+              if (u) window.open(u, "_blank");
+            }} size="lg" className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90">
               Secure Checkout
             </Button>
             <p className="mt-3 text-center text-[11px] text-muted-foreground">UPI · Cards · COD · Net Banking</p>

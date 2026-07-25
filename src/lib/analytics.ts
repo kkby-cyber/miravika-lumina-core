@@ -4,6 +4,7 @@
  * to GA4 Enhanced Ecommerce, Google Ads conversions and remarketing audiences.
  */
 import type { ShopifyProduct } from "@/lib/shopify";
+import { pixelEvent } from "@/lib/pixels";
 
 type DL = Record<string, unknown>;
 

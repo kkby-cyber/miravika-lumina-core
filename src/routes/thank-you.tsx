@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
+import { trackPurchase } from "@/lib/analytics";
 
 export const Route = createFileRoute("/thank-you")({
   head: () => ({
@@ -12,7 +14,31 @@ export const Route = createFileRoute("/thank-you")({
   component: ThankYou,
 });
 
+/**
+ * Fires the GA4/Ads purchase conversion when Shopify returns the shopper here
+ * with order details (?order_id=&value=&currency=). De-duplicated per order id
+ * inside trackPurchase, so refreshes never double-count a conversion.
+ */
+function usePurchaseConversion() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const q = new URLSearchParams(window.location.search);
+    const id = q.get("order_id") || q.get("order") || q.get("transaction_id");
+    const value = Number(q.get("value") ?? q.get("total") ?? 0);
+    if (!id || !Number.isFinite(value)) return;
+    trackPurchase({
+      transaction_id: id,
+      value,
+      currency: q.get("currency") ?? "INR",
+      shipping: Number(q.get("shipping") ?? 0) || 0,
+      tax: Number(q.get("tax") ?? 0) || 0,
+      coupon: q.get("coupon") ?? undefined,
+    });
+  }, []);
+}
+
 function ThankYou() {
+  usePurchaseConversion();
   return (
     <div className="mx-auto max-w-xl px-4 py-24 text-center">
       <CheckCircle2 className="mx-auto h-14 w-14 text-gold" />

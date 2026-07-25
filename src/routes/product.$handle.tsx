@@ -16,7 +16,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useProducts } from "@/hooks/useProducts";
-import { itemFromProduct, trackViewItem } from "@/lib/analytics";
+import { itemFromProduct, trackViewItem, trackAddToWishlist, trackRemoveFromWishlist } from "@/lib/analytics";
 import { ZoomableImage } from "@/components/site/ZoomableImage";
 import { SecurePaymentIcons } from "@/components/site/SecurePaymentIcons";
 import { SizeGuide } from "@/components/site/SizeGuide";
@@ -93,7 +93,15 @@ function ProductPage() {
   const isLoadingCart = useCartStore((s) => s.isLoading);
   const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
   const wished = useWishlistStore((s) => s.has(handle));
-  const toggleWish = useWishlistStore((s) => s.toggle);
+  const toggleWishRaw = useWishlistStore((s) => s.toggle);
+  const toggleWish = (h: string) => {
+    if (product) {
+      const ga = [itemFromProduct(product, { variantId: variant?.id, price: variant?.price.amount })];
+      const cur = product.priceRange.minVariantPrice.currencyCode;
+      wished ? trackRemoveFromWishlist(ga, cur) : trackAddToWishlist(ga, cur);
+    }
+    toggleWishRaw(h);
+  };
 
   useEffect(() => {
     setActiveImg(0);

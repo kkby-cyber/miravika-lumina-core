@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLink, Package, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackLogin } from "@/lib/analytics";
 
 export const Route = createFileRoute("/account")({
   head: () => ({
@@ -23,7 +24,7 @@ function Account() {
         MIRAVIKA accounts are securely managed by Shopify — login, addresses, order history and reorders all live in one place.
       </p>
       <div className="mt-8 grid gap-3">
-        <a href={accountUrl} target="_blank" rel="noreferrer">
+        <a href={accountUrl} target="_blank" rel="noreferrer" onClick={() => trackLogin("shopify_account")}>
           <Button size="lg" className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90">
             Login / Sign up <ExternalLink className="ml-2 h-4 w-4" />
           </Button>

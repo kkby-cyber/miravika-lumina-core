@@ -169,6 +169,8 @@ function RootComponent() {
 
 function SiteShell() {
   useCartSync();
+  usePageViewTracking();
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />

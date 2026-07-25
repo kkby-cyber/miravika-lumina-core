@@ -6,6 +6,8 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { resolveCollectionHandle } from "@/lib/shopify";
 import type { ShopifyProduct } from "@/lib/shopify";
 import { itemFromProduct, trackViewItemList } from "@/lib/analytics";
+import { useShopRatings } from "@/hooks/useReviews";
+
 
 // Fallback friendly copy for known handles
 const HANDLE_COPY: Record<string, { title: string; sub: string }> = {

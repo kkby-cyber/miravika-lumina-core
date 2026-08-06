@@ -45,9 +45,10 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    const id = setInterval(() => setAnnounceIdx((i) => (i + 1) % ANNOUNCEMENTS.length), 4200);
+    const id = setInterval(() => setAnnounceIdx((i) => (i + 1) % ANNOUNCEMENTS.length), 6500);
     return () => clearInterval(id);
   }, []);
+
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";

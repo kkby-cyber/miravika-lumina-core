@@ -81,19 +81,13 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
           />
         )}
 
-        {/* Badges */}
-        <div className="absolute left-2 top-2 flex flex-col gap-1">
-          {onSale && (
-            <span className="rounded-sm bg-noir px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-ivory">
-              −{pctOff}%
-            </span>
-          )}
-          {soldOut && (
-            <span className="rounded-sm bg-ivory/95 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-foreground">
-              Sold Out
-            </span>
-          )}
-        </div>
+        {/* Quiet status label only — no discount stickers */}
+        {soldOut && (
+          <span className="absolute left-3 top-3 rounded-full bg-ivory/90 px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-foreground/70 backdrop-blur">
+            Sold Out
+          </span>
+        )}
+
 
         <button
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}

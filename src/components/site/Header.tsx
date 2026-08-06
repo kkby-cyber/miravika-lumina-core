@@ -61,20 +61,24 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-40 transition-all duration-500 ${
+      className={`sticky top-0 z-40 transition-all duration-700 ${
         transparent
           ? "bg-transparent"
-          : "bg-ivory/95 backdrop-blur-md " + (scrolled ? "shadow-[0_1px_20px_-10px_rgba(0,0,0,0.15)]" : "")
+          : "bg-ivory/80 backdrop-blur-xl backdrop-saturate-150 " +
+            (scrolled ? "shadow-[0_10px_40px_-28px_rgba(17,17,17,0.55)]" : "")
       }`}
     >
-      {/* Announcement bar */}
-      <div className={`overflow-hidden border-b transition-colors duration-500 ${transparent ? "border-white/10 bg-noir/40 text-ivory" : "border-border/40 bg-noir text-ivory"}`}>
-        <div className="relative mx-auto h-8 max-w-7xl px-4">
+      {/* Announcement bar — one message at a time, slow crossfade */}
+      <div
+        className={`overflow-hidden border-b transition-colors duration-700 ${transparent ? "border-white/10 bg-noir/45 text-ivory" : "border-border/40 bg-noir text-ivory"}`}
+      >
+        <div className="relative mx-auto h-9 max-w-7xl px-4" aria-live="polite">
           {ANNOUNCEMENTS.map((msg, i) => (
             <p
               key={i}
-              className={`absolute inset-0 flex items-center justify-center text-center text-[10.5px] font-light tracking-[0.28em] uppercase transition-all duration-700 ${
-                i === announceIdx ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1 pointer-events-none"
+              aria-hidden={i !== announceIdx}
+              className={`absolute inset-0 flex items-center justify-center text-center text-[10px] font-light uppercase tracking-[0.3em] transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] md:text-[10.5px] ${
+                i === announceIdx ? "opacity-100 translate-y-0" : "pointer-events-none -translate-y-1 opacity-0"
               }`}
             >
               {msg}
@@ -84,12 +88,12 @@ export function Header() {
       </div>
 
       {/* Main header */}
-      <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-4 md:h-[80px] md:px-8">
+      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-4 md:h-[92px] md:px-8">
         {/* LEFT: mobile menu button */}
         <div className="flex flex-1 items-center lg:flex-none">
           <button
             aria-label="Open menu"
-            className="-ml-2 p-2 lg:hidden"
+            className="-ml-2 grid h-11 w-11 place-items-center lg:hidden"
             onClick={() => setMenuOpen(true)}
           >
             <Menu className="h-[22px] w-[22px]" strokeWidth={1.25} />
@@ -101,24 +105,26 @@ export function Header() {
           <img
             src={logoAsset.url}
             alt="MIRAVIKA — Luxury Redefined"
-            className="h-9 w-auto md:h-12"
+            className="h-11 w-auto transition-all duration-500 md:h-[60px]"
             width={220}
             height={56}
+            fetchPriority="high"
           />
         </Link>
 
+
         {/* RIGHT: icons */}
         <div className="flex flex-1 items-center justify-end gap-0.5 lg:flex-none">
-          <Link to="/search" aria-label="Search" className="p-2.5 transition-colors hover:text-gold">
+          <Link to="/search" aria-label="Search" className="grid h-11 w-11 place-items-center transition-colors hover:text-gold">
             <Search className="h-[18px] w-[18px]" strokeWidth={1.25} />
           </Link>
-          <Link to="/account" aria-label="Account" className="hidden p-2.5 transition-colors hover:text-gold sm:block">
+          <Link to="/account" aria-label="Account" className="hidden h-11 w-11 place-items-center transition-colors hover:text-gold sm:grid">
             <User className="h-[18px] w-[18px]" strokeWidth={1.25} />
           </Link>
-          <Link to="/wishlist" aria-label={`Wishlist (${wishlistCount})`} className="relative p-2.5 transition-colors hover:text-gold">
+          <Link to="/wishlist" aria-label={`Wishlist (${wishlistCount})`} className="relative grid h-11 w-11 place-items-center transition-colors hover:text-gold">
             <Heart className="h-[18px] w-[18px]" strokeWidth={1.25} />
             {wishlistCount > 0 && (
-              <span className="absolute top-1 right-1 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground">
+              <span className="absolute right-1 top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground">
                 {wishlistCount}
               </span>
             )}
@@ -126,17 +132,18 @@ export function Header() {
           <button
             aria-label={`Cart (${totalItems})`}
             onClick={() => setOpen(true)}
-            className="relative p-2.5 transition-colors hover:text-gold"
+            className="relative grid h-11 w-11 place-items-center transition-colors hover:text-gold"
           >
             <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.25} />
             {totalItems > 0 && (
-              <span className="absolute top-1 right-1 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground">
+              <span className="absolute right-1 top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground">
                 {totalItems}
               </span>
             )}
           </button>
         </div>
       </div>
+
 
       {/* DESKTOP NAV ROW — single centered row, luxury spacing */}
       <nav className={`hidden border-t transition-colors duration-500 lg:block ${transparent ? "border-white/10" : "border-border/30"}`}>

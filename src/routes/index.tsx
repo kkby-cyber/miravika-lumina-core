@@ -294,10 +294,10 @@ function Home() {
                   height={1200}
                   className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.07]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-noir/75 via-noir/15 to-transparent transition-opacity duration-700 group-hover:from-noir/85" />
+                <div className="absolute inset-0 bg-gradient-to-t from-noir/85 via-noir/30 to-transparent transition-opacity duration-700 group-hover:from-noir/90" />
                 <div className="absolute inset-x-0 bottom-0 p-5 text-ivory md:p-7">
-                  <p className="text-[9px] uppercase tracking-[0.3em] text-gold">{c.tag}</p>
-                  <h3 className="mt-1.5 font-display text-lg md:text-2xl">{c.title}</h3>
+                  <p className="text-[9px] uppercase leading-[1.6] tracking-[0.3em] text-gold">{c.tag}</p>
+                  <h3 className="mt-2 font-display text-lg leading-[1.2] md:text-2xl">{c.title}</h3>
                   <span className="mt-2 block h-px w-0 bg-gold transition-all duration-700 group-hover:w-12" />
                 </div>
               </Link>

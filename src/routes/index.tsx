@@ -136,9 +136,11 @@ function ProductRail({
   const collectionProducts = data?.products ?? [];
   const needFallback = !isLoading && collectionProducts.length === 0;
   const { data: fallback, isLoading: fallbackLoading } = useProducts(
-    needFallback ? (fallbackQuery ?? undefined) : undefined,
-    needFallback ? 8 : 0,
+    fallbackQuery || undefined,
+    8,
+    needFallback,
   );
+
   const products: ShopifyProduct[] = collectionProducts.length
     ? collectionProducts
     : needFallback

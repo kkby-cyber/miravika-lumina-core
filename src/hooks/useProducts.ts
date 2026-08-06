@@ -7,16 +7,18 @@ import {
   type ShopifyProduct,
 } from "@/lib/shopify";
 
-export function useProducts(query?: string, first = 50) {
+export function useProducts(query?: string, first = 50, enabled = true) {
   return useQuery({
     queryKey: ["shopify-products", query ?? "", first],
     queryFn: async () => {
       const data = await storefrontApiRequest(PRODUCTS_QUERY, { first, query: query ?? null });
       return (data?.data?.products?.edges ?? []) as ShopifyProduct[];
     },
+    enabled,
     staleTime: 60_000,
   });
 }
+
 
 export function useProduct(handle: string) {
   return useQuery({

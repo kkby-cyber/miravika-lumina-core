@@ -32,7 +32,6 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const priceAmt = parseFloat(p.priceRange.minVariantPrice.amount);
   const currency = p.priceRange.minVariantPrice.currencyCode;
   const onSale = compareAmt !== null && compareAmt > priceAmt;
-  const pctOff = onSale && compareAmt ? Math.round((1 - priceAmt / compareAmt) * 100) : 0;
   const soldOut = !variant?.availableForSale;
   const hasVariants = (p.options?.[0]?.values?.length ?? 1) > 1 || (p.variants.edges.length > 1);
 
@@ -62,14 +61,14 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
 
   return (
     <Link to="/product/$handle" params={{ handle: p.handle }} className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-beige">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-beige shadow-[0_14px_36px_-30px_rgba(17,17,17,0.55)] transition-shadow duration-700 group-hover:shadow-[0_26px_50px_-28px_rgba(17,17,17,0.4)]">
         {img && (
           <img
             src={img.url}
             alt={img.altText ?? p.title}
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "auto"}
-            className="h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0"
+            className="h-full w-full object-cover transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] group-hover:opacity-0"
           />
         )}
         {img2 && (
@@ -77,23 +76,17 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
             src={img2.url}
             alt=""
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] group-hover:opacity-100"
           />
         )}
 
-        {/* Badges */}
-        <div className="absolute left-2 top-2 flex flex-col gap-1">
-          {onSale && (
-            <span className="rounded-sm bg-noir px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-ivory">
-              −{pctOff}%
-            </span>
-          )}
-          {soldOut && (
-            <span className="rounded-sm bg-ivory/95 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-foreground">
-              Sold Out
-            </span>
-          )}
-        </div>
+        {/* Quiet status label only — no discount stickers */}
+        {soldOut && (
+          <span className="absolute left-3 top-3 rounded-full bg-ivory/90 px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-foreground/70 backdrop-blur">
+            Sold Out
+          </span>
+        )}
+
 
         <button
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
@@ -105,7 +98,7 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
             toggleWish(p.handle);
           }}
 
-          className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-ivory/90 backdrop-blur transition hover:bg-ivory"
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-ivory/90 backdrop-blur transition hover:bg-ivory"
         >
           <Heart className={`h-4 w-4 ${wished ? "fill-gold text-gold" : "text-foreground/70"}`} strokeWidth={1.5} />
         </button>
@@ -131,7 +124,7 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
       </div>
 
       <div className="mt-3 px-0.5">
-        <h3 className="line-clamp-1 text-[13px] font-medium text-foreground md:text-sm">{p.title}</h3>
+        <h3 className="line-clamp-2 text-[13px] leading-snug font-medium text-foreground md:text-sm">{p.title}</h3>
         <InlineRating average={rating?.average} count={rating?.count} />
 
         <div className="mt-1 flex items-baseline gap-2">

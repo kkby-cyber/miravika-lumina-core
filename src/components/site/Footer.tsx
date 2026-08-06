@@ -77,7 +77,7 @@ export function Footer() {
 
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-5">
           <div className="md:col-span-2">
-            <img src={logoAsset.url} alt="MIRAVIKA" className="h-14 w-auto brightness-110" />
+            <img src={logoAsset.url} alt="MIRAVIKA" className="h-16 w-auto brightness-110 md:h-20" loading="lazy" />
             <p className="mt-4 max-w-sm text-sm text-ivory/70">
               A premium global lifestyle brand — fashion, jewelry, beauty, home and lifestyle essentials, thoughtfully curated for the modern customer. Worldwide shipping.
             </p>
@@ -135,11 +135,25 @@ export function Footer() {
         </div>
 
         <div className="border-t border-white/10">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2.5 px-6 py-5">
+            {["UPI", "Visa", "Mastercard", "Amex", "Net Banking", "Cash on Delivery"].map((m) => (
+              <span
+                key={m}
+                className="rounded-md border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-ivory/65"
+              >
+                {m}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 text-[11px] tracking-wider text-ivory/50 md:flex-row">
             <p>© {new Date().getFullYear()} MIRAVIKA · Luxury Redefined</p>
             <p>Crafted worldwide · Delivered with care</p>
           </div>
         </div>
+
       </div>
     </footer>
   );

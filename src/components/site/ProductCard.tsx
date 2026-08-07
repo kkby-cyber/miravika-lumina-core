@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Heart, Loader2, Plus } from "lucide-react";
+import { Eye, Heart, Loader2, Plus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { formatPrice, type ShopifyProduct } from "@/lib/shopify";
@@ -12,7 +12,9 @@ import { itemFromProduct, trackAddToWishlist, trackRemoveFromWishlist } from "@/
 
 export function ProductCard({ product, priority = false }: { product: ShopifyProduct; priority?: boolean }) {
   const p = product.node;
-  const variant = p.variants.edges[0]?.node;
+  const variantEdges = p.variants.edges;
+  // Prefer the first purchasable variant — never judge stock by variant #1 alone.
+  const variant = (variantEdges.find((v) => v.node.availableForSale) ?? variantEdges[0])?.node;
   const img = p.images.edges[0]?.node;
   const img2 = p.images.edges[1]?.node;
   const addItem = useCartStore((s) => s.addItem);
@@ -32,15 +34,23 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const priceAmt = parseFloat(p.priceRange.minVariantPrice.amount);
   const currency = p.priceRange.minVariantPrice.currencyCode;
   const onSale = compareAmt !== null && compareAmt > priceAmt;
-  const soldOut = !variant?.availableForSale;
-  const hasVariants = (p.options?.[0]?.values?.length ?? 1) > 1 || (p.variants.edges.length > 1);
+  // Product-level availability is the source of truth; fall back to variant flags.
+  const soldOut =
+    p.availableForSale === false ||
+    (p.availableForSale === undefined && !variantEdges.some((v) => v.node.availableForSale));
+  const hasVariants = (p.options?.[0]?.values?.length ?? 1) > 1 || variantEdges.length > 1;
+
+  const goToPdp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate({ to: "/product/$handle", params: { handle: p.handle } });
+  };
 
   const onAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!variant) return;
     if (hasVariants) {
-      // Direct to PDP for variant selection (SPA nav, preserves scroll & preload)
       navigate({ to: "/product/$handle", params: { handle: p.handle } });
       return;
     }
@@ -61,14 +71,15 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
 
   return (
     <Link to="/product/$handle" params={{ handle: p.handle }} className="group block">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-beige shadow-[0_14px_36px_-30px_rgba(17,17,17,0.55)] transition-shadow duration-700 group-hover:shadow-[0_26px_50px_-28px_rgba(17,17,17,0.4)]">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-beige shadow-[0_14px_36px_-30px_rgba(17,17,17,0.55)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1 group-hover:shadow-[0_30px_56px_-28px_rgba(17,17,17,0.42)]">
         {img && (
           <img
             src={img.url}
             alt={img.altText ?? p.title}
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "auto"}
-            className="h-full w-full object-cover transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] group-hover:opacity-0"
+            decoding="async"
+            className="h-full w-full object-cover transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06] group-hover:opacity-0"
           />
         )}
         {img2 && (
@@ -76,7 +87,8 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
             src={img2.url}
             alt=""
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] group-hover:opacity-100"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06] group-hover:opacity-100"
           />
         )}
 
@@ -87,21 +99,32 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
           </span>
         )}
 
-
-        <button
-          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-          onClick={(e) => {
-            e.preventDefault();
-            const ga = [itemFromProduct(p)];
-            const cur = p.priceRange.minVariantPrice.currencyCode;
-            wished ? trackRemoveFromWishlist(ga, cur) : trackAddToWishlist(ga, cur);
-            toggleWish(p.handle);
-          }}
-
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-ivory/90 backdrop-blur transition hover:bg-ivory"
-        >
-          <Heart className={`h-4 w-4 ${wished ? "fill-gold text-gold" : "text-foreground/70"}`} strokeWidth={1.5} />
-        </button>
+        <div className="absolute right-3 top-3 flex flex-col gap-2">
+          <button
+            aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const ga = [itemFromProduct(p)];
+              const cur = p.priceRange.minVariantPrice.currencyCode;
+              wished ? trackRemoveFromWishlist(ga, cur) : trackAddToWishlist(ga, cur);
+              toggleWish(p.handle);
+            }}
+            className="grid h-9 w-9 place-items-center rounded-full bg-ivory/90 backdrop-blur transition-transform duration-300 hover:bg-ivory active:scale-90"
+          >
+            <Heart
+              className={`h-4 w-4 transition-transform duration-300 ${wished ? "scale-110 fill-gold text-gold" : "text-foreground/70"}`}
+              strokeWidth={1.5}
+            />
+          </button>
+          <button
+            aria-label="Quick view"
+            onClick={goToPdp}
+            className="hidden h-9 w-9 translate-x-2 place-items-center rounded-full bg-ivory/90 opacity-0 backdrop-blur transition-all duration-500 hover:bg-ivory group-hover:translate-x-0 group-hover:opacity-100 md:grid"
+          >
+            <Eye className="h-4 w-4 text-foreground/70" strokeWidth={1.5} />
+          </button>
+        </div>
 
         {/* Quick add */}
         {!soldOut && (
@@ -124,11 +147,13 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
       </div>
 
       <div className="mt-3 px-0.5">
-        <h3 className="line-clamp-2 text-[13px] leading-snug font-medium text-foreground md:text-sm">{p.title}</h3>
+        <h3 className="line-clamp-2 text-[13px] leading-snug font-medium text-foreground transition-colors duration-300 group-hover:text-gold md:text-sm">
+          {p.title}
+        </h3>
         <InlineRating average={rating?.average} count={rating?.count} />
 
         <div className="mt-1 flex items-baseline gap-2">
-          <p className="text-[13px] text-foreground md:text-sm">
+          <p className="text-[13px] text-foreground transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 md:text-sm">
             {formatPrice(priceAmt, currency)}
           </p>
           {onSale && compareAmt && (

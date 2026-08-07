@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useCollection, useProducts } from "@/hooks/useProducts";

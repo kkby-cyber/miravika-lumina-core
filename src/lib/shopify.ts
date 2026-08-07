@@ -11,6 +11,7 @@ export interface ShopifyProduct {
     title: string;
     description: string;
     handle: string;
+    availableForSale?: boolean;
     productType?: string;
     tags?: string[];
     priceRange: {
@@ -72,7 +73,7 @@ export async function storefrontApiRequest(query: string, variables: Record<stri
 }
 
 const PRODUCT_FIELDS = `
-  id title description handle productType tags
+  id title description handle productType tags availableForSale
   priceRange { minVariantPrice { amount currencyCode } }
   compareAtPriceRange { minVariantPrice { amount currencyCode } }
   images(first: 8) { edges { node { url altText } } }
@@ -153,22 +154,38 @@ export const COLLECTION_SLUG_MAP: Record<string, string> = {
   "magnetic-earrings": "jewelry-accessories",
   "fashion-accessories": "womens-fashion",
   "beauty-accessories": "beauty-personal-care",
-  "hair-accessories": "jewelry-accessories",
-  "home-decor": "home-kitchen",
+  "hair-accessories": "womens-fashion",
+  // Retired collections — permanently folded into the live seven
+  "home-decor": "gifts",
+  "home-kitchen": "gifts",
+  home: "gifts",
+  "electronics-accessories": "gifts",
+  tech: "gifts",
+  electronics: "gifts",
   luxury: "best-sellers",
   bags: "womens-fashion",
-  scrunchies: "jewelry-accessories",
-  bows: "jewelry-accessories",
-  clips: "jewelry-accessories",
-  bands: "jewelry-accessories",
+  scrunchies: "womens-fashion",
+  bows: "womens-fashion",
+  clips: "womens-fashion",
+  bands: "womens-fashion",
   accessories: "jewelry-accessories",
-  tech: "electronics-accessories",
-  electronics: "electronics-accessories",
+  jewellery: "jewelry-accessories",
+  rakhi: "gifts",
   women: "womens-fashion",
   fashion: "womens-fashion",
   beauty: "beauty-personal-care",
-  home: "home-kitchen",
 };
+
+/** The only collections the storefront exposes. */
+export const LIVE_COLLECTIONS = [
+  { slug: "new-arrivals", label: "New Arrivals" },
+  { slug: "trending-now", label: "Trending Now" },
+  { slug: "womens-fashion", label: "Women's Fashion" },
+  { slug: "jewelry-accessories", label: "Jewelry & Accessories" },
+  { slug: "beauty-personal-care", label: "Beauty & Personal Care" },
+  { slug: "gifts", label: "Gifts" },
+  { slug: "best-sellers", label: "Best Sellers" },
+] as const;
 
 export function resolveCollectionHandle(slug: string) {
   return COLLECTION_SLUG_MAP[slug] ?? slug;

@@ -14,8 +14,6 @@ const NAV: NavItem[] = [
   { label: "Women's Fashion", slug: "womens-fashion" },
   { label: "Jewelry & Accessories", slug: "jewelry-accessories" },
   { label: "Beauty & Personal Care", slug: "beauty-personal-care" },
-  { label: "Home & Kitchen", slug: "home-kitchen" },
-  { label: "Electronics & Accessories", slug: "electronics-accessories" },
   { label: "Gifts", slug: "gifts" },
   { label: "Best Sellers", slug: "best-sellers" },
 ];

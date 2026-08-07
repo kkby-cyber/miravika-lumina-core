@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useCollection, useProducts } from "@/hooks/useProducts";
@@ -16,8 +16,6 @@ const HANDLE_COPY: Record<string, { title: string; sub: string }> = {
   "womens-fashion": { title: "Women's Fashion", sub: "Ready-to-wear, elevated for every day and every occasion." },
   "jewelry-accessories": { title: "Jewelry & Accessories", sub: "Sterling silver, moissanite and heirloom-inspired pieces." },
   "beauty-personal-care": { title: "Beauty & Personal Care", sub: "Skincare, tools and ritual essentials — curated for the modern woman." },
-  "home-kitchen": { title: "Home & Kitchen", sub: "Thoughtful essentials that elevate every corner of your home." },
-  "electronics-accessories": { title: "Electronics & Accessories", sub: "Smart, sleek gadgets designed to simplify your day." },
   "gifts": { title: "Gifts", sub: "Considered gifting for every occasion." },
   "trending-now": { title: "Trending Now", sub: "What's moving fast, worldwide." },
 };
@@ -71,6 +69,13 @@ export const Route = createFileRoute("/collection/$slug")({
         },
       ],
     };
+  },
+  // Retired / legacy slugs redirect to their live equivalent so no URL 404s.
+  beforeLoad: ({ params }) => {
+    const handle = resolveCollectionHandle(params.slug);
+    if (handle !== params.slug) {
+      throw redirect({ to: "/collection/$slug", params: { slug: handle }, replace: true });
+    }
   },
   component: CollectionPage,
 });

@@ -24,8 +24,6 @@ const COLLECTIONS = [
   "womens-fashion",
   "jewelry-accessories",
   "beauty-personal-care",
-  "home-kitchen",
-  "electronics-accessories",
   "gifts",
   "best-sellers",
 ];

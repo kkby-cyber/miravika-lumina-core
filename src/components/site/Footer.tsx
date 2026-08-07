@@ -110,7 +110,6 @@ export function Footer() {
               <li><Link to="/collection/$slug" params={{ slug: "womens-fashion" }} className="hover:text-gold">Women's Fashion</Link></li>
               <li><Link to="/collection/$slug" params={{ slug: "jewelry-accessories" }} className="hover:text-gold">Jewelry & Accessories</Link></li>
               <li><Link to="/collection/$slug" params={{ slug: "beauty-personal-care" }} className="hover:text-gold">Beauty</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "home-kitchen" }} className="hover:text-gold">Home & Kitchen</Link></li>
               <li><Link to="/collection/$slug" params={{ slug: "gifts" }} className="hover:text-gold">Gifts</Link></li>
             </ul>
           </div>

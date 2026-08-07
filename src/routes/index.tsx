@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Award, Globe, Handshake, Heart, ShieldCheck, Sparkles } from "lucide-react";
-import { useCollection, useProducts } from "@/hooks/useProducts";
-import { ProductCard } from "@/components/site/ProductCard";
+import { useCollection } from "@/hooks/useProducts";
+import { ProductCarousel } from "@/components/site/ProductCarousel";
+import { VideoSection } from "@/components/site/VideoSection";
 import { Reveal } from "@/components/site/Reveal";
 import { Newsletter } from "@/components/site/Newsletter";
 import heroChampagne from "@/assets/IMG-20260709-WA0018.jpg.asset.json";
@@ -16,10 +17,7 @@ import emerald from "@/assets/IMG-20260709-WA0009.jpg.asset.json";
 import catFashion from "@/assets/cat-fashion.jpg.asset.json";
 import catJewelry from "@/assets/cat-jewelry.jpg.asset.json";
 import catBeauty from "@/assets/cat-beauty.jpg.asset.json";
-import catHome from "@/assets/cat-home.jpg.asset.json";
-import catTech from "@/assets/cat-tech.jpg.asset.json";
 import catGifts from "@/assets/cat-gifts.jpg.asset.json";
-import type { ShopifyProduct } from "@/lib/shopify";
 import { CustomerGallery, Testimonials } from "@/components/site/Testimonials";
 
 const SITE = "https://miravika.com";
@@ -96,12 +94,12 @@ export const Route = createFileRoute("/")({
 });
 
 const CATEGORIES = [
+  { slug: "new-arrivals", title: "New Arrivals", tag: "Just Landed", img: streetScarf.url },
   { slug: "womens-fashion", title: "Women's Fashion", tag: "Ready to Wear", img: catFashion.url },
   { slug: "jewelry-accessories", title: "Jewelry & Accessories", tag: "Fine · Fashion", img: catJewelry.url },
-  { slug: "beauty-personal-care", title: "Beauty", tag: "Ritual Essentials", img: catBeauty.url },
-  { slug: "home-kitchen", title: "Home & Kitchen", tag: "Everyday Elevated", img: catHome.url },
-  { slug: "electronics-accessories", title: "Tech", tag: "Smart · Sleek", img: catTech.url },
+  { slug: "beauty-personal-care", title: "Beauty & Personal Care", tag: "Ritual Essentials", img: catBeauty.url },
   { slug: "gifts", title: "Gifts", tag: "For Every Occasion", img: catGifts.url },
+  { slug: "trending-now", title: "Trending Now", tag: "Moving Fast", img: emerald.url },
 ] as const;
 
 const WHY = [
@@ -113,91 +111,27 @@ const WHY = [
   { icon: Handshake, title: "Easy Returns" },
 ];
 
-function ProductRail({
+function CollectionCarousel({
   eyebrow,
   title,
   sub,
-  handle,
-  ctaSlug,
-  priority,
-  fallbackQuery,
-  tone = "light",
+  slug,
 }: {
   eyebrow: string;
   title: string;
   sub?: string;
-  handle: string;
-  ctaSlug: string;
-  priority?: boolean;
-  fallbackQuery?: string;
-  tone?: "light" | "beige";
+  slug: string;
 }) {
-  const { data, isLoading } = useCollection(handle, 8);
-  const collectionProducts = data?.products ?? [];
-  const needFallback = !isLoading && collectionProducts.length === 0;
-  const { data: fallback, isLoading: fallbackLoading } = useProducts(
-    fallbackQuery || undefined,
-    8,
-    needFallback,
-  );
-
-  const products: ShopifyProduct[] = collectionProducts.length
-    ? collectionProducts
-    : needFallback
-      ? (fallback ?? [])
-      : [];
-  const loading = isLoading || (needFallback && fallbackLoading);
-
+  const { data, isLoading } = useCollection(slug, 16);
   return (
-    <section
-      aria-labelledby={`rail-${handle}`}
-      className={tone === "beige" ? "bg-beige/40" : undefined}
-    >
-      <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-28">
-        <Reveal className="mb-8 flex items-end justify-between gap-6 md:mb-14">
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.34em] text-gold">{eyebrow}</p>
-            <h2 id={`rail-${handle}`} className="mt-3 font-display text-[28px] leading-tight md:text-5xl">
-              {title}
-            </h2>
-            {sub && <p className="mt-3 max-w-lg text-[13px] leading-relaxed text-muted-foreground md:text-sm">{sub}</p>}
-          </div>
-          <Link
-            to="/collection/$slug"
-            params={{ slug: ctaSlug }}
-            className="hidden shrink-0 border-b border-foreground/25 pb-1 text-[11px] uppercase tracking-[0.22em] text-foreground/70 transition-colors hover:border-gold hover:text-gold md:inline-block"
-          >
-            View all
-          </Link>
-        </Reveal>
-
-        {loading ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-7">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="aspect-[4/5] animate-pulse rounded-xl bg-beige" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-7">
-            {products.slice(0, 8).map((p: ShopifyProduct, i) => (
-              <Reveal key={p.node.id} delay={Math.min(i, 3) * 70}>
-                <ProductCard product={p} priority={priority && i < 2} />
-              </Reveal>
-            ))}
-          </div>
-        )}
-
-        <div className="mt-10 flex justify-center md:hidden">
-          <Link
-            to="/collection/$slug"
-            params={{ slug: ctaSlug }}
-            className="inline-flex min-h-12 items-center gap-2 rounded-full border border-foreground/20 px-9 text-[11px] uppercase tracking-[0.22em] transition-colors hover:border-gold hover:text-gold"
-          >
-            View All <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </div>
-      </div>
-    </section>
+    <ProductCarousel
+      eyebrow={eyebrow}
+      title={title}
+      subtitle={sub}
+      slug={slug}
+      products={data?.products ?? []}
+      isLoading={isLoading}
+    />
   );
 }
 
@@ -261,6 +195,17 @@ function Home() {
         </div>
       </section>
 
+      {/* FILM — SIGNATURE */}
+      <VideoSection
+        src="/video/miravika-signature.mp4"
+        poster="/video/miravika-signature-poster.jpg"
+        eyebrow="The Film"
+        title={<>The Miravika <span className="italic gold-gradient-text">signature.</span></>}
+        copy="A closer look at the craft, the finish and the detail behind every piece we curate."
+        ctaLabel="Shop New Arrivals"
+        ctaSlug="new-arrivals"
+      />
+
       {/* CATEGORIES */}
       <section aria-labelledby="categories-heading" className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-28">
         <Reveal className="mb-10 flex items-end justify-between gap-6 md:mb-16">
@@ -306,17 +251,22 @@ function Home() {
         </ul>
       </section>
 
-      {/* BEST SELLERS */}
-      <ProductRail
-        eyebrow="Best Sellers"
-        title="Most Loved"
-        sub="The pieces our community returns to, season after season."
-        handle="best-sellers"
-        ctaSlug="best-sellers"
-        fallbackQuery=""
-        tone="beige"
-        priority
+      {/* FILM — GIFTING */}
+      <VideoSection
+        src="/video/miravika-rakhi.mp4"
+        poster="/video/miravika-rakhi-poster.jpg"
+        eyebrow="Gifting Edit"
+        title={<>Gifts wrapped in <span className="italic gold-gradient-text">gold.</span></>}
+        copy="Festive-ready keepsakes, presented in signature Miravika packaging — made to be remembered."
+        ctaLabel="Shop Gifts"
+        ctaSlug="gifts"
+        align="right"
       />
+
+      {/* BEST SELLERS */}
+      <div className="bg-beige/40">
+      <CollectionCarousel eyebrow="Best Sellers" title="Most Loved" sub="The pieces our community returns to, season after season." slug="best-sellers" />
+      </div>
 
       {/* EDITORIAL SPLIT */}
       <section className="bg-noir text-ivory">
@@ -354,14 +304,7 @@ function Home() {
       </section>
 
       {/* NEW ARRIVALS */}
-      <ProductRail
-        eyebrow="Just Landed"
-        title="New Arrivals"
-        sub="The newest additions to the boutique."
-        handle="new-arrivals"
-        ctaSlug="new-arrivals"
-        fallbackQuery=""
-      />
+      <CollectionCarousel eyebrow="Just Landed" title="New Arrivals" sub="The newest additions to the boutique." slug="new-arrivals" />
 
       {/* JEWELRY SPOTLIGHT */}
       <section className="bg-beige">
@@ -398,35 +341,15 @@ function Home() {
       </section>
 
       {/* TRENDING NOW */}
-      <ProductRail
-        eyebrow="Trending Now"
-        title="The Zeitgeist"
-        sub="What's moving fast, worldwide."
-        handle="trending-now"
-        ctaSlug="trending-now"
-        fallbackQuery=""
-      />
+      <CollectionCarousel eyebrow="Trending Now" title="The Zeitgeist" sub="What&apos;s moving fast, worldwide." slug="trending-now" />
 
-      {/* LUXURY ESSENTIALS */}
-      <ProductRail
-        eyebrow="Luxury Essentials"
-        title="The Foundations"
-        sub="Quiet, versatile pieces that anchor everything else."
-        handle="luxury-essentials"
-        ctaSlug="best-sellers"
-        fallbackQuery="tag:essentials"
-        tone="beige"
-      />
+      {/* WOMEN'S FASHION */}
+      <div className="bg-beige/40">
+      <CollectionCarousel eyebrow="Women&apos;s Fashion" title="Ready to Wear" sub="Considered silhouettes for every day and every occasion." slug="womens-fashion" />
+      </div>
 
-      {/* EDITOR'S PICKS */}
-      <ProductRail
-        eyebrow="Editor's Picks"
-        title="Chosen by Our Studio"
-        sub="A short list from the people who curate every drop."
-        handle="editors-picks"
-        ctaSlug="trending-now"
-        fallbackQuery="tag:editors-pick"
-      />
+      {/* JEWELRY */}
+      <CollectionCarousel eyebrow="Jewelry &amp; Accessories" title="Little Things That Shine" sub="Sterling silver, moissanite and heirloom-inspired pieces." slug="jewelry-accessories" />
 
       {/* PROMISE */}
       <section aria-label="Our promise" className="border-y border-border/50 bg-ivory">
@@ -459,7 +382,7 @@ function Home() {
           {[
             { img: streetScarf.url, title: "For the Traveller", tag: "Fashion", slug: "womens-fashion" },
             { img: emerald.url, title: "For the Occasion", tag: "Jewelry", slug: "jewelry-accessories" },
-            { img: corridor.url, title: "For the Home", tag: "Home & Kitchen", slug: "home-kitchen" },
+            { img: corridor.url, title: "For the Celebration", tag: "Gifts", slug: "gifts" },
           ].map((g, i) => (
             <Reveal as="li" key={g.title} delay={i * 90}>
               <Link
@@ -531,7 +454,7 @@ function Home() {
           <div className="mx-auto mt-5 h-px w-16 gold-line" />
         </Reveal>
         <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {[streetBeige.url, catJewelry.url, emerald.url, catHome.url, catBeauty.url, heroBoutique.url, catGifts.url, heroBlackGold.url].map(
+          {[streetBeige.url, catJewelry.url, emerald.url, streetScarf.url, catBeauty.url, heroBoutique.url, catGifts.url, heroBlackGold.url].map(
             (src, i) => (
               <li key={src + i} className={i > 3 ? "hidden md:block" : undefined}>
                 <a

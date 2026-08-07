@@ -70,6 +70,13 @@ export const Route = createFileRoute("/collection/$slug")({
       ],
     };
   },
+  // Retired / legacy slugs redirect to their live equivalent so no URL 404s.
+  beforeLoad: ({ params }) => {
+    const handle = resolveCollectionHandle(params.slug);
+    if (handle !== params.slug) {
+      throw redirect({ to: "/collection/$slug", params: { slug: handle }, replace: true });
+    }
+  },
   component: CollectionPage,
 });
 

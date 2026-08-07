@@ -16,8 +16,6 @@ const HANDLE_COPY: Record<string, { title: string; sub: string }> = {
   "womens-fashion": { title: "Women's Fashion", sub: "Ready-to-wear, elevated for every day and every occasion." },
   "jewelry-accessories": { title: "Jewelry & Accessories", sub: "Sterling silver, moissanite and heirloom-inspired pieces." },
   "beauty-personal-care": { title: "Beauty & Personal Care", sub: "Skincare, tools and ritual essentials — curated for the modern woman." },
-  "home-kitchen": { title: "Home & Kitchen", sub: "Thoughtful essentials that elevate every corner of your home." },
-  "electronics-accessories": { title: "Electronics & Accessories", sub: "Smart, sleek gadgets designed to simplify your day." },
   "gifts": { title: "Gifts", sub: "Considered gifting for every occasion." },
   "trending-now": { title: "Trending Now", sub: "What's moving fast, worldwide." },
 };

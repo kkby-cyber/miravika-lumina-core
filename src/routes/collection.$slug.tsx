@@ -76,6 +76,7 @@ export const Route = createFileRoute("/collection/$slug")({
     if (handle !== params.slug) {
       throw redirect({ to: "/collection/$slug", params: { slug: handle }, replace: true });
     }
+    return {};
   },
   component: CollectionPage,
 });

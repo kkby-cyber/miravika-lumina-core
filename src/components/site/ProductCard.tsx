@@ -23,7 +23,7 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const [busy, setBusy] = useState(false);
   const [added, setAdded] = useState(false);
   const [quickView, setQuickView] = useState(false);
-  const addedTimer = useRef<ReturnType<typeof setTimeout>>();
+  const addedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const wished = useWishlistStore((s) => s.has(p.handle));
   const toggleWish = useWishlistStore((s) => s.toggle);
   const navigate = useNavigate();

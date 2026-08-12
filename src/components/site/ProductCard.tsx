@@ -80,7 +80,8 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
 
 
   return (
-    <Link to="/product/$handle" params={{ handle: p.handle }} className="group block">
+    <div className="group block">
+      <Link to="/product/$handle" params={{ handle: p.handle }} className="block">
       <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-beige shadow-[0_14px_36px_-30px_rgba(17,17,17,0.55)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1 group-hover:shadow-[0_30px_56px_-28px_rgba(17,17,17,0.42)]">
         {img && (
           <img

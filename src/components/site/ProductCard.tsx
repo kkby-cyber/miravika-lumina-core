@@ -137,24 +137,6 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
           </button>
         </div>
 
-        {/* Quick add */}
-        {!soldOut && (
-          <button
-            onClick={onAdd}
-            disabled={busy}
-            aria-label={hasVariants ? "Choose options" : "Quick add"}
-            className="absolute inset-x-2 bottom-2 hidden translate-y-3 items-center justify-center gap-2 rounded-full bg-foreground py-2.5 text-[11px] uppercase tracking-[0.18em] text-ivory opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 disabled:opacity-50 md:inline-flex"
-          >
-            {busy ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <>
-                <Plus className="h-3.5 w-3.5" />
-                {hasVariants ? "Choose Options" : "Quick Add"}
-              </>
-            )}
-          </button>
-        )}
       </div>
 
       <div className="mt-3 px-0.5">
@@ -174,6 +156,40 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
           )}
         </div>
       </div>
-    </Link>
+      </Link>
+
+      {/* Always-visible luxury quick add — never overlaps the image */}
+      <button
+        type="button"
+        onClick={onAdd}
+        disabled={busy || soldOut}
+        aria-label={soldOut ? "Sold out" : hasVariants ? "Choose options" : `Add ${p.title} to cart`}
+        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-gold/60 bg-ivory px-3 py-2.5 text-[10px] uppercase tracking-[0.18em] text-foreground transition-all duration-300 hover:border-gold hover:bg-beige disabled:cursor-not-allowed disabled:opacity-45 md:text-[11px]"
+      >
+        {busy ? (
+          <>
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-gold" />
+            Adding
+          </>
+        ) : added ? (
+          <>
+            <Check className="h-3.5 w-3.5 text-gold" />
+            Added to Cart
+          </>
+        ) : soldOut ? (
+          "Sold Out"
+        ) : (
+          <>
+            <Plus className="h-3.5 w-3.5 text-gold" />
+            {hasVariants ? "Select Options" : "Add to Cart"}
+          </>
+        )}
+      </button>
+
+      {hasVariants && (
+        <QuickViewModal product={product} open={quickView} onOpenChange={setQuickView} />
+      )}
+    </div>
   );
 }
+

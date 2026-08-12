@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Eye, Heart, Loader2, Plus } from "lucide-react";
-import { useState } from "react";
+import { Check, Eye, Heart, Loader2, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { formatPrice, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useProductRating } from "@/hooks/useReviews";
 import { InlineRating } from "@/components/site/Stars";
+import { QuickViewModal } from "@/components/site/QuickViewModal";
 import { itemFromProduct, trackAddToWishlist, trackRemoveFromWishlist } from "@/lib/analytics";
 
 
@@ -20,11 +21,15 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const addItem = useCartStore((s) => s.addItem);
   const setOpen = useCartStore((s) => s.setOpen);
   const [busy, setBusy] = useState(false);
+  const [added, setAdded] = useState(false);
+  const [quickView, setQuickView] = useState(false);
+  const addedTimer = useRef<ReturnType<typeof setTimeout>>();
   const wished = useWishlistStore((s) => s.has(p.handle));
   const toggleWish = useWishlistStore((s) => s.toggle);
   const navigate = useNavigate();
   const rating = useProductRating(p.handle);
 
+  useEffect(() => () => clearTimeout(addedTimer.current), []);
 
   const compareAmt = variant?.compareAtPrice?.amount
     ? parseFloat(variant.compareAtPrice.amount)
@@ -49,9 +54,10 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const onAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!variant) return;
+    if (!variant || busy) return;
+    // Multiple variants → let the shopper choose without leaving the page.
     if (hasVariants) {
-      navigate({ to: "/product/$handle", params: { handle: p.handle } });
+      setQuickView(true);
       return;
     }
     setBusy(true);
@@ -64,9 +70,13 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
       selectedOptions: variant.selectedOptions ?? [],
     });
     setBusy(false);
-    toast.success("Added to bag", { position: "top-center" });
+    setAdded(true);
+    clearTimeout(addedTimer.current);
+    addedTimer.current = setTimeout(() => setAdded(false), 2000);
+    toast.success("Added to Cart", { description: p.title, position: "top-center" });
     setOpen(true);
   };
+
 
 
   return (

@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Eye, Heart, Loader2, Plus } from "lucide-react";
-import { useState } from "react";
+import { Check, Eye, Heart, Loader2, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { formatPrice, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useProductRating } from "@/hooks/useReviews";
 import { InlineRating } from "@/components/site/Stars";
+import { QuickViewModal } from "@/components/site/QuickViewModal";
 import { itemFromProduct, trackAddToWishlist, trackRemoveFromWishlist } from "@/lib/analytics";
 
 
@@ -20,11 +21,15 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const addItem = useCartStore((s) => s.addItem);
   const setOpen = useCartStore((s) => s.setOpen);
   const [busy, setBusy] = useState(false);
+  const [added, setAdded] = useState(false);
+  const [quickView, setQuickView] = useState(false);
+  const addedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const wished = useWishlistStore((s) => s.has(p.handle));
   const toggleWish = useWishlistStore((s) => s.toggle);
   const navigate = useNavigate();
   const rating = useProductRating(p.handle);
 
+  useEffect(() => () => clearTimeout(addedTimer.current), []);
 
   const compareAmt = variant?.compareAtPrice?.amount
     ? parseFloat(variant.compareAtPrice.amount)
@@ -49,9 +54,10 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
   const onAdd = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!variant) return;
+    if (!variant || busy) return;
+    // Multiple variants → let the shopper choose without leaving the page.
     if (hasVariants) {
-      navigate({ to: "/product/$handle", params: { handle: p.handle } });
+      setQuickView(true);
       return;
     }
     setBusy(true);
@@ -64,13 +70,18 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
       selectedOptions: variant.selectedOptions ?? [],
     });
     setBusy(false);
-    toast.success("Added to bag", { position: "top-center" });
+    setAdded(true);
+    clearTimeout(addedTimer.current);
+    addedTimer.current = setTimeout(() => setAdded(false), 2000);
+    toast.success("Added to Cart", { description: p.title, position: "top-center" });
     setOpen(true);
   };
 
 
+
   return (
-    <Link to="/product/$handle" params={{ handle: p.handle }} className="group block">
+    <div className="group block">
+      <Link to="/product/$handle" params={{ handle: p.handle }} className="block">
       <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-beige shadow-[0_14px_36px_-30px_rgba(17,17,17,0.55)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1 group-hover:shadow-[0_30px_56px_-28px_rgba(17,17,17,0.42)]">
         {img && (
           <img
@@ -126,24 +137,6 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
           </button>
         </div>
 
-        {/* Quick add */}
-        {!soldOut && (
-          <button
-            onClick={onAdd}
-            disabled={busy}
-            aria-label={hasVariants ? "Choose options" : "Quick add"}
-            className="absolute inset-x-2 bottom-2 hidden translate-y-3 items-center justify-center gap-2 rounded-full bg-foreground py-2.5 text-[11px] uppercase tracking-[0.18em] text-ivory opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 disabled:opacity-50 md:inline-flex"
-          >
-            {busy ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <>
-                <Plus className="h-3.5 w-3.5" />
-                {hasVariants ? "Choose Options" : "Quick Add"}
-              </>
-            )}
-          </button>
-        )}
       </div>
 
       <div className="mt-3 px-0.5">
@@ -163,6 +156,40 @@ export function ProductCard({ product, priority = false }: { product: ShopifyPro
           )}
         </div>
       </div>
-    </Link>
+      </Link>
+
+      {/* Always-visible luxury quick add — never overlaps the image */}
+      <button
+        type="button"
+        onClick={onAdd}
+        disabled={busy || soldOut}
+        aria-label={soldOut ? "Sold out" : hasVariants ? "Choose options" : `Add ${p.title} to cart`}
+        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-gold/60 bg-ivory px-3 py-2.5 text-[10px] uppercase tracking-[0.18em] text-foreground transition-all duration-300 hover:border-gold hover:bg-beige disabled:cursor-not-allowed disabled:opacity-45 md:text-[11px]"
+      >
+        {busy ? (
+          <>
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-gold" />
+            Adding
+          </>
+        ) : added ? (
+          <>
+            <Check className="h-3.5 w-3.5 text-gold" />
+            Added to Cart
+          </>
+        ) : soldOut ? (
+          "Sold Out"
+        ) : (
+          <>
+            <Plus className="h-3.5 w-3.5 text-gold" />
+            {hasVariants ? "Select Options" : "Add to Cart"}
+          </>
+        )}
+      </button>
+
+      {hasVariants && (
+        <QuickViewModal product={product} open={quickView} onOpenChange={setQuickView} />
+      )}
+    </div>
   );
 }
+

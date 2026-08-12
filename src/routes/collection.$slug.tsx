@@ -71,7 +71,7 @@ export const Route = createFileRoute("/collection/$slug")({
     };
   },
   // Retired / legacy slugs redirect to their live equivalent so no URL 404s.
-  beforeLoad: ({ params }) => {
+  loader: ({ params }) => {
     const handle = resolveCollectionHandle(params.slug);
     if (handle !== params.slug) {
       throw redirect({ href: `/collection/${handle}`, replace: true });

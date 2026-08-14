@@ -143,6 +143,8 @@ export const useCartStore = create<CartStore>()(
             if (r) {
               set({ cartId: r.cartId, checkoutUrl: r.checkoutUrl, items: [{ ...item, lineId: r.lineId ?? null }] });
               added = true;
+            } else {
+              cartError("This item couldn't be added right now. Please try again.");
             }
           } else if (existing) {
             if (!existing.lineId) return;
@@ -151,16 +153,27 @@ export const useCartStore = create<CartStore>()(
             if (r.success) {
               set({ items: get().items.map((i) => (i.variantId === item.variantId ? { ...i, quantity: newQ } : i)) });
               added = true;
-            } else if (r.cartNotFound) clearCart();
+            } else if (r.cartNotFound) {
+              clearCart();
+              cartError("Your bag expired. Please add the item again.");
+            } else {
+              cartError("We couldn't update the quantity. It may be out of stock.");
+            }
           } else {
             const r = await addLine(cartId, { ...item, lineId: null });
             if (r.success) {
               set({ items: [...get().items, { ...item, lineId: r.lineId ?? null }] });
               added = true;
-            } else if (r.cartNotFound) clearCart();
+            } else if (r.cartNotFound) {
+              clearCart();
+              cartError("Your bag expired. Please add the item again.");
+            } else {
+              cartError("This item couldn't be added right now. Please try again.");
+            }
           }
         } catch (e) {
           console.error(e);
+          cartError("Network issue — please check your connection and try again.");
         } finally {
           set({ isLoading: false });
         }

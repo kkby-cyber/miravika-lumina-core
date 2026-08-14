@@ -17,10 +17,13 @@ const FREE_SHIP_INR = 2999;
 const FREE_SHIP_USD = 49;
 
 export function CartDrawer() {
-  const { items, isOpen, setOpen, isLoading, isSyncing, updateQuantity, removeItem, getCheckoutUrl, syncCart } = useCartStore();
+  const { items, isOpen, setOpen, isLoading, isSyncing, updateQuantity, removeItem, openCheckout, syncCart, cost } = useCartStore();
   const totalItems = items.reduce((a, b) => a + b.quantity, 0);
-  const currency = items[0]?.price.currencyCode || "INR";
-  const total = items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
+  // Prefer Shopify's own cart cost; the local sum is only a pre-sync placeholder.
+  const currency = cost?.subtotalAmount.currencyCode || items[0]?.price.currencyCode || "INR";
+  const total = cost
+    ? parseFloat(cost.subtotalAmount.amount)
+    : items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
 
   const threshold = currency === "INR" ? FREE_SHIP_INR : FREE_SHIP_USD;
   const remaining = Math.max(0, threshold - total);

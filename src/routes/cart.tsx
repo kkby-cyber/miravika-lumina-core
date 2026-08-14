@@ -20,9 +20,12 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { items, updateQuantity, removeItem, getCheckoutUrl } = useCartStore();
-  const currency = items[0]?.price.currencyCode || "INR";
-  const subtotal = items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
+  const { items, updateQuantity, removeItem, openCheckout, cost } = useCartStore();
+  // Shopify's cart cost is authoritative; the local sum is only a pre-sync placeholder.
+  const currency = cost?.subtotalAmount.currencyCode || items[0]?.price.currencyCode || "INR";
+  const subtotal = cost
+    ? parseFloat(cost.subtotalAmount.amount)
+    : items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 md:py-16">
@@ -76,12 +79,11 @@ function CartPage() {
             <CouponField />
             <div className="my-4 gold-line" />
             <Button onClick={() => {
+              if (!openCheckout()) return;
               trackBeginCheckout(
                 items.map((i, idx) => itemFromProduct(i.product.node, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx })),
                 currency,
               );
-              const u = getCheckoutUrl();
-              if (u) window.open(u, "_blank");
             }} size="lg" className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90">
               Secure Checkout
             </Button>

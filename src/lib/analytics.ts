@@ -90,7 +90,9 @@ export function trackPurchase(order: {
   coupon?: string;
   items?: GA4Item[];
 }) {
+  // Only a real, Shopify-confirmed order with a positive amount may convert.
   if (typeof window === "undefined" || !order.transaction_id) return;
+  if (!Number.isFinite(order.value) || order.value <= 0) return;
   const key = `miravika_purchase_${order.transaction_id}`;
   try {
     if (window.sessionStorage.getItem(key)) return; // never double-count

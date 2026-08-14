@@ -2,6 +2,17 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { storefrontApiRequest, type ShopifyProduct } from "@/lib/shopify";
 import { itemFromProduct, trackAddToCart, trackRemoveFromCart } from "@/lib/analytics";
+import { toast } from "sonner";
+
+/** Customer-friendly failure notice — never surfaces raw API/stack detail. */
+function cartError(message = "We couldn't update your bag. Please try again.") {
+  toast.error(message, { position: "top-center" });
+}
+
+export interface Money {
+  amount: string;
+  currencyCode: string;
+}
 
 export interface CartItem {
   lineId: string | null;
@@ -29,10 +40,29 @@ interface CartStore {
   getCheckoutUrl: () => string | null;
   discountCode: string | null;
   setDiscountCode: (code: string | null) => void;
-
+  /** Authoritative amounts as calculated by Shopify (never computed locally). */
+  cost: { subtotalAmount: Money; totalAmount: Money } | null;
+  /** Opens Shopify's hosted checkout; falls back to same-tab when popups are blocked. */
+  openCheckout: () => boolean;
 }
 
-const CART_QUERY = `query cart($id: ID!) { cart(id: $id) { id totalQuantity } }`;
+const CART_QUERY = `query cart($id: ID!) {
+  cart(id: $id) {
+    id
+    totalQuantity
+    checkoutUrl
+    cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
+    lines(first: 100) {
+      edges {
+        node {
+          id
+          quantity
+          merchandise { ... on ProductVariant { id availableForSale } }
+        }
+      }
+    }
+  }
+}`;
 const CART_CREATE = `mutation cartCreate($input: CartInput!) { cartCreate(input: $input) { cart { id checkoutUrl lines(first:100){edges{node{id merchandise{... on ProductVariant{id}}}}} } userErrors { field message } } }`;
 const CART_ADD = `mutation cartLinesAdd($cartId: ID!, $lines:[CartLineInput!]!) { cartLinesAdd(cartId:$cartId, lines:$lines) { cart { id lines(first:100){edges{node{id merchandise{... on ProductVariant{id}}}}} } userErrors{field message} } }`;
 const CART_UPDATE = `mutation cartLinesUpdate($cartId: ID!, $lines:[CartLineUpdateInput!]!) { cartLinesUpdate(cartId:$cartId, lines:$lines) { cart{id} userErrors{field message} } }`;
@@ -113,6 +143,8 @@ export const useCartStore = create<CartStore>()(
             if (r) {
               set({ cartId: r.cartId, checkoutUrl: r.checkoutUrl, items: [{ ...item, lineId: r.lineId ?? null }] });
               added = true;
+            } else {
+              cartError("This item couldn't be added right now. Please try again.");
             }
           } else if (existing) {
             if (!existing.lineId) return;
@@ -121,16 +153,27 @@ export const useCartStore = create<CartStore>()(
             if (r.success) {
               set({ items: get().items.map((i) => (i.variantId === item.variantId ? { ...i, quantity: newQ } : i)) });
               added = true;
-            } else if (r.cartNotFound) clearCart();
+            } else if (r.cartNotFound) {
+              clearCart();
+              cartError("Your bag expired. Please add the item again.");
+            } else {
+              cartError("We couldn't update the quantity. It may be out of stock.");
+            }
           } else {
             const r = await addLine(cartId, { ...item, lineId: null });
             if (r.success) {
               set({ items: [...get().items, { ...item, lineId: r.lineId ?? null }] });
               added = true;
-            } else if (r.cartNotFound) clearCart();
+            } else if (r.cartNotFound) {
+              clearCart();
+              cartError("Your bag expired. Please add the item again.");
+            } else {
+              cartError("This item couldn't be added right now. Please try again.");
+            }
           }
         } catch (e) {
           console.error(e);
+          cartError("Network issue — please check your connection and try again.");
         } finally {
           set({ isLoading: false });
         }
@@ -157,7 +200,15 @@ export const useCartStore = create<CartStore>()(
               const ga = [itemFromProduct(item.product.node, { variantId, variantTitle: item.variantTitle, price: item.price.amount, quantity: Math.abs(delta) })];
               delta > 0 ? trackAddToCart(ga, item.price.currencyCode) : trackRemoveFromCart(ga, item.price.currencyCode);
             }
-          } else if (r.cartNotFound) clearCart();
+          } else if (r.cartNotFound) {
+            clearCart();
+            cartError("Your bag expired. Please add the item again.");
+          } else {
+            cartError("Only a limited quantity is available for this item.");
+          }
+        } catch (e) {
+          console.error(e);
+          cartError("Network issue — please check your connection and try again.");
         } finally {
           set({ isLoading: false });
         }
@@ -178,16 +229,22 @@ export const useCartStore = create<CartStore>()(
             const next = get().items.filter((i) => i.variantId !== variantId);
             next.length === 0 ? clearCart() : set({ items: next });
           } else if (r.cartNotFound) clearCart();
+          else cartError("We couldn't remove that item. Please try again.");
+        } catch (e) {
+          console.error(e);
+          cartError("Network issue — please check your connection and try again.");
         } finally {
           set({ isLoading: false });
         }
       },
 
 
-      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null }),
+      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null, cost: null }),
 
       discountCode: null,
       setDiscountCode: (code) => set({ discountCode: code ? code.trim().toUpperCase() : null }),
+
+      cost: null,
 
       // Shopify applies the code on its hosted checkout via the discount param
       getCheckoutUrl: () => {
@@ -198,6 +255,21 @@ export const useCartStore = create<CartStore>()(
         return `${checkoutUrl}${sep}discount=${encodeURIComponent(discountCode)}`;
       },
 
+      /**
+       * Hands the shopper to Shopify's hosted checkout (where Razorpay and every
+       * other configured Shopify payment method lives). The cart is never cleared
+       * here — only a Shopify-confirmed empty cart clears it, in syncCart.
+       */
+      openCheckout: () => {
+        const url = get().getCheckoutUrl();
+        if (!url || get().items.length === 0) {
+          cartError("Checkout isn't available right now. Please refresh and try again.");
+          return false;
+        }
+        const win = typeof window !== "undefined" ? window.open(url, "_blank", "noopener") : null;
+        if (!win && typeof window !== "undefined") window.location.href = url; // popup blocked
+        return true;
+      },
 
       syncCart: async () => {
         const { cartId, isSyncing, clearCart } = get();
@@ -205,9 +277,28 @@ export const useCartStore = create<CartStore>()(
         set({ isSyncing: true });
         try {
           const data = await storefrontApiRequest(CART_QUERY, { id: cartId });
-          if (!data) return;
+          if (!data) return; // API/billing error — keep the local bag intact
           const cart = data?.data?.cart;
-          if (!cart || cart.totalQuantity === 0) clearCart();
+          if (!cart || cart.totalQuantity === 0) {
+            clearCart();
+            return;
+          }
+          // Shopify is authoritative: reconcile quantities, drop lines it dropped,
+          // and store Shopify's own cost so we never invent a payable amount.
+          type Line = { node: { id: string; quantity: number; merchandise: { id: string } } };
+          const lines: Line[] = cart.lines?.edges ?? [];
+          const byVariant = new Map(lines.map((l) => [l.node.merchandise.id, l.node]));
+          const reconciled = get()
+            .items.filter((i) => byVariant.has(i.variantId))
+            .map((i) => {
+              const l = byVariant.get(i.variantId)!;
+              return { ...i, lineId: l.id, quantity: l.quantity };
+            });
+          set({
+            items: reconciled,
+            checkoutUrl: cart.checkoutUrl ? formatCheckoutUrl(cart.checkoutUrl) : get().checkoutUrl,
+            cost: cart.cost ?? null,
+          });
         } catch (e) {
           console.error(e);
         } finally {

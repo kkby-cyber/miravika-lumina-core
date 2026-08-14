@@ -2,6 +2,17 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { storefrontApiRequest, type ShopifyProduct } from "@/lib/shopify";
 import { itemFromProduct, trackAddToCart, trackRemoveFromCart } from "@/lib/analytics";
+import { toast } from "sonner";
+
+/** Customer-friendly failure notice — never surfaces raw API/stack detail. */
+function cartError(message = "We couldn't update your bag. Please try again.") {
+  toast.error(message, { position: "top-center" });
+}
+
+export interface Money {
+  amount: string;
+  currencyCode: string;
+}
 
 export interface CartItem {
   lineId: string | null;

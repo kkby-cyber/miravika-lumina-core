@@ -20,9 +20,12 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { items, updateQuantity, removeItem, getCheckoutUrl } = useCartStore();
-  const currency = items[0]?.price.currencyCode || "INR";
-  const subtotal = items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
+  const { items, updateQuantity, removeItem, openCheckout, cost } = useCartStore();
+  // Shopify's cart cost is authoritative; the local sum is only a pre-sync placeholder.
+  const currency = cost?.subtotalAmount.currencyCode || items[0]?.price.currencyCode || "INR";
+  const subtotal = cost
+    ? parseFloat(cost.subtotalAmount.amount)
+    : items.reduce((a, b) => a + parseFloat(b.price.amount) * b.quantity, 0);
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 md:py-16">

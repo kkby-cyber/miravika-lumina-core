@@ -229,6 +229,10 @@ export const useCartStore = create<CartStore>()(
             const next = get().items.filter((i) => i.variantId !== variantId);
             next.length === 0 ? clearCart() : set({ items: next });
           } else if (r.cartNotFound) clearCart();
+          else cartError("We couldn't remove that item. Please try again.");
+        } catch (e) {
+          console.error(e);
+          cartError("Network issue — please check your connection and try again.");
         } finally {
           set({ isLoading: false });
         }

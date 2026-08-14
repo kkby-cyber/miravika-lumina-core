@@ -79,12 +79,11 @@ function CartPage() {
             <CouponField />
             <div className="my-4 gold-line" />
             <Button onClick={() => {
+              if (!openCheckout()) return;
               trackBeginCheckout(
                 items.map((i, idx) => itemFromProduct(i.product.node, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx })),
                 currency,
               );
-              const u = getCheckoutUrl();
-              if (u) window.open(u, "_blank");
             }} size="lg" className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90">
               Secure Checkout
             </Button>

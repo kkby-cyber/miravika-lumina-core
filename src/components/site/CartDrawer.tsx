@@ -43,10 +43,9 @@ export function CartDrawer() {
   }, [isOpen, syncCart]);
 
   const checkout = () => {
-    const url = getCheckoutUrl();
-    if (url) {
+    // begin_checkout fires only when Shopify checkout actually opens.
+    if (openCheckout()) {
       trackBeginCheckout(ga4Items(), currency);
-      window.open(url, "_blank");
       setOpen(false);
     }
   };

@@ -91,7 +91,7 @@ function ProductPage() {
   const addItem = useCartStore((s) => s.addItem);
   const setOpen = useCartStore((s) => s.setOpen);
   const isLoadingCart = useCartStore((s) => s.isLoading);
-  const getCheckoutUrl = useCartStore((s) => s.getCheckoutUrl);
+  const openCheckout = useCartStore((s) => s.openCheckout);
   const wished = useWishlistStore((s) => s.has(handle));
   const toggleWishRaw = useWishlistStore((s) => s.toggle);
   const toggleWish = (h: string) => {

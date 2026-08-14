@@ -200,7 +200,15 @@ export const useCartStore = create<CartStore>()(
               const ga = [itemFromProduct(item.product.node, { variantId, variantTitle: item.variantTitle, price: item.price.amount, quantity: Math.abs(delta) })];
               delta > 0 ? trackAddToCart(ga, item.price.currencyCode) : trackRemoveFromCart(ga, item.price.currencyCode);
             }
-          } else if (r.cartNotFound) clearCart();
+          } else if (r.cartNotFound) {
+            clearCart();
+            cartError("Your bag expired. Please add the item again.");
+          } else {
+            cartError("Only a limited quantity is available for this item.");
+          }
+        } catch (e) {
+          console.error(e);
+          cartError("Network issue — please check your connection and try again.");
         } finally {
           set({ isLoading: false });
         }

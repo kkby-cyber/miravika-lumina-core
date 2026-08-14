@@ -201,12 +201,15 @@ function ProductPage() {
   };
 
   const handleBuyNow = async () => {
+    if (!variant) return;
     await handleAdd();
-    // Wait a tick for cart state, then open checkout
-    setTimeout(() => {
-      const url = getCheckoutUrl();
-      if (url) window.open(url, "_blank");
-    }, 300);
+    // handleAdd awaits the Shopify cart mutation, so the checkout URL is ready here.
+    if (openCheckout()) {
+      trackBeginCheckout(
+        [itemFromProduct(product, { variantId: variant.id, variantTitle: variant.title, price: variant.price.amount, quantity: qty })],
+        variant.price.currencyCode,
+      );
+    }
   };
 
   const handleShare = async () => {

@@ -214,10 +214,12 @@ export const useCartStore = create<CartStore>()(
       },
 
 
-      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null }),
+      clearCart: () => set({ items: [], cartId: null, checkoutUrl: null, cost: null }),
 
       discountCode: null,
       setDiscountCode: (code) => set({ discountCode: code ? code.trim().toUpperCase() : null }),
+
+      cost: null,
 
       // Shopify applies the code on its hosted checkout via the discount param
       getCheckoutUrl: () => {
@@ -228,6 +230,21 @@ export const useCartStore = create<CartStore>()(
         return `${checkoutUrl}${sep}discount=${encodeURIComponent(discountCode)}`;
       },
 
+      /**
+       * Hands the shopper to Shopify's hosted checkout (where Razorpay and every
+       * other configured Shopify payment method lives). The cart is never cleared
+       * here — only a Shopify-confirmed empty cart clears it, in syncCart.
+       */
+      openCheckout: () => {
+        const url = get().getCheckoutUrl();
+        if (!url || get().items.length === 0) {
+          cartError("Checkout isn't available right now. Please refresh and try again.");
+          return false;
+        }
+        const win = typeof window !== "undefined" ? window.open(url, "_blank", "noopener") : null;
+        if (!win && typeof window !== "undefined") window.location.href = url; // popup blocked
+        return true;
+      },
 
       syncCart: async () => {
         const { cartId, isSyncing, clearCart } = get();
@@ -235,9 +252,28 @@ export const useCartStore = create<CartStore>()(
         set({ isSyncing: true });
         try {
           const data = await storefrontApiRequest(CART_QUERY, { id: cartId });
-          if (!data) return;
+          if (!data) return; // API/billing error — keep the local bag intact
           const cart = data?.data?.cart;
-          if (!cart || cart.totalQuantity === 0) clearCart();
+          if (!cart || cart.totalQuantity === 0) {
+            clearCart();
+            return;
+          }
+          // Shopify is authoritative: reconcile quantities, drop lines it dropped,
+          // and store Shopify's own cost so we never invent a payable amount.
+          type Line = { node: { id: string; quantity: number; merchandise: { id: string } } };
+          const lines: Line[] = cart.lines?.edges ?? [];
+          const byVariant = new Map(lines.map((l) => [l.node.merchandise.id, l.node]));
+          const reconciled = get()
+            .items.filter((i) => byVariant.has(i.variantId))
+            .map((i) => {
+              const l = byVariant.get(i.variantId)!;
+              return { ...i, lineId: l.id, quantity: l.quantity };
+            });
+          set({
+            items: reconciled,
+            checkoutUrl: cart.checkoutUrl ? formatCheckoutUrl(cart.checkoutUrl) : get().checkoutUrl,
+            cost: cart.cost ?? null,
+          });
         } catch (e) {
           console.error(e);
         } finally {

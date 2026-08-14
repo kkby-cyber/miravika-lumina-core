@@ -32,7 +32,23 @@ interface CartStore {
 
 }
 
-const CART_QUERY = `query cart($id: ID!) { cart(id: $id) { id totalQuantity } }`;
+const CART_QUERY = `query cart($id: ID!) {
+  cart(id: $id) {
+    id
+    totalQuantity
+    checkoutUrl
+    cost { subtotalAmount { amount currencyCode } totalAmount { amount currencyCode } }
+    lines(first: 100) {
+      edges {
+        node {
+          id
+          quantity
+          merchandise { ... on ProductVariant { id availableForSale quantityAvailable currentlyNotInStock } }
+        }
+      }
+    }
+  }
+}`;
 const CART_CREATE = `mutation cartCreate($input: CartInput!) { cartCreate(input: $input) { cart { id checkoutUrl lines(first:100){edges{node{id merchandise{... on ProductVariant{id}}}}} } userErrors { field message } } }`;
 const CART_ADD = `mutation cartLinesAdd($cartId: ID!, $lines:[CartLineInput!]!) { cartLinesAdd(cartId:$cartId, lines:$lines) { cart { id lines(first:100){edges{node{id merchandise{... on ProductVariant{id}}}}} } userErrors{field message} } }`;
 const CART_UPDATE = `mutation cartLinesUpdate($cartId: ID!, $lines:[CartLineUpdateInput!]!) { cartLinesUpdate(cartId:$cartId, lines:$lines) { cart{id} userErrors{field message} } }`;

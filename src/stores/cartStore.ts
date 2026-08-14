@@ -40,7 +40,10 @@ interface CartStore {
   getCheckoutUrl: () => string | null;
   discountCode: string | null;
   setDiscountCode: (code: string | null) => void;
-
+  /** Authoritative amounts as calculated by Shopify (never computed locally). */
+  cost: { subtotalAmount: Money; totalAmount: Money } | null;
+  /** Opens Shopify's hosted checkout; falls back to same-tab when popups are blocked. */
+  openCheckout: () => boolean;
 }
 
 const CART_QUERY = `query cart($id: ID!) {

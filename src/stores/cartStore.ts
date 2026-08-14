@@ -57,7 +57,7 @@ const CART_QUERY = `query cart($id: ID!) {
         node {
           id
           quantity
-          merchandise { ... on ProductVariant { id availableForSale quantityAvailable currentlyNotInStock } }
+          merchandise { ... on ProductVariant { id availableForSale } }
         }
       }
     }

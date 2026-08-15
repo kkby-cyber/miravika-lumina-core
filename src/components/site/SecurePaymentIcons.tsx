@@ -1,10 +1,10 @@
-import { Banknote, CreditCard, Landmark, Lock, Smartphone } from "lucide-react";
+import { CreditCard, Landmark, Lock, Smartphone, Wallet } from "lucide-react";
 
 const METHODS = [
   { icon: Smartphone, label: "UPI" },
   { icon: CreditCard, label: "Cards" },
   { icon: Landmark, label: "Net Banking" },
-  { icon: Banknote, label: "Cash on Delivery" },
+  { icon: Wallet, label: "Wallets" },
 ];
 
 /** Payment methods available on the MIRAVIKA (Shopify) checkout. */

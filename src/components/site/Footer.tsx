@@ -135,7 +135,7 @@ export function Footer() {
 
         <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-2.5 px-6 py-5">
-            {["UPI", "Visa", "Mastercard", "Amex", "Net Banking", "Cash on Delivery"].map((m) => (
+            {["UPI", "Visa", "Mastercard", "Amex", "Net Banking", "Wallets"].map((m) => (
               <span
                 key={m}
                 className="rounded-md border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.16em] text-ivory/65"

@@ -43,7 +43,7 @@ function About() {
           We work with design studios and trusted partners across the world to bring you products that feel considered, not commoditised. Every piece is reviewed for quality, packaging and after-sales support before it earns a place in the MIRAVIKA edit.
         </p>
         <p>
-          We ship worldwide, offer Cash on Delivery across India, and stand behind every order with easy 7-day returns and a support team that actually replies. Thank you for shopping with us — you're the reason we obsess over the details.
+          We ship worldwide, keep checkout secure and encrypted, and stand behind every order with easy 7-day returns and a support team that actually replies. Thank you for shopping with us — you're the reason we obsess over the details.
         </p>
       </div>
 

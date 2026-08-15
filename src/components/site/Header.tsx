@@ -21,7 +21,7 @@ const NAV: NavItem[] = [
 const ANNOUNCEMENTS = [
   "Complimentary Worldwide Shipping on Orders ₹2999+ / $49+",
   "Easy 7-Day Returns · Hassle-Free Exchange",
-  "Secure Checkout · Cash on Delivery in India",
+  "Secure Encrypted Checkout · UPI, Cards & Net Banking",
   "Discover the New Season — Curated with Care",
 ];
 

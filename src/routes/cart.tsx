@@ -87,7 +87,7 @@ function CartPage() {
             }} size="lg" className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90">
               Secure Checkout
             </Button>
-            <p className="mt-3 text-center text-[11px] text-muted-foreground">UPI · Cards · COD · Net Banking</p>
+            <p className="mt-3 text-center text-[11px] text-muted-foreground">UPI · Cards · Net Banking · Wallets</p>
             <SecurePaymentIcons className="mt-4" />
           </aside>
 

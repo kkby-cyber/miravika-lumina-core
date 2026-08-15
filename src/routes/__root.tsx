@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#111111" },
       { title: "MIRAVIKA — Luxury Redefined" },
-      { name: "description", content: "MIRAVIKA — a premium international lifestyle house of fashion, jewelry, beauty and home essentials. Worldwide shipping. Cash on Delivery in India." },
+      { name: "description", content: "MIRAVIKA — a premium international lifestyle house of fashion, jewelry, beauty and home essentials. Worldwide shipping and secure encrypted checkout." },
       { name: "author", content: "MIRAVIKA" },
       { property: "og:site_name", content: "MIRAVIKA" },
       { property: "og:type", content: "website" },

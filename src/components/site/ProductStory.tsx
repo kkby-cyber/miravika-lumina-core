@@ -15,7 +15,7 @@ export function highlightsForProduct(tags: string[] | undefined): string[] {
     "Curated and quality-checked by the MIRAVIKA studio",
     "Arrives in signature MIRAVIKA packaging — gift ready",
     "Dispatched within 24–48 hours with tracking",
-    "7-day easy returns · Cash on Delivery across India",
+    "7-day easy returns · Secure encrypted checkout",
   ];
 }
 

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "MIRAVIKA is an international lifestyle house of fashion, jewelry, beauty and home essentials. Curated global edits, worldwide shipping and Cash on Delivery in India.",
+          "MIRAVIKA is an international lifestyle house of fashion, jewelry, beauty and home essentials. Curated global edits, worldwide shipping and a secure encrypted checkout.",
       },
       { property: "og:title", content: "MIRAVIKA — Luxury Redefined" },
       {
@@ -189,7 +189,7 @@ function Home() {
         <div className="absolute inset-x-0 bottom-0 border-t border-foreground/10 bg-ivory/75 backdrop-blur-md">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-3.5 text-[9.5px] uppercase tracking-[0.28em] text-foreground/65 md:text-[10px]">
             <span>Free Worldwide Shipping ₹2999+</span>
-            <span className="hidden md:inline">Cash on Delivery · India</span>
+            <span className="hidden md:inline">Secure Encrypted Checkout</span>
             <span className="hidden md:inline">Handpicked Global Edit</span>
           </div>
         </div>

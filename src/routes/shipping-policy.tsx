@@ -5,7 +5,7 @@ export const Route = createFileRoute("/shipping-policy")({
   head: () => ({
     meta: [
       { title: "Shipping Policy — MIRAVIKA" },
-      { name: "description", content: "MIRAVIKA shipping timelines, charges, COD availability and international delivery." },
+      { name: "description", content: "MIRAVIKA shipping timelines, charges, payment options and international delivery." },
     ],
     links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/shipping-policy" }],
   }),
@@ -27,9 +27,9 @@ export const Route = createFileRoute("/shipping-policy")({
       <p>
         Complimentary shipping within India on prepaid orders above ₹999. Orders below ₹999 attract a flat shipping fee of ₹79. International shipping is calculated at checkout based on destination and order weight.
       </p>
-      <h2>Cash on Delivery (India)</h2>
+      <h2>Payment</h2>
       <p>
-        COD is available across most Indian pincodes. A small handling fee may apply and is displayed at checkout.
+        All orders are prepaid through our secure Shopify checkout — UPI, credit and debit cards, net banking and wallets are supported.
       </p>
       <h2>Duties & taxes (international)</h2>
       <p>

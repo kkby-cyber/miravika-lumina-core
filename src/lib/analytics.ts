@@ -77,9 +77,17 @@ export const trackBeginCheckout = (items: GA4Item[], currency: string) => {
 };
 
 /**
- * Purchase / conversion event.
- * Shopify hosts checkout, so this fires on the MIRAVIKA thank-you page when
- * Shopify passes order details back, and is de-duplicated per transaction id.
+ * Purchase / conversion event — the ONLY place a purchase may be reported.
+ *
+ * Shopify hosts checkout and owns the order, so this is called from exactly two
+ * genuine post-order surfaces:
+ *   1. the Shopify Customer Events "Custom Pixel" (checkout_completed), which
+ *      pushes the same payload into GTM-PVNR5BST on Shopify's own thank-you page;
+ *   2. /thank-you, as a fallback when Shopify returns the shopper here with
+ *      order parameters.
+ * Both paths key off the real Shopify order id, and the de-duplication guard
+ * below is persistent, so a refresh, a re-visit or both surfaces firing can
+ * never produce a second conversion.
  */
 export function trackPurchase(order: {
   transaction_id: string;
@@ -95,8 +103,9 @@ export function trackPurchase(order: {
   if (!Number.isFinite(order.value) || order.value <= 0) return;
   const key = `miravika_purchase_${order.transaction_id}`;
   try {
-    if (window.sessionStorage.getItem(key)) return; // never double-count
-    window.sessionStorage.setItem(key, "1");
+    // localStorage (not sessionStorage): survives refreshes and new sessions.
+    if (window.localStorage.getItem(key)) return; // never double-count
+    window.localStorage.setItem(key, String(Date.now()));
   } catch {
     /* private mode — still send once per page load */
   }
@@ -112,8 +121,20 @@ export function trackPurchase(order: {
       items: order.items ?? [],
     },
   });
-  pixelEvent("Purchase", { value: order.value, currency: order.currency, content_type: "product" });
+  pixelEvent(
+    "Purchase",
+    {
+      value: order.value,
+      currency: order.currency,
+      content_type: "product",
+      contents: (order.items ?? []).map((i) => ({ id: i.item_id, quantity: i.quantity ?? 1, item_price: i.price })),
+      content_ids: (order.items ?? []).map((i) => i.item_id),
+      order_id: order.transaction_id,
+    },
+    order.transaction_id,
+  );
 }
+
 
 export const trackSearch = (term: string, results: number) => {
   pushDL({ event: "search", search_term: term, search_results: results });

@@ -40,7 +40,7 @@ export const Route = createFileRoute("/product/$handle")({
     const readable = titleCase(params.handle);
     const url = `https://miravika-lumina-core.lovable.app/product/${params.handle}`;
     // Unique description per product handle so no two PDPs share the same meta description
-    const description = `Shop ${readable} at MIRAVIKA — a curated piece from our premium global lifestyle edit. Worldwide shipping, 7-day easy returns and Cash on Delivery across India.`;
+    const description = `Shop ${readable} at MIRAVIKA — a curated piece from our premium global lifestyle edit. Worldwide shipping, 7-day easy returns and a secure encrypted checkout.`;
     return {
       meta: [
         { title: `${readable} | MIRAVIKA` },
@@ -527,7 +527,7 @@ function ProductPage() {
             <div className="mt-6 grid grid-cols-3 gap-3 rounded-lg border border-border/60 bg-beige/40 p-4 text-center">
               <div><Truck className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">Free ₹2999+</p></div>
               <div><Undo2 className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">7-day returns</p></div>
-              <div><ShieldCheck className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">Secure · COD</p></div>
+              <div><ShieldCheck className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">100% Secure</p></div>
             </div>
 
             {/* Secure payment icons */}
@@ -548,7 +548,7 @@ function ProductPage() {
                     <li>Dispatched within 24–48 hours from our warehouse.</li>
                     <li>India: 3–7 business days · Worldwide: 7–14 business days.</li>
                     <li>Free shipping on orders ₹2,999+ (India) and $49+ (International).</li>
-                    <li>Cash on Delivery available across India.</li>
+                    <li>Secure checkout — UPI, cards, net banking and wallets.</li>
                   </ul>
                 </AccordionContent>
               </AccordionItem>

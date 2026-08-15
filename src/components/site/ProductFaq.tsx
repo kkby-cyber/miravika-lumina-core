@@ -32,8 +32,8 @@ export function faqsForProduct(tags: string[] | undefined, hasSize: boolean): Fa
       a: "Orders are dispatched within 24–48 hours. Delivery is 3–7 business days across India and 7–14 business days internationally. You'll receive a tracking link by email as soon as your parcel ships.",
     },
     {
-      q: "Is Cash on Delivery available?",
-      a: "Yes. Cash on Delivery is available across India, alongside UPI, credit and debit cards, net banking and wallets. All online payments are processed on Shopify's PCI-DSS compliant checkout.",
+      q: "Which payment methods are accepted?",
+      a: "UPI, credit and debit cards, net banking and popular wallets. Every payment is processed on Shopify's PCI-DSS compliant checkout.",
     },
     {
       q: "Can I return or exchange this piece?",

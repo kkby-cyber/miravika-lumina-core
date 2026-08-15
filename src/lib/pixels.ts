@@ -77,15 +77,21 @@ export function loadMarketingPixels() {
   }
 }
 
-/** Mirrors a commerce event to any active platform pixel. */
+/**
+ * Mirrors a commerce event to any active platform pixel.
+ *
+ * `eventID` is Meta's de-duplication key: passing the Shopify order id means a
+ * browser Purchase and a future server-side CAPI Purchase collapse into one.
+ */
 export function pixelEvent(
   name: "ViewContent" | "AddToCart" | "InitiateCheckout" | "Purchase" | "Search" | "AddToWishlist" | "Lead" | "CompleteRegistration",
   params: Record<string, unknown> = {},
+  eventID?: string,
 ) {
   if (typeof window === "undefined") return;
   const w = window as W;
   try {
-    w.fbq?.("track", name, params);
+    w.fbq?.("track", name, params, eventID ? { eventID } : undefined);
     w.ttq?.track?.(name, params);
     w.pintrk?.("track", name.toLowerCase(), params);
     w.snaptr?.("track", name.toUpperCase(), params);
@@ -93,3 +99,4 @@ export function pixelEvent(
     /* pixels must never break the storefront */
   }
 }
+

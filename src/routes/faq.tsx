@@ -59,14 +59,13 @@ const SECTIONS: { heading: string; items: [string, string][] }[] = [
       ["Where do you ship?", "We ship worldwide, including India, USA, UK, Canada, Australia, UAE and Europe. Customs duties, if any, are borne by the customer for international orders."],
       ["How long does delivery take?", "Within India: 3–7 business days. International: 7–14 business days depending on destination and customs clearance. Exact estimates appear at checkout and on each product page."],
       ["How do I track my order?", "You'll receive a tracking link by email (and WhatsApp in India) as soon as your order ships. You can also track from the Track Order page."],
-      ["Do you offer Cash on Delivery?", "Yes — COD is available across most Indian pincodes. A small handling fee may apply at checkout."],
       ["Are shipping charges refundable?", "Shipping charges are non-refundable unless the return is due to a defect or an error on our part."],
     ],
   },
   {
     heading: "Payments",
     items: [
-      ["What payment methods are accepted?", "UPI, all major credit and debit cards, net banking, popular wallets, PayPal and Cash on Delivery (India). International customers can pay via card or PayPal."],
+      ["What payment methods are accepted?", "UPI, all major credit and debit cards, net banking and popular wallets. All orders are prepaid through our secure Shopify checkout."],
       ["Is checkout secure?", "Yes. Payments are processed by PCI-DSS compliant gateways over encrypted (SSL) connections. We never store your full card details on our servers."],
       ["In what currency are prices displayed?", "By default, prices are shown in your local currency where supported. You'll be charged the equivalent amount in your card's currency."],
     ],

@@ -3,7 +3,7 @@ import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
-import logoAsset from "@/assets/miravika-logo.png.asset.json";
+import logoAsset from "@/assets/miravika-logo-transparent.png.asset.json";
 
 type NavItem = { label: string; slug: string };
 
@@ -86,9 +86,9 @@ export function Header() {
       </div>
 
       {/* Main header */}
-      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-4 px-4 md:h-[92px] md:px-8">
-        {/* LEFT: mobile menu button */}
-        <div className="flex flex-1 items-center lg:flex-none">
+      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between gap-3 px-4 md:h-[92px] md:px-8">
+        {/* LEFT: menu button (mobile) + logo */}
+        <div className="flex min-w-0 items-center gap-1">
           <button
             aria-label="Open menu"
             className="-ml-2 grid h-11 w-11 place-items-center lg:hidden"
@@ -96,23 +96,21 @@ export function Header() {
           >
             <Menu className="h-[22px] w-[22px]" strokeWidth={1.25} />
           </button>
+
+          <Link to="/" aria-label="MIRAVIKA — Home" className="flex items-center">
+            <img
+              src={logoAsset.url}
+              alt="MIRAVIKA — Luxury Redefined"
+              className="h-11 w-auto bg-transparent transition-all duration-500 md:h-[64px]"
+              width={220}
+              height={56}
+              fetchPriority="high"
+            />
+          </Link>
         </div>
 
-        {/* CENTER LOGO */}
-        <Link to="/" aria-label="MIRAVIKA — Home" className="flex flex-none items-center justify-center">
-          <img
-            src={logoAsset.url}
-            alt="MIRAVIKA — Luxury Redefined"
-            className="h-11 w-auto transition-all duration-500 md:h-[60px]"
-            width={220}
-            height={56}
-            fetchPriority="high"
-          />
-        </Link>
-
-
         {/* RIGHT: icons */}
-        <div className="flex flex-1 items-center justify-end gap-0.5 lg:flex-none">
+        <div className="flex items-center justify-end gap-0.5">
           <Link to="/search" aria-label="Search" className="grid h-11 w-11 place-items-center transition-colors hover:text-gold">
             <Search className="h-[18px] w-[18px]" strokeWidth={1.25} />
           </Link>
@@ -141,6 +139,7 @@ export function Header() {
           </button>
         </div>
       </div>
+
 
 
       {/* DESKTOP NAV ROW — single centered row, luxury spacing */}

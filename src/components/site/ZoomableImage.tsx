@@ -19,6 +19,19 @@ export function ZoomableImage({
   const [origin, setOrigin] = useState("50% 50%");
   const [lightbox, setLightbox] = useState(false);
 
+  // Shopify CDN supports on-the-fly resizing — serve crisp, high-resolution art.
+  const sized = (w: number) => {
+    try {
+      const u = new URL(src);
+      u.searchParams.set("width", String(w));
+      return u.toString();
+    } catch {
+      return src;
+    }
+  };
+  const srcSet = [800, 1200, 1600, 2048].map((w) => `${sized(w)} ${w}w`).join(", ");
+
+
   const move = (clientX: number, clientY: number) => {
     const el = ref.current;
     if (!el) return;

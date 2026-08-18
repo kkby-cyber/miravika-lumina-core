@@ -467,36 +467,36 @@ function ProductPage() {
             {/* Qty + CTAs (desktop) */}
             <div className="mt-7 hidden items-center gap-3 md:flex">
               <div className="flex items-center rounded-full border border-border">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease" className="grid h-11 w-11 place-items-center hover:text-gold"><Minus className="h-4 w-4" /></button>
-                <span className="w-8 text-center text-sm">{qty}</span>
-                <button onClick={() => setQty((q) => q + 1)} aria-label="Increase" className="grid h-11 w-11 place-items-center hover:text-gold"><Plus className="h-4 w-4" /></button>
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease" className="grid h-14 w-12 place-items-center hover:text-gold"><Minus className="h-4 w-4" /></button>
+                <span className="w-8 text-center text-sm font-semibold">{qty}</span>
+                <button onClick={() => setQty((q) => q + 1)} aria-label="Increase" className="grid h-14 w-12 place-items-center hover:text-gold"><Plus className="h-4 w-4" /></button>
               </div>
               <Button
                 onClick={handleAdd}
                 disabled={isLoadingCart || !variant?.availableForSale}
                 size="lg"
-                className="h-11 flex-1 rounded-full bg-foreground text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/90"
+                className="h-14 flex-1 rounded-full bg-foreground text-[13px] font-semibold uppercase tracking-[0.22em] text-ivory shadow-[0_14px_36px_-18px_rgba(17,17,17,0.85)] transition-transform hover:-translate-y-0.5 hover:bg-foreground/90"
               >
-                {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
+                {isLoadingCart ? <Loader2 className="h-5 w-5 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
               </Button>
               <button
                 onClick={() => toggleWish(handle)}
                 aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-                className="grid h-11 w-11 place-items-center rounded-full border border-border hover:border-gold"
+                className="grid h-14 w-14 place-items-center rounded-full border border-border hover:border-gold"
               >
-                <Heart className={`h-4 w-4 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
+                <Heart className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
               </button>
             </div>
 
             <Button
               onClick={handleBuyNow}
               disabled={isLoadingCart || !variant?.availableForSale}
-              variant="outline"
               size="lg"
-              className="mt-3 hidden h-11 w-full rounded-full border-foreground/30 text-[11px] uppercase tracking-[0.22em] hover:border-gold hover:text-gold md:inline-flex"
+              className="mt-3 hidden h-14 w-full rounded-full bg-gold text-[13px] font-semibold uppercase tracking-[0.22em] text-gold-foreground shadow-[0_14px_36px_-16px_color-mix(in_oklab,var(--gold)_70%,transparent)] transition-transform hover:-translate-y-0.5 hover:bg-gold/90 md:inline-flex"
             >
-              Buy It Now
+              Buy It Now — Secure Checkout
             </Button>
+
 
             <button onClick={handleShare} className="mt-4 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground hover:text-gold">
               <Share2 className="h-3.5 w-3.5" /> Share

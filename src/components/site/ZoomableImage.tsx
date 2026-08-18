@@ -88,7 +88,7 @@ export function ZoomableImage({
           >
             <X className="h-5 w-5" />
           </button>
-          <img src={src} alt={alt} className="max-h-[90vh] max-w-full object-contain" />
+          <img src={sized(2048)} alt={alt} className="max-h-[90vh] max-w-full object-contain" />
         </div>
       )}
     </>

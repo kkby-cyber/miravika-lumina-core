@@ -58,7 +58,9 @@ export function ZoomableImage({
         }}
       >
         <img
-          src={src}
+          src={sized(1200)}
+          srcSet={srcSet}
+          sizes="(min-width: 768px) 640px, 100vw"
           alt={alt}
           fetchPriority={priority ? "high" : "auto"}
           loading={priority ? "eager" : "lazy"}

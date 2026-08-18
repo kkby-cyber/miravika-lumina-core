@@ -405,13 +405,18 @@ function ProductPage() {
 
             {/* Review summary at the top of the PDP (only with genuine reviews) */}
             {aggregate && (
-              <a href="#reviews" className="mt-2 inline-flex items-center gap-2 hover:text-gold">
-                <Stars rating={aggregate.average} size={14} />
+              <a
+                href="#reviews"
+                className="mt-3 inline-flex items-center gap-2.5 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1.5 transition-colors hover:border-gold hover:bg-gold/15"
+              >
+                <Stars rating={aggregate.average} size={16} />
+                <span className="text-[13px] font-semibold text-foreground">{aggregate.average.toFixed(1)}</span>
                 <span className="text-xs text-muted-foreground">
-                  {aggregate.average.toFixed(1)} · {aggregate.count} {aggregate.count === 1 ? "review" : "reviews"}
+                  {aggregate.count} verified {aggregate.count === 1 ? "review" : "reviews"} · Read all
                 </span>
               </a>
             )}
+
 
             <div className="mt-4 flex items-baseline gap-3">
               <p className="font-display text-2xl">
@@ -462,36 +467,36 @@ function ProductPage() {
             {/* Qty + CTAs (desktop) */}
             <div className="mt-7 hidden items-center gap-3 md:flex">
               <div className="flex items-center rounded-full border border-border">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease" className="grid h-11 w-11 place-items-center hover:text-gold"><Minus className="h-4 w-4" /></button>
-                <span className="w-8 text-center text-sm">{qty}</span>
-                <button onClick={() => setQty((q) => q + 1)} aria-label="Increase" className="grid h-11 w-11 place-items-center hover:text-gold"><Plus className="h-4 w-4" /></button>
+                <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease" className="grid h-14 w-12 place-items-center hover:text-gold"><Minus className="h-4 w-4" /></button>
+                <span className="w-8 text-center text-sm font-semibold">{qty}</span>
+                <button onClick={() => setQty((q) => q + 1)} aria-label="Increase" className="grid h-14 w-12 place-items-center hover:text-gold"><Plus className="h-4 w-4" /></button>
               </div>
               <Button
                 onClick={handleAdd}
                 disabled={isLoadingCart || !variant?.availableForSale}
                 size="lg"
-                className="h-11 flex-1 rounded-full bg-foreground text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/90"
+                className="h-14 flex-1 rounded-full bg-foreground text-[13px] font-semibold uppercase tracking-[0.22em] text-ivory shadow-[0_14px_36px_-18px_rgba(17,17,17,0.85)] transition-transform hover:-translate-y-0.5 hover:bg-foreground/90"
               >
-                {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
+                {isLoadingCart ? <Loader2 className="h-5 w-5 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
               </Button>
               <button
                 onClick={() => toggleWish(handle)}
                 aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-                className="grid h-11 w-11 place-items-center rounded-full border border-border hover:border-gold"
+                className="grid h-14 w-14 place-items-center rounded-full border border-border hover:border-gold"
               >
-                <Heart className={`h-4 w-4 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
+                <Heart className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
               </button>
             </div>
 
             <Button
               onClick={handleBuyNow}
               disabled={isLoadingCart || !variant?.availableForSale}
-              variant="outline"
               size="lg"
-              className="mt-3 hidden h-11 w-full rounded-full border-foreground/30 text-[11px] uppercase tracking-[0.22em] hover:border-gold hover:text-gold md:inline-flex"
+              className="mt-3 hidden h-14 w-full rounded-full bg-gold text-[13px] font-semibold uppercase tracking-[0.22em] text-gold-foreground shadow-[0_14px_36px_-16px_color-mix(in_oklab,var(--gold)_70%,transparent)] transition-transform hover:-translate-y-0.5 hover:bg-gold/90 md:inline-flex"
             >
-              Buy It Now
+              Buy It Now — Secure Checkout
             </Button>
+
 
             <button onClick={handleShare} className="mt-4 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground hover:text-gold">
               <Share2 className="h-3.5 w-3.5" /> Share
@@ -647,30 +652,30 @@ function ProductPage() {
 
       {/* MOBILE STICKY BUY BAR */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-ivory/95 backdrop-blur-md md:hidden">
-        <div className="flex items-center gap-2 px-4 py-3">
-          <div className="min-w-0 flex-shrink">
-            <p className="line-clamp-1 text-[11px] font-medium">{product.title}</p>
-            <p className="text-[13px] font-display">
-              {formatPrice(priceAmt, variant?.price.currencyCode ?? "INR")}
-            </p>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <button
-              onClick={() => toggleWish(handle)}
-              aria-label="Wishlist"
-              className="grid h-10 w-10 place-items-center rounded-full border border-border"
-            >
-              <Heart className={`h-4 w-4 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
-            </button>
-            <Button
-              onClick={handleAdd}
-              disabled={isLoadingCart || !variant?.availableForSale}
-              className="h-10 rounded-full bg-foreground px-6 text-[11px] uppercase tracking-[0.2em] text-ivory hover:bg-foreground/90"
-            >
-              {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
-            </Button>
-          </div>
+        <div className="flex items-center gap-2 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          <button
+            onClick={() => toggleWish(handle)}
+            aria-label="Wishlist"
+            className="grid h-12 w-12 flex-none place-items-center rounded-full border border-border"
+          >
+            <Heart className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
+          </button>
+          <Button
+            onClick={handleAdd}
+            disabled={isLoadingCart || !variant?.availableForSale}
+            className="h-12 flex-1 rounded-full bg-foreground text-[12px] font-semibold uppercase tracking-[0.18em] text-ivory hover:bg-foreground/90"
+          >
+            {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
+          </Button>
+          <Button
+            onClick={handleBuyNow}
+            disabled={isLoadingCart || !variant?.availableForSale}
+            className="h-12 flex-1 rounded-full bg-gold text-[12px] font-semibold uppercase tracking-[0.18em] text-gold-foreground hover:bg-gold/90"
+          >
+            Buy Now
+          </Button>
         </div>
+
       </div>
     </>
   );

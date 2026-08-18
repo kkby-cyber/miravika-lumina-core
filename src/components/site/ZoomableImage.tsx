@@ -19,6 +19,19 @@ export function ZoomableImage({
   const [origin, setOrigin] = useState("50% 50%");
   const [lightbox, setLightbox] = useState(false);
 
+  // Shopify CDN supports on-the-fly resizing — serve crisp, high-resolution art.
+  const sized = (w: number) => {
+    try {
+      const u = new URL(src);
+      u.searchParams.set("width", String(w));
+      return u.toString();
+    } catch {
+      return src;
+    }
+  };
+  const srcSet = [800, 1200, 1600, 2048].map((w) => `${sized(w)} ${w}w`).join(", ");
+
+
   const move = (clientX: number, clientY: number) => {
     const el = ref.current;
     if (!el) return;
@@ -45,7 +58,9 @@ export function ZoomableImage({
         }}
       >
         <img
-          src={src}
+          src={sized(1200)}
+          srcSet={srcSet}
+          sizes="(min-width: 768px) 640px, 100vw"
           alt={alt}
           fetchPriority={priority ? "high" : "auto"}
           loading={priority ? "eager" : "lazy"}
@@ -73,7 +88,7 @@ export function ZoomableImage({
           >
             <X className="h-5 w-5" />
           </button>
-          <img src={src} alt={alt} className="max-h-[90vh] max-w-full object-contain" />
+          <img src={sized(2048)} alt={alt} className="max-h-[90vh] max-w-full object-contain" />
         </div>
       )}
     </>

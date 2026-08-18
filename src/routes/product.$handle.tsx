@@ -652,30 +652,30 @@ function ProductPage() {
 
       {/* MOBILE STICKY BUY BAR */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-ivory/95 backdrop-blur-md md:hidden">
-        <div className="flex items-center gap-2 px-4 py-3">
-          <div className="min-w-0 flex-shrink">
-            <p className="line-clamp-1 text-[11px] font-medium">{product.title}</p>
-            <p className="text-[13px] font-display">
-              {formatPrice(priceAmt, variant?.price.currencyCode ?? "INR")}
-            </p>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <button
-              onClick={() => toggleWish(handle)}
-              aria-label="Wishlist"
-              className="grid h-10 w-10 place-items-center rounded-full border border-border"
-            >
-              <Heart className={`h-4 w-4 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
-            </button>
-            <Button
-              onClick={handleAdd}
-              disabled={isLoadingCart || !variant?.availableForSale}
-              className="h-10 rounded-full bg-foreground px-6 text-[11px] uppercase tracking-[0.2em] text-ivory hover:bg-foreground/90"
-            >
-              {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
-            </Button>
-          </div>
+        <div className="flex items-center gap-2 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+          <button
+            onClick={() => toggleWish(handle)}
+            aria-label="Wishlist"
+            className="grid h-12 w-12 flex-none place-items-center rounded-full border border-border"
+          >
+            <Heart className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
+          </button>
+          <Button
+            onClick={handleAdd}
+            disabled={isLoadingCart || !variant?.availableForSale}
+            className="h-12 flex-1 rounded-full bg-foreground text-[12px] font-semibold uppercase tracking-[0.18em] text-ivory hover:bg-foreground/90"
+          >
+            {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
+          </Button>
+          <Button
+            onClick={handleBuyNow}
+            disabled={isLoadingCart || !variant?.availableForSale}
+            className="h-12 flex-1 rounded-full bg-gold text-[12px] font-semibold uppercase tracking-[0.18em] text-gold-foreground hover:bg-gold/90"
+          >
+            Buy Now
+          </Button>
         </div>
+
       </div>
     </>
   );

@@ -405,13 +405,18 @@ function ProductPage() {
 
             {/* Review summary at the top of the PDP (only with genuine reviews) */}
             {aggregate && (
-              <a href="#reviews" className="mt-2 inline-flex items-center gap-2 hover:text-gold">
-                <Stars rating={aggregate.average} size={14} />
+              <a
+                href="#reviews"
+                className="mt-3 inline-flex items-center gap-2.5 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1.5 transition-colors hover:border-gold hover:bg-gold/15"
+              >
+                <Stars rating={aggregate.average} size={16} />
+                <span className="text-[13px] font-semibold text-foreground">{aggregate.average.toFixed(1)}</span>
                 <span className="text-xs text-muted-foreground">
-                  {aggregate.average.toFixed(1)} · {aggregate.count} {aggregate.count === 1 ? "review" : "reviews"}
+                  {aggregate.count} verified {aggregate.count === 1 ? "review" : "reviews"} · Read all
                 </span>
               </a>
             )}
+
 
             <div className="mt-4 flex items-baseline gap-3">
               <p className="font-display text-2xl">

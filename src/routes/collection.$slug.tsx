@@ -3,29 +3,26 @@ import { useState, useMemo, useEffect } from "react";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useCollection, useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/site/ProductCard";
-import { resolveCollectionHandle } from "@/lib/shopify";
+import { resolveCollectionHandle, LEGACY_SLUG_REDIRECTS } from "@/lib/shopify";
 import type { ShopifyProduct } from "@/lib/shopify";
 import { itemFromProduct, trackViewItemList } from "@/lib/analytics";
 import { useShopRatings } from "@/hooks/useReviews";
 
 
-// Fallback friendly copy for known handles
+// Editorial copy for the canonical storefront categories
 const HANDLE_COPY: Record<string, { title: string; sub: string }> = {
+  "signature-collection": { title: "Signature Collection", sub: "The definitive Miravika edit — iconic pieces, hand-finished and made to be remembered." },
   "new-arrivals": { title: "New Arrivals", sub: "Fresh from the ateliers — the newest additions to the Miravika boutique." },
-  "best-sellers": { title: "Best Sellers", sub: "The pieces our community can't get enough of." },
-  "womens-fashion": { title: "Women's Fashion", sub: "Ready-to-wear, elevated for every day and every occasion." },
-  "jewelry-accessories": { title: "Jewelry & Accessories", sub: "Sterling silver, moissanite and heirloom-inspired pieces." },
-  "beauty-personal-care": { title: "Beauty & Personal Care", sub: "Skincare, tools and ritual essentials — curated for the modern woman." },
-  "gifts": { title: "Gifts", sub: "Considered gifting for every occasion." },
-  "trending-now": { title: "Trending Now", sub: "What's moving fast, worldwide." },
+  "ready-to-wear": { title: "Ready-to-Wear", sub: "Considered silhouettes, elevated for every day and every occasion." },
+  "accessories-fine-goods": { title: "Accessories Fine Goods", sub: "Sterling silver, moissanite and heirloom-inspired finishing pieces." },
+  "curated-sets": { title: "Curated Sets", sub: "Thoughtfully composed sets — considered gifting for every occasion." },
 };
 
 export const Route = createFileRoute("/collection/$slug")({
   head: ({ params }) => {
-    const handle = resolveCollectionHandle(params.slug);
-    const copy = HANDLE_COPY[handle] ?? { title: params.slug.replace(/-/g, " "), sub: "Curated by Miravika." };
-    // Canonicalize to the resolved handle so legacy slug variants never create duplicate content
-    const canonical = `https://miravika-lumina-core.lovable.app/collection/${handle}`;
+    const copy = HANDLE_COPY[params.slug] ?? { title: params.slug.replace(/-/g, " "), sub: "Curated by Miravika." };
+    // Canonical URL is the category slug itself — legacy variants redirect here
+    const canonical = `https://miravika-lumina-core.lovable.app/collection/${params.slug}`;
     return {
       meta: [
         { title: `${copy.title} — Shop the Edit | MIRAVIKA` },
@@ -70,11 +67,11 @@ export const Route = createFileRoute("/collection/$slug")({
       ],
     };
   },
-  // Retired / legacy slugs redirect to their live equivalent so no URL 404s.
+  // Retired / legacy slugs redirect to their canonical category so no URL 404s.
   loader: ({ params }) => {
-    const handle = resolveCollectionHandle(params.slug);
-    if (handle !== params.slug) {
-      throw redirect({ href: `/collection/${handle}`, replace: true });
+    const target = LEGACY_SLUG_REDIRECTS[params.slug];
+    if (target) {
+      throw redirect({ href: `/collection/${target}`, replace: true });
     }
   },
   component: CollectionPage,

@@ -105,12 +105,11 @@ export function Footer() {
           <div>
             <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">Shop</h4>
             <ul className="mt-4 space-y-2.5 text-sm text-ivory/80">
+              <li><Link to="/collection/$slug" params={{ slug: "signature-collection" }} className="hover:text-gold">Signature Collection</Link></li>
               <li><Link to="/collection/$slug" params={{ slug: "new-arrivals" }} className="hover:text-gold">New Arrivals</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "best-sellers" }} className="hover:text-gold">Best Sellers</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "womens-fashion" }} className="hover:text-gold">Women's Fashion</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "jewelry-accessories" }} className="hover:text-gold">Jewelry & Accessories</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "beauty-personal-care" }} className="hover:text-gold">Beauty</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "gifts" }} className="hover:text-gold">Gifts</Link></li>
+              <li><Link to="/collection/$slug" params={{ slug: "ready-to-wear" }} className="hover:text-gold">Ready-to-Wear</Link></li>
+              <li><Link to="/collection/$slug" params={{ slug: "accessories-fine-goods" }} className="hover:text-gold">Accessories Fine Goods</Link></li>
+              <li><Link to="/collection/$slug" params={{ slug: "curated-sets" }} className="hover:text-gold">Curated Sets</Link></li>
             </ul>
           </div>
           <div>

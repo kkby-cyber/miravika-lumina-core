@@ -17,15 +17,13 @@ const STATIC_PATHS: [string, string, string?][] = [
   ["/terms", "yearly", "0.4"],
 ];
 
-// Live Shopify collection handles
+// Canonical storefront category slugs
 const COLLECTIONS = [
+  "signature-collection",
   "new-arrivals",
-  "trending-now",
-  "womens-fashion",
-  "jewelry-accessories",
-  "beauty-personal-care",
-  "gifts",
-  "best-sellers",
+  "ready-to-wear",
+  "accessories-fine-goods",
+  "curated-sets",
 ];
 
 interface ProdEdge { node: { handle: string } }

@@ -108,11 +108,11 @@ export function CartDrawer() {
               </Link>
               <Link
                 to="/collection/$slug"
-                params={{ slug: "best-sellers" }}
+                params={{ slug: "signature-collection" }}
                 onClick={() => setOpen(false)}
                 className="mt-3 text-[11px] uppercase tracking-[0.22em] text-muted-foreground underline-offset-4 hover:text-gold hover:underline"
               >
-                Or view best sellers
+                Or explore the Signature Collection
               </Link>
             </div>
           ) : (

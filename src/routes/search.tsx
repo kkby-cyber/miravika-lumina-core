@@ -18,10 +18,10 @@ export const Route = createFileRoute("/search")({
 });
 
 const POPULAR = [
-  { label: "Necklaces", slug: "jewelry-accessories" },
-  { label: "Best Sellers", slug: "best-sellers" },
+  { label: "Signature Collection", slug: "signature-collection" },
   { label: "New Arrivals", slug: "new-arrivals" },
-  { label: "Gifts", slug: "gifts" },
+  { label: "Ready-to-Wear", slug: "ready-to-wear" },
+  { label: "Curated Sets", slug: "curated-sets" },
 ];
 
 function SearchPage() {

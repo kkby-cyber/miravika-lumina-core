@@ -3,19 +3,16 @@ import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
-import logoAsset from "@/assets/miravika-logo-transparent.png.asset.json";
 
 type NavItem = { label: string; slug: string };
 
-// Synchronized with live Shopify collections. Order per brand direction.
+// Canonical MIRAVIKA categories — backed by live Shopify collections (see COLLECTION_HANDLE_MAP).
 const NAV: NavItem[] = [
+  { label: "Signature Collection", slug: "signature-collection" },
   { label: "New Arrivals", slug: "new-arrivals" },
-  { label: "Trending Now", slug: "trending-now" },
-  { label: "Women's Fashion", slug: "womens-fashion" },
-  { label: "Jewelry & Accessories", slug: "jewelry-accessories" },
-  { label: "Beauty & Personal Care", slug: "beauty-personal-care" },
-  { label: "Gifts", slug: "gifts" },
-  { label: "Best Sellers", slug: "best-sellers" },
+  { label: "Ready-to-Wear", slug: "ready-to-wear" },
+  { label: "Accessories Fine Goods", slug: "accessories-fine-goods" },
+  { label: "Curated Sets", slug: "curated-sets" },
 ];
 
 const ANNOUNCEMENTS = [
@@ -99,11 +96,11 @@ export function Header() {
 
           <Link to="/" aria-label="MIRAVIKA — Home" className="flex items-center">
             <img
-              src={logoAsset.url}
+              src="/miravika-logo-gold.png"
               alt="MIRAVIKA — Luxury Redefined"
-              className="h-11 w-auto bg-transparent transition-all duration-500 md:h-[64px]"
-              width={220}
-              height={56}
+              className="h-11 w-auto transition-all duration-500 md:h-[62px]"
+              width={675}
+              height={592}
               fetchPriority="high"
             />
           </Link>

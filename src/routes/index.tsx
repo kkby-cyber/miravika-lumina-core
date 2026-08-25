@@ -369,7 +369,7 @@ function Home() {
       <CustomerGallery />
 
       {/* SHOP BY OCCASION */}
-      <section aria-labelledby="occasion-heading" className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-28">
+      <section aria-labelledby="occasion-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
         <Reveal className="mb-10 text-center md:mb-14">
           <p className="text-[10px] uppercase tracking-[0.34em] text-gold">Shop by Occasion</p>
           <h2 id="occasion-heading" className="mt-3 font-display text-[28px] leading-tight md:text-5xl">
@@ -379,9 +379,9 @@ function Home() {
         </Reveal>
         <ul className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-7">
           {[
-            { img: streetScarf.url, title: "For the Traveller", tag: "Fashion", slug: "womens-fashion" },
-            { img: emerald.url, title: "For the Occasion", tag: "Jewelry", slug: "jewelry-accessories" },
-            { img: corridor.url, title: "For the Celebration", tag: "Gifts", slug: "gifts" },
+            { img: streetScarf.url, title: "For the Traveller", tag: "Ready-to-Wear", slug: "ready-to-wear" },
+            { img: emerald.url, title: "For the Occasion", tag: "Fine Goods", slug: "accessories-fine-goods" },
+            { img: corridor.url, title: "For the Celebration", tag: "Curated Sets", slug: "curated-sets" },
           ].map((g, i) => (
             <Reveal as="li" key={g.title} delay={i * 90}>
               <Link
@@ -444,7 +444,7 @@ function Home() {
       </section>
 
       {/* INSTAGRAM */}
-      <section aria-labelledby="instagram-heading" className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-28">
+      <section aria-labelledby="instagram-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
         <Reveal className="mb-10 text-center">
           <p className="text-[10px] uppercase tracking-[0.34em] text-gold">@miravika.india</p>
           <h2 id="instagram-heading" className="mt-3 font-display text-[28px] leading-tight md:text-5xl">

@@ -149,44 +149,57 @@ export function formatPrice(amount: string | number, currency = "INR") {
   }
 }
 
-/** Map legacy / friendly slugs → real Shopify collection handles */
-export const COLLECTION_SLUG_MAP: Record<string, string> = {
-  "magnetic-earrings": "jewelry-accessories",
-  "fashion-accessories": "womens-fashion",
-  "beauty-accessories": "beauty-personal-care",
-  "hair-accessories": "womens-fashion",
-  // Retired collections — permanently folded into the live seven
-  "home-decor": "gifts",
-  "home-kitchen": "gifts",
-  home: "gifts",
-  "electronics-accessories": "gifts",
-  tech: "gifts",
-  electronics: "gifts",
-  luxury: "best-sellers",
-  bags: "womens-fashion",
-  scrunchies: "womens-fashion",
-  bows: "womens-fashion",
-  clips: "womens-fashion",
-  bands: "womens-fashion",
-  accessories: "jewelry-accessories",
-  jewellery: "jewelry-accessories",
-  rakhi: "gifts",
-  women: "womens-fashion",
-  fashion: "womens-fashion",
-  beauty: "beauty-personal-care",
+/** Canonical storefront categories → real Shopify collection handles (data source). */
+export const COLLECTION_HANDLE_MAP: Record<string, string> = {
+  "signature-collection": "best-sellers",
+  "new-arrivals": "new-arrivals",
+  "ready-to-wear": "womens-fashion",
+  "accessories-fine-goods": "jewelry-accessories",
+  "curated-sets": "gifts",
 };
 
-/** The only collections the storefront exposes. */
+/** Legacy / retired slugs → canonical category slug (redirected at route level). */
+export const LEGACY_SLUG_REDIRECTS: Record<string, string> = {
+  "best-sellers": "signature-collection",
+  "trending-now": "signature-collection",
+  luxury: "signature-collection",
+  "womens-fashion": "ready-to-wear",
+  women: "ready-to-wear",
+  fashion: "ready-to-wear",
+  bags: "ready-to-wear",
+  scrunchies: "ready-to-wear",
+  bows: "ready-to-wear",
+  clips: "ready-to-wear",
+  bands: "ready-to-wear",
+  "hair-accessories": "ready-to-wear",
+  "fashion-accessories": "ready-to-wear",
+  "jewelry-accessories": "accessories-fine-goods",
+  jewellery: "accessories-fine-goods",
+  accessories: "accessories-fine-goods",
+  "magnetic-earrings": "accessories-fine-goods",
+  "beauty-personal-care": "accessories-fine-goods",
+  beauty: "accessories-fine-goods",
+  "beauty-accessories": "accessories-fine-goods",
+  gifts: "curated-sets",
+  rakhi: "curated-sets",
+  "home-decor": "curated-sets",
+  "home-kitchen": "curated-sets",
+  home: "curated-sets",
+  tech: "curated-sets",
+  electronics: "curated-sets",
+  "electronics-accessories": "curated-sets",
+};
+
+/** The only categories the storefront exposes. */
 export const LIVE_COLLECTIONS = [
+  { slug: "signature-collection", label: "Signature Collection" },
   { slug: "new-arrivals", label: "New Arrivals" },
-  { slug: "trending-now", label: "Trending Now" },
-  { slug: "womens-fashion", label: "Women's Fashion" },
-  { slug: "jewelry-accessories", label: "Jewelry & Accessories" },
-  { slug: "beauty-personal-care", label: "Beauty & Personal Care" },
-  { slug: "gifts", label: "Gifts" },
-  { slug: "best-sellers", label: "Best Sellers" },
+  { slug: "ready-to-wear", label: "Ready-to-Wear" },
+  { slug: "accessories-fine-goods", label: "Accessories Fine Goods" },
+  { slug: "curated-sets", label: "Curated Sets" },
 ] as const;
 
+/** Resolve a canonical category slug to the Shopify collection handle that backs it. */
 export function resolveCollectionHandle(slug: string) {
-  return COLLECTION_SLUG_MAP[slug] ?? slug;
+  return COLLECTION_HANDLE_MAP[slug] ?? slug;
 }

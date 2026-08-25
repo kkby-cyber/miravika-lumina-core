@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Award, Globe, Handshake, Heart, ShieldCheck, Sparkles } from "lucide-react";
 import { useCollection } from "@/hooks/useProducts";
+import { resolveCollectionHandle } from "@/lib/shopify";
 import { ProductCarousel } from "@/components/site/ProductCarousel";
 import { VideoSection } from "@/components/site/VideoSection";
 import { Reveal } from "@/components/site/Reveal";
@@ -94,12 +95,11 @@ export const Route = createFileRoute("/")({
 });
 
 const CATEGORIES = [
+  { slug: "signature-collection", title: "Signature Collection", tag: "The Iconic Edit", img: heroBlackGold.url },
   { slug: "new-arrivals", title: "New Arrivals", tag: "Just Landed", img: streetScarf.url },
-  { slug: "womens-fashion", title: "Women's Fashion", tag: "Ready to Wear", img: catFashion.url },
-  { slug: "jewelry-accessories", title: "Jewelry & Accessories", tag: "Fine · Fashion", img: catJewelry.url },
-  { slug: "beauty-personal-care", title: "Beauty & Personal Care", tag: "Ritual Essentials", img: catBeauty.url },
-  { slug: "gifts", title: "Gifts", tag: "For Every Occasion", img: catGifts.url },
-  { slug: "trending-now", title: "Trending Now", tag: "Moving Fast", img: emerald.url },
+  { slug: "ready-to-wear", title: "Ready-to-Wear", tag: "Considered Silhouettes", img: catFashion.url },
+  { slug: "accessories-fine-goods", title: "Accessories Fine Goods", tag: "Finishing Pieces", img: catJewelry.url },
+  { slug: "curated-sets", title: "Curated Sets", tag: "For Every Occasion", img: catGifts.url },
 ] as const;
 
 const WHY = [
@@ -177,10 +177,10 @@ function Home() {
               </Link>
               <Link
                 to="/collection/$slug"
-                params={{ slug: "best-sellers" }}
+                params={{ slug: "signature-collection" }}
                 className="inline-flex min-h-[44px] items-center border-b border-foreground/35 pb-1 text-[11px] uppercase tracking-[0.26em] text-foreground transition-colors hover:border-gold hover:text-gold"
               >
-                Best Sellers
+                Signature Collection
               </Link>
             </div>
           </div>
@@ -207,7 +207,7 @@ function Home() {
       />
 
       {/* CATEGORIES */}
-      <section aria-labelledby="categories-heading" className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-28">
+      <section aria-labelledby="categories-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
         <Reveal className="mb-10 flex items-end justify-between gap-6 md:mb-16">
           <div>
             <p className="text-[10px] uppercase tracking-[0.34em] text-gold">Shop by Category</p>
@@ -265,9 +265,9 @@ function Home() {
         align="right"
       />
 
-      {/* BEST SELLERS */}
+      {/* SIGNATURE COLLECTION */}
       <div className="bg-beige/40">
-      <CollectionCarousel eyebrow="Best Sellers" title="Most Loved" sub="The pieces our community returns to, season after season." slug="best-sellers" />
+      <CollectionCarousel eyebrow="Signature Collection" title="Most Loved" sub="The definitive Miravika edit — pieces our community returns to, season after season." slug="signature-collection" />
       </div>
 
       {/* EDITORIAL SPLIT */}
@@ -294,7 +294,7 @@ function Home() {
               </p>
               <Link
                 to="/collection/$slug"
-                params={{ slug: "trending-now" }}
+                params={{ slug: "signature-collection" }}
                 className="group mt-10 inline-flex min-h-[52px] w-fit items-center gap-3 rounded-full border border-gold px-10 text-[11px] uppercase tracking-[0.26em] text-gold transition-all duration-500 hover:bg-gold hover:text-noir"
               >
                 Discover the Edit
@@ -313,7 +313,7 @@ function Home() {
         <div className="mx-auto grid max-w-7xl items-center gap-0 md:grid-cols-2">
           <div className="flex flex-col justify-center px-6 py-16 md:order-1 md:px-16 md:py-28">
             <Reveal>
-              <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Jewelry</p>
+              <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Fine Goods</p>
               <h2 className="mt-5 font-display text-[34px] leading-[1.05] md:text-6xl">
                 Little things that <span className="italic gold-gradient-text">shine.</span>
               </h2>
@@ -322,10 +322,10 @@ function Home() {
               </p>
               <Link
                 to="/collection/$slug"
-                params={{ slug: "jewelry-accessories" }}
+                params={{ slug: "accessories-fine-goods" }}
                 className="group mt-10 inline-flex min-h-[52px] w-fit items-center gap-3 rounded-full bg-noir px-10 text-[11px] uppercase tracking-[0.26em] text-ivory transition-colors duration-500 hover:bg-foreground/85"
               >
-                Shop Jewelry
+                Shop Fine Goods
                 <ArrowRight className="h-3.5 w-3.5 transition-transform duration-500 group-hover:translate-x-1" />
               </Link>
             </Reveal>

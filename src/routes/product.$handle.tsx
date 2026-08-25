@@ -477,7 +477,7 @@ function ProductPage() {
                 size="lg"
                 className="h-14 flex-1 rounded-full bg-foreground text-[13px] font-semibold uppercase tracking-[0.22em] text-ivory shadow-[0_14px_36px_-18px_rgba(17,17,17,0.85)] transition-transform hover:-translate-y-0.5 hover:bg-foreground/90"
               >
-                {isLoadingCart ? <Loader2 className="h-5 w-5 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
+                {isLoadingCart ? <Loader2 className="h-5 w-5 animate-spin" /> : variant?.availableForSale ? "Add to Cart" : "Sold Out"}
               </Button>
               <button
                 onClick={() => toggleWish(handle)}
@@ -494,7 +494,7 @@ function ProductPage() {
               size="lg"
               className="mt-3 hidden h-14 w-full rounded-full bg-gold text-[13px] font-semibold uppercase tracking-[0.22em] text-gold-foreground shadow-[0_14px_36px_-16px_color-mix(in_oklab,var(--gold)_70%,transparent)] transition-transform hover:-translate-y-0.5 hover:bg-gold/90 md:inline-flex"
             >
-              Buy It Now — Secure Checkout
+              Buy Now — Secure Checkout
             </Button>
 
 
@@ -665,7 +665,7 @@ function ProductPage() {
             disabled={isLoadingCart || !variant?.availableForSale}
             className="h-12 flex-1 rounded-full bg-foreground text-[12px] font-semibold uppercase tracking-[0.18em] text-ivory hover:bg-foreground/90"
           >
-            {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Bag" : "Sold Out"}
+            {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Cart" : "Sold Out"}
           </Button>
           <Button
             onClick={handleBuyNow}

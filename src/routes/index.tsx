@@ -122,7 +122,7 @@ function CollectionCarousel({
   sub?: string;
   slug: string;
 }) {
-  const { data, isLoading } = useCollection(slug, 16);
+  const { data, isLoading } = useCollection(resolveCollectionHandle(slug), 16);
   return (
     <ProductCarousel
       eyebrow={eyebrow}
@@ -153,20 +153,20 @@ function Home() {
 
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-7 pb-16 md:px-16 lg:px-20">
           <div className="max-w-xl">
-            <p className="animate-fade-in text-[10px] uppercase tracking-[0.42em] text-foreground/65 md:text-[11px]">
+            <p className="animate-lux-fade-up text-[10px] uppercase tracking-[0.42em] text-foreground/65 md:text-[11px]">
               The New Season · Autumn 2026
             </p>
-            <h1 className="mt-6 font-display text-[46px] leading-[0.98] tracking-[-0.01em] text-foreground md:mt-7 md:text-[84px]">
+            <h1 className="animate-lux-fade-up mt-6 font-display text-[46px] leading-[0.98] tracking-[-0.01em] text-foreground md:mt-7 md:text-[84px]" style={{ animationDelay: "140ms" }}>
               Luxury,
               <br />
               <span className="italic gold-gradient-text">Redefined.</span>
             </h1>
-            <div className="mt-7 h-px w-20 gold-line" />
-            <p className="mt-6 max-w-md text-[14px] leading-[1.8] text-foreground/70 md:text-[16px]">
+            <div className="animate-lux-fade-up mt-7 h-px w-20 gold-line" style={{ animationDelay: "260ms" }} />
+            <p className="animate-lux-fade-up mt-6 max-w-md text-[14px] leading-[1.8] text-foreground/70 md:text-[16px]" style={{ animationDelay: "340ms" }}>
               An international house of fashion, jewelry, beauty and home. Curated for the modern woman — effortless,
               elegant, everyday.
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <div className="animate-lux-fade-up mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style={{ animationDelay: "460ms" }}>
               <Link
                 to="/collection/$slug"
                 params={{ slug: "new-arrivals" }}
@@ -222,13 +222,15 @@ function Home() {
             View all
           </Link>
         </Reveal>
-        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-7">
+        <ul className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-7">
           {CATEGORIES.map((c, i) => (
-            <Reveal as="li" key={c.slug} delay={Math.min(i, 3) * 80}>
+            <Reveal as="li" key={c.slug} delay={Math.min(i, 3) * 80} className={i === 0 ? "col-span-2 md:row-span-2" : ""}>
               <Link
                 to="/collection/$slug"
                 params={{ slug: c.slug }}
-                className="group relative block aspect-[3/4] overflow-hidden rounded-2xl bg-beige shadow-[0_16px_40px_-30px_rgba(17,17,17,0.6)] transition-shadow duration-700 hover:shadow-[0_30px_60px_-30px_rgba(17,17,17,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                className={`group relative block overflow-hidden rounded-2xl bg-beige shadow-[0_16px_40px_-30px_rgba(17,17,17,0.6)] transition-shadow duration-700 hover:shadow-[0_30px_60px_-30px_rgba(17,17,17,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+                  i === 0 ? "aspect-[16/10] md:aspect-auto md:h-full" : "aspect-[3/4]"
+                }`}
               >
                 <img
                   src={c.img}
@@ -258,8 +260,8 @@ function Home() {
         eyebrow="Gifting Edit"
         title={<>Gifts wrapped in <span className="italic gold-gradient-text">gold.</span></>}
         copy="Festive-ready keepsakes, presented in signature Miravika packaging — made to be remembered."
-        ctaLabel="Shop Gifts"
-        ctaSlug="gifts"
+        ctaLabel="Shop Curated Sets"
+        ctaSlug="curated-sets"
         align="right"
       />
 
@@ -340,16 +342,13 @@ function Home() {
         </div>
       </section>
 
-      {/* TRENDING NOW */}
-      <CollectionCarousel eyebrow="Trending Now" title="The Zeitgeist" sub="What&apos;s moving fast, worldwide." slug="trending-now" />
-
-      {/* WOMEN'S FASHION */}
+      {/* READY-TO-WEAR */}
       <div className="bg-beige/40">
-      <CollectionCarousel eyebrow="Women&apos;s Fashion" title="Ready to Wear" sub="Considered silhouettes for every day and every occasion." slug="womens-fashion" />
+      <CollectionCarousel eyebrow="Ready-to-Wear" title="Considered Silhouettes" sub="Elevated pieces for every day and every occasion." slug="ready-to-wear" />
       </div>
 
-      {/* JEWELRY */}
-      <CollectionCarousel eyebrow="Jewelry &amp; Accessories" title="Little Things That Shine" sub="Sterling silver, moissanite and heirloom-inspired pieces." slug="jewelry-accessories" />
+      {/* ACCESSORIES FINE GOODS */}
+      <CollectionCarousel eyebrow="Accessories Fine Goods" title="Little Things That Shine" sub="Sterling silver, moissanite and heirloom-inspired pieces." slug="accessories-fine-goods" />
 
       {/* PROMISE */}
       <section aria-label="Our promise" className="border-y border-border/50 bg-ivory">

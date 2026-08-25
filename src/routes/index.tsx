@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Award, Globe, Handshake, Heart, ShieldCheck, Sparkles } from "lucide-react";
 import { useCollection } from "@/hooks/useProducts";
+import { resolveCollectionHandle } from "@/lib/shopify";
 import { ProductCarousel } from "@/components/site/ProductCarousel";
 import { VideoSection } from "@/components/site/VideoSection";
 import { Reveal } from "@/components/site/Reveal";
@@ -94,12 +95,11 @@ export const Route = createFileRoute("/")({
 });
 
 const CATEGORIES = [
+  { slug: "signature-collection", title: "Signature Collection", tag: "The Iconic Edit", img: heroBlackGold.url },
   { slug: "new-arrivals", title: "New Arrivals", tag: "Just Landed", img: streetScarf.url },
-  { slug: "womens-fashion", title: "Women's Fashion", tag: "Ready to Wear", img: catFashion.url },
-  { slug: "jewelry-accessories", title: "Jewelry & Accessories", tag: "Fine · Fashion", img: catJewelry.url },
-  { slug: "beauty-personal-care", title: "Beauty & Personal Care", tag: "Ritual Essentials", img: catBeauty.url },
-  { slug: "gifts", title: "Gifts", tag: "For Every Occasion", img: catGifts.url },
-  { slug: "trending-now", title: "Trending Now", tag: "Moving Fast", img: emerald.url },
+  { slug: "ready-to-wear", title: "Ready-to-Wear", tag: "Considered Silhouettes", img: catFashion.url },
+  { slug: "accessories-fine-goods", title: "Accessories Fine Goods", tag: "Finishing Pieces", img: catJewelry.url },
+  { slug: "curated-sets", title: "Curated Sets", tag: "For Every Occasion", img: catGifts.url },
 ] as const;
 
 const WHY = [
@@ -122,7 +122,7 @@ function CollectionCarousel({
   sub?: string;
   slug: string;
 }) {
-  const { data, isLoading } = useCollection(slug, 16);
+  const { data, isLoading } = useCollection(resolveCollectionHandle(slug), 16);
   return (
     <ProductCarousel
       eyebrow={eyebrow}
@@ -153,20 +153,20 @@ function Home() {
 
         <div className="relative mx-auto flex h-full max-w-7xl items-center px-7 pb-16 md:px-16 lg:px-20">
           <div className="max-w-xl">
-            <p className="animate-fade-in text-[10px] uppercase tracking-[0.42em] text-foreground/65 md:text-[11px]">
+            <p className="animate-lux-fade-up text-[10px] uppercase tracking-[0.42em] text-foreground/65 md:text-[11px]">
               The New Season · Autumn 2026
             </p>
-            <h1 className="mt-6 font-display text-[46px] leading-[0.98] tracking-[-0.01em] text-foreground md:mt-7 md:text-[84px]">
+            <h1 className="animate-lux-fade-up mt-6 font-display text-[46px] leading-[0.98] tracking-[-0.01em] text-foreground md:mt-7 md:text-[84px]" style={{ animationDelay: "140ms" }}>
               Luxury,
               <br />
               <span className="italic gold-gradient-text">Redefined.</span>
             </h1>
-            <div className="mt-7 h-px w-20 gold-line" />
-            <p className="mt-6 max-w-md text-[14px] leading-[1.8] text-foreground/70 md:text-[16px]">
+            <div className="animate-lux-fade-up mt-7 h-px w-20 gold-line" style={{ animationDelay: "260ms" }} />
+            <p className="animate-lux-fade-up mt-6 max-w-md text-[14px] leading-[1.8] text-foreground/70 md:text-[16px]" style={{ animationDelay: "340ms" }}>
               An international house of fashion, jewelry, beauty and home. Curated for the modern woman — effortless,
               elegant, everyday.
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <div className="animate-lux-fade-up mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style={{ animationDelay: "460ms" }}>
               <Link
                 to="/collection/$slug"
                 params={{ slug: "new-arrivals" }}
@@ -177,10 +177,10 @@ function Home() {
               </Link>
               <Link
                 to="/collection/$slug"
-                params={{ slug: "best-sellers" }}
+                params={{ slug: "signature-collection" }}
                 className="inline-flex min-h-[44px] items-center border-b border-foreground/35 pb-1 text-[11px] uppercase tracking-[0.26em] text-foreground transition-colors hover:border-gold hover:text-gold"
               >
-                Best Sellers
+                Signature Collection
               </Link>
             </div>
           </div>
@@ -207,7 +207,7 @@ function Home() {
       />
 
       {/* CATEGORIES */}
-      <section aria-labelledby="categories-heading" className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-28">
+      <section aria-labelledby="categories-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
         <Reveal className="mb-10 flex items-end justify-between gap-6 md:mb-16">
           <div>
             <p className="text-[10px] uppercase tracking-[0.34em] text-gold">Shop by Category</p>
@@ -222,13 +222,15 @@ function Home() {
             View all
           </Link>
         </Reveal>
-        <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-7">
+        <ul className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-7">
           {CATEGORIES.map((c, i) => (
-            <Reveal as="li" key={c.slug} delay={Math.min(i, 3) * 80}>
+            <Reveal as="li" key={c.slug} delay={Math.min(i, 3) * 80} className={i === 0 ? "col-span-2 md:row-span-2" : ""}>
               <Link
                 to="/collection/$slug"
                 params={{ slug: c.slug }}
-                className="group relative block aspect-[3/4] overflow-hidden rounded-2xl bg-beige shadow-[0_16px_40px_-30px_rgba(17,17,17,0.6)] transition-shadow duration-700 hover:shadow-[0_30px_60px_-30px_rgba(17,17,17,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                className={`group relative block overflow-hidden rounded-2xl bg-beige shadow-[0_16px_40px_-30px_rgba(17,17,17,0.6)] transition-shadow duration-700 hover:shadow-[0_30px_60px_-30px_rgba(17,17,17,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 ${
+                  i === 0 ? "aspect-[16/10] md:aspect-auto md:h-full" : "aspect-[3/4]"
+                }`}
               >
                 <img
                   src={c.img}
@@ -258,14 +260,14 @@ function Home() {
         eyebrow="Gifting Edit"
         title={<>Gifts wrapped in <span className="italic gold-gradient-text">gold.</span></>}
         copy="Festive-ready keepsakes, presented in signature Miravika packaging — made to be remembered."
-        ctaLabel="Shop Gifts"
-        ctaSlug="gifts"
+        ctaLabel="Shop Curated Sets"
+        ctaSlug="curated-sets"
         align="right"
       />
 
-      {/* BEST SELLERS */}
+      {/* SIGNATURE COLLECTION */}
       <div className="bg-beige/40">
-      <CollectionCarousel eyebrow="Best Sellers" title="Most Loved" sub="The pieces our community returns to, season after season." slug="best-sellers" />
+      <CollectionCarousel eyebrow="Signature Collection" title="Most Loved" sub="The definitive Miravika edit — pieces our community returns to, season after season." slug="signature-collection" />
       </div>
 
       {/* EDITORIAL SPLIT */}
@@ -292,7 +294,7 @@ function Home() {
               </p>
               <Link
                 to="/collection/$slug"
-                params={{ slug: "trending-now" }}
+                params={{ slug: "signature-collection" }}
                 className="group mt-10 inline-flex min-h-[52px] w-fit items-center gap-3 rounded-full border border-gold px-10 text-[11px] uppercase tracking-[0.26em] text-gold transition-all duration-500 hover:bg-gold hover:text-noir"
               >
                 Discover the Edit
@@ -311,7 +313,7 @@ function Home() {
         <div className="mx-auto grid max-w-7xl items-center gap-0 md:grid-cols-2">
           <div className="flex flex-col justify-center px-6 py-16 md:order-1 md:px-16 md:py-28">
             <Reveal>
-              <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Jewelry</p>
+              <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Fine Goods</p>
               <h2 className="mt-5 font-display text-[34px] leading-[1.05] md:text-6xl">
                 Little things that <span className="italic gold-gradient-text">shine.</span>
               </h2>
@@ -320,10 +322,10 @@ function Home() {
               </p>
               <Link
                 to="/collection/$slug"
-                params={{ slug: "jewelry-accessories" }}
+                params={{ slug: "accessories-fine-goods" }}
                 className="group mt-10 inline-flex min-h-[52px] w-fit items-center gap-3 rounded-full bg-noir px-10 text-[11px] uppercase tracking-[0.26em] text-ivory transition-colors duration-500 hover:bg-foreground/85"
               >
-                Shop Jewelry
+                Shop Fine Goods
                 <ArrowRight className="h-3.5 w-3.5 transition-transform duration-500 group-hover:translate-x-1" />
               </Link>
             </Reveal>
@@ -340,16 +342,13 @@ function Home() {
         </div>
       </section>
 
-      {/* TRENDING NOW */}
-      <CollectionCarousel eyebrow="Trending Now" title="The Zeitgeist" sub="What&apos;s moving fast, worldwide." slug="trending-now" />
-
-      {/* WOMEN'S FASHION */}
+      {/* READY-TO-WEAR */}
       <div className="bg-beige/40">
-      <CollectionCarousel eyebrow="Women&apos;s Fashion" title="Ready to Wear" sub="Considered silhouettes for every day and every occasion." slug="womens-fashion" />
+      <CollectionCarousel eyebrow="Ready-to-Wear" title="Considered Silhouettes" sub="Elevated pieces for every day and every occasion." slug="ready-to-wear" />
       </div>
 
-      {/* JEWELRY */}
-      <CollectionCarousel eyebrow="Jewelry &amp; Accessories" title="Little Things That Shine" sub="Sterling silver, moissanite and heirloom-inspired pieces." slug="jewelry-accessories" />
+      {/* ACCESSORIES FINE GOODS */}
+      <CollectionCarousel eyebrow="Accessories Fine Goods" title="Little Things That Shine" sub="Sterling silver, moissanite and heirloom-inspired pieces." slug="accessories-fine-goods" />
 
       {/* PROMISE */}
       <section aria-label="Our promise" className="border-y border-border/50 bg-ivory">
@@ -370,7 +369,7 @@ function Home() {
       <CustomerGallery />
 
       {/* SHOP BY OCCASION */}
-      <section aria-labelledby="occasion-heading" className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-28">
+      <section aria-labelledby="occasion-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
         <Reveal className="mb-10 text-center md:mb-14">
           <p className="text-[10px] uppercase tracking-[0.34em] text-gold">Shop by Occasion</p>
           <h2 id="occasion-heading" className="mt-3 font-display text-[28px] leading-tight md:text-5xl">
@@ -380,9 +379,9 @@ function Home() {
         </Reveal>
         <ul className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-7">
           {[
-            { img: streetScarf.url, title: "For the Traveller", tag: "Fashion", slug: "womens-fashion" },
-            { img: emerald.url, title: "For the Occasion", tag: "Jewelry", slug: "jewelry-accessories" },
-            { img: corridor.url, title: "For the Celebration", tag: "Gifts", slug: "gifts" },
+            { img: streetScarf.url, title: "For the Traveller", tag: "Ready-to-Wear", slug: "ready-to-wear" },
+            { img: emerald.url, title: "For the Occasion", tag: "Fine Goods", slug: "accessories-fine-goods" },
+            { img: corridor.url, title: "For the Celebration", tag: "Curated Sets", slug: "curated-sets" },
           ].map((g, i) => (
             <Reveal as="li" key={g.title} delay={i * 90}>
               <Link
@@ -445,7 +444,7 @@ function Home() {
       </section>
 
       {/* INSTAGRAM */}
-      <section aria-labelledby="instagram-heading" className="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-28">
+      <section aria-labelledby="instagram-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
         <Reveal className="mb-10 text-center">
           <p className="text-[10px] uppercase tracking-[0.34em] text-gold">@miravika.india</p>
           <h2 id="instagram-heading" className="mt-3 font-display text-[28px] leading-tight md:text-5xl">

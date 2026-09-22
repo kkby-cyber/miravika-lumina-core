@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/format-price";
@@ -20,8 +20,9 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { items, updateQuantity, removeItem, openCheckout, cost } = useCartStore();
-  // Shopify's cart cost is authoritative; the local sum is only a pre-sync placeholder.
+  const { items, updateQuantity, removeItem, cost } = useCartStore();
+  const navigate = useNavigate();
+  // Nexus cart cost is authoritative; the local sum is only a pre-sync placeholder.
   const currency = cost?.subtotalAmount.currencyCode || items[0]?.price.currencyCode || "INR";
   const subtotal = cost
     ? parseFloat(cost.subtotalAmount.amount)
@@ -78,13 +79,28 @@ function CartPage() {
             </div>
             <CouponField />
             <div className="my-4 gold-line" />
-            <Button onClick={() => {
-              if (!openCheckout()) return;
-              trackBeginCheckout(
-                items.map((i, idx) => itemFromProduct(i.product, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx })),
-                currency,
-              );
-            }} size="lg" className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90">
+            <Button
+              onClick={() => {
+                if (!items.length) return;
+
+                trackBeginCheckout(
+                  items.map((i, idx) =>
+                    itemFromProduct(i.product, {
+                      variantId: i.variantId,
+                      variantTitle: i.variantTitle,
+                      price: i.price.amount,
+                      quantity: i.quantity,
+                      index: idx,
+                    }),
+                  ),
+                  currency,
+                );
+
+                navigate({ to: "/checkout" });
+              }}
+              size="lg"
+              className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90"
+            >
               Secure Checkout
             </Button>
             <p className="mt-3 text-center text-[11px] text-muted-foreground">UPI · Cards · Net Banking · Wallets</p>

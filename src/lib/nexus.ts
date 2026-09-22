@@ -1,5 +1,14 @@
-export const NEXUS_API_URL =
-  import.meta.env.VITE_NEXUS_API_URL || "http://localhost:8080";
+const NEXUS_API_URL = import.meta.env.VITE_NEXUS_API_URL;
+
+function getNexusApiUrl(): string {
+  if (!NEXUS_API_URL) {
+    throw new Error(
+      "MIRAVIKA Nexus API is not configured. Set VITE_NEXUS_API_URL in the deployment environment.",
+    );
+  }
+
+  return NEXUS_API_URL.replace(/\/$/, "");
+}
 
 export interface NexusImage {
   url: string;
@@ -69,10 +78,7 @@ interface NexusResponse<T> {
   };
 }
 
-async function nexusRequest<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
+async function nexusRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${NEXUS_API_URL}${path}`, {
     ...init,
     headers: {
@@ -94,12 +100,14 @@ async function nexusRequest<T>(
   return body.data;
 }
 
-export async function getNexusProducts(options: {
-  limit?: number;
-  offset?: number;
-  query?: string;
-  collection?: string;
-} = {}) {
+export async function getNexusProducts(
+  options: {
+    limit?: number;
+    offset?: number;
+    query?: string;
+    collection?: string;
+  } = {},
+) {
   const params = new URLSearchParams();
 
   params.set("limit", String(Math.min(options.limit ?? 24, 100)));
@@ -126,7 +134,6 @@ export async function getNexusCollections() {
     collections: NexusCollection[];
   }>("/api/public/collections");
 }
-
 
 export interface NexusShippingQuote {
   serviceable: boolean;

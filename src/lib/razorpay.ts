@@ -41,8 +41,7 @@ export function loadRazorpay(): Promise<void> {
     script.async = true;
 
     script.onload = () => resolve();
-    script.onerror = () =>
-      reject(new Error("Razorpay Checkout could not be loaded."));
+    script.onerror = () => reject(new Error("Razorpay Checkout could not be loaded."));
 
     document.head.appendChild(script);
   });

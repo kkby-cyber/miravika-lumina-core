@@ -80,8 +80,7 @@ interface CartStore {
   openCheckout: () => boolean;
 }
 
-const NEXUS_API_URL =
-  import.meta.env.VITE_NEXUS_API_URL || "http://localhost:8080";
+const NEXUS_API_URL = import.meta.env.VITE_NEXUS_API_URL;
 
 function getCartToken() {
   if (typeof window === "undefined") return null;
@@ -125,10 +124,7 @@ async function nexusCartRequest(
   return data;
 }
 
-function cartItemToLocal(
-  item: NexusCartItem,
-  existing: CartItem | undefined,
-): CartItem | null {
+function cartItemToLocal(item: NexusCartItem, existing: CartItem | undefined): CartItem | null {
   if (!existing) return null;
 
   return {
@@ -139,10 +135,7 @@ function cartItemToLocal(
 }
 
 function calculateCost(items: CartItem[]) {
-  const subtotal = items.reduce(
-    (sum, item) => sum + Number(item.price.amount) * item.quantity,
-    0,
-  );
+  const subtotal = items.reduce((sum, item) => sum + Number(item.price.amount) * item.quantity, 0);
 
   const currencyCode = items[0]?.price.currencyCode ?? "INR";
   const amount = subtotal.toFixed(2);
@@ -184,8 +177,7 @@ export const useCartStore = create<CartStore>()(
           const serverItems = result.data?.items ?? [];
           const serverItem = serverItems.find(
             (serverItem) =>
-              serverItem.variant_id === item.variantId ||
-              serverItem.product_variants?.sku === sku,
+              serverItem.variant_id === item.variantId || serverItem.product_variants?.sku === sku,
           );
 
           const existing = get().items.find(
@@ -195,11 +187,9 @@ export const useCartStore = create<CartStore>()(
           const nextItem: CartItem = {
             ...item,
             lineId: serverItem?.id ?? existing?.lineId ?? null,
-            quantity: serverItem?.quantity ?? (
-              existing
-                ? existing.quantity + item.quantity
-                : item.quantity
-            ),
+            quantity:
+              serverItem?.quantity ??
+              (existing ? existing.quantity + item.quantity : item.quantity),
           };
 
           const nextItems = existing
@@ -248,9 +238,7 @@ export const useCartStore = create<CartStore>()(
           return;
         }
 
-        const item = get().items.find(
-          (current) => current.variantId === variantId,
-        );
+        const item = get().items.find((current) => current.variantId === variantId);
 
         if (!item?.lineId) return;
 
@@ -273,9 +261,7 @@ export const useCartStore = create<CartStore>()(
           const actualQuantity = Number(serverItem?.quantity ?? quantity);
 
           const nextItems = get().items.map((current) =>
-            current.variantId === variantId
-              ? { ...current, quantity: actualQuantity }
-              : current,
+            current.variantId === variantId ? { ...current, quantity: actualQuantity } : current,
           );
 
           set({
@@ -292,9 +278,11 @@ export const useCartStore = create<CartStore>()(
               quantity: Math.abs(delta),
             });
 
-            delta > 0
-              ? trackAddToCart([analyticsItem], item.price.currencyCode)
-              : trackRemoveFromCart([analyticsItem], item.price.currencyCode);
+            if (delta > 0) {
+              trackAddToCart([analyticsItem], item.price.currencyCode);
+            } else {
+              trackRemoveFromCart([analyticsItem], item.price.currencyCode);
+            }
           }
         } catch (error) {
           console.error(error);
@@ -305,9 +293,7 @@ export const useCartStore = create<CartStore>()(
       },
 
       removeItem: async (variantId) => {
-        const item = get().items.find(
-          (current) => current.variantId === variantId,
-        );
+        const item = get().items.find((current) => current.variantId === variantId);
 
         if (!item?.lineId) return;
 
@@ -331,9 +317,7 @@ export const useCartStore = create<CartStore>()(
             item.price.currencyCode,
           );
 
-          const nextItems = get().items.filter(
-            (current) => current.variantId !== variantId,
-          );
+          const nextItems = get().items.filter((current) => current.variantId !== variantId);
 
           set({
             items: nextItems,
@@ -355,9 +339,7 @@ export const useCartStore = create<CartStore>()(
           cost: null,
         });
 
-        void nexusCartRequest("POST", { action: "clear" }).catch((error) =>
-          console.error(error),
-        );
+        void nexusCartRequest("POST", { action: "clear" }).catch((error) => console.error(error));
       },
 
       syncCart: async () => {
@@ -376,8 +358,7 @@ export const useCartStore = create<CartStore>()(
           for (const serverItem of serverItems) {
             const existing = localItems.find(
               (localItem) =>
-                localItem.lineId === serverItem.id ||
-                localItem.variantId === serverItem.variant_id,
+                localItem.lineId === serverItem.id || localItem.variantId === serverItem.variant_id,
             );
 
             const mapped = cartItemToLocal(serverItem, existing);

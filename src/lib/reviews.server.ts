@@ -1,14 +1,18 @@
 // Server-only Judge.me (Shopify review app) client.
 // Reads credentials from the server environment at call time — never at module scope.
-import { aggregateOf, type Review, type ProductReviewsResult, type ShopRatingsResult } from "./reviews-types";
+import {
+  aggregateOf,
+  type Review,
+  type ProductReviewsResult,
+  type ShopRatingsResult,
+} from "./reviews-types";
 
 const API_BASE = "https://judge.me/api/v1";
 
 function credentials() {
   const apiToken = process.env.JUDGEME_API_TOKEN;
-  const shopDomain =
-    process.env.JUDGEME_SHOP_DOMAIN || "miravika-operating-system-ngwql.myshopify.com";
-  if (!apiToken) return null;
+  const shopDomain = process.env.JUDGEME_SHOP_DOMAIN;
+  if (!apiToken || !shopDomain) return null;
   return { apiToken, shopDomain };
 }
 
@@ -29,7 +33,11 @@ function mediaUrls(value: unknown): string[] {
       if (typeof entry === "string") return entry;
       if (entry && typeof entry === "object") {
         const o = entry as Record<string, unknown>;
-        return str(o.urls ? (o.urls as Record<string, unknown>).original : undefined) || str(o.url) || str(o.original);
+        return (
+          str(o.urls ? (o.urls as Record<string, unknown>).original : undefined) ||
+          str(o.url) ||
+          str(o.original)
+        );
       }
       return "";
     })
@@ -47,7 +55,8 @@ function normalize(raw: RawReview): Review {
     rating: Number(raw.rating ?? 0),
     title: str(raw.title),
     body: str(raw.body),
-    reviewerName: str((raw.reviewer as Record<string, unknown>)?.name) || str(raw.name) || "Verified customer",
+    reviewerName:
+      str((raw.reviewer as Record<string, unknown>)?.name) || str(raw.name) || "Verified customer",
     verifiedBuyer,
     createdAt: str(raw.created_at),
     updatedAt: str(raw.updated_at) || null,
@@ -156,7 +165,12 @@ export async function submitReviewToProvider(input: SubmitReviewInput) {
   const text = await res.text();
   if (!res.ok) {
     console.error(`[judge.me] POST /reviews failed [${res.status}]: ${text}`);
-    return { ok: false as const, reason: "provider_error" as const, status: res.status, body: text };
+    return {
+      ok: false as const,
+      reason: "provider_error" as const,
+      status: res.status,
+      body: text,
+    };
   }
   return { ok: true as const };
 }

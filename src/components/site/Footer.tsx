@@ -1,13 +1,37 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Mail, MessageCircle, Facebook, ShieldCheck, Truck, Undo2, Headphones } from "lucide-react";
+import {
+  Instagram,
+  Mail,
+  MessageCircle,
+  Facebook,
+  ShieldCheck,
+  Truck,
+  Undo2,
+  Headphones,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import logoAsset from "@/assets/miravika-logo.png.asset.json";
 import { trackGenerateLead, trackSignUp } from "@/lib/analytics";
 
 // Pinterest icon (lucide doesn't include it in the default export)
-const PinterestIcon = ({ className, strokeWidth = 1.5 }: { className?: string; strokeWidth?: number }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+const PinterestIcon = ({
+  className,
+  strokeWidth = 1.5,
+}: {
+  className?: string;
+  strokeWidth?: number;
+}) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={strokeWidth}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    aria-hidden="true"
+  >
     <circle cx="12" cy="12" r="10" />
     <path d="M8 20l4-9" />
     <path d="M10 13c.5 1 1.5 1.5 2.5 1.5 2.5 0 4-2 4-4.5S14.8 6 12 6 8 8 8 10c0 1 .5 2 1.5 2.5" />
@@ -28,7 +52,9 @@ export function Footer() {
     if (!email) return;
     trackGenerateLead("newsletter_footer");
     trackSignUp("newsletter");
-    toast.success("Welcome to Miravika", { description: "Check your inbox for 10% off your first order." });
+    toast.success("Welcome to Miravika", {
+      description: "Check your inbox for 10% off your first order.",
+    });
     setEmail("");
   };
 
@@ -58,7 +84,10 @@ export function Footer() {
             <p className="max-w-lg text-sm text-ivory/70">
               Private access to new drops, editorial stories and 10% off your first order.
             </p>
-            <form onSubmit={onSubscribe} className="mt-2 flex w-full max-w-md flex-col gap-2 sm:flex-row">
+            <form
+              onSubmit={onSubscribe}
+              className="mt-2 flex w-full max-w-md flex-col gap-2 sm:flex-row"
+            >
               <input
                 type="email"
                 required
@@ -68,7 +97,10 @@ export function Footer() {
                 aria-label="Email address"
                 className="flex-1 rounded-full border border-white/20 bg-transparent px-5 py-3 text-sm text-ivory placeholder:text-ivory/40 focus:border-gold focus:outline-none"
               />
-              <button type="submit" className="rounded-full bg-gold px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-noir transition hover:bg-gold/90">
+              <button
+                type="submit"
+                className="rounded-full bg-gold px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-noir transition hover:bg-gold/90"
+              >
                 Subscribe
               </button>
             </form>
@@ -77,13 +109,23 @@ export function Footer() {
 
         <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-5">
           <div className="md:col-span-2">
-            <img src={logoAsset.url} alt="MIRAVIKA" className="h-16 w-auto brightness-110 md:h-20" loading="lazy" />
+            <img
+              src={logoAsset.url}
+              alt="MIRAVIKA"
+              className="h-16 w-auto brightness-110 md:h-20"
+              loading="lazy"
+            />
             <p className="mt-4 max-w-sm text-sm text-ivory/70">
-              A premium global lifestyle brand — fashion, jewelry, beauty, home and lifestyle essentials, thoughtfully curated for the modern customer. Worldwide shipping.
+              A premium global lifestyle brand — fashion, jewelry, beauty, home and lifestyle
+              essentials, thoughtfully curated for the modern customer. Worldwide shipping.
             </p>
             <div className="mt-5 flex items-center gap-2">
               {[
-                { Icon: Instagram, href: "https://instagram.com/miravika.india", label: "Instagram @miravika.india" },
+                {
+                  Icon: Instagram,
+                  href: "https://instagram.com/miravika.india",
+                  label: "Instagram @miravika.india",
+                },
                 { Icon: Facebook, href: "https://facebook.com/miravika", label: "Facebook" },
                 { Icon: PinterestIcon, href: "https://pinterest.com/miravika", label: "Pinterest" },
                 { Icon: MessageCircle, href: "https://wa.me/", label: "WhatsApp" },
@@ -103,31 +145,109 @@ export function Footer() {
             </div>
           </div>
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">Shop</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">
+              Shop
+            </h4>
             <ul className="mt-4 space-y-2.5 text-sm text-ivory/80">
-              <li><Link to="/collection/$slug" params={{ slug: "signature-collection" }} className="hover:text-gold">Signature Collection</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "new-arrivals" }} className="hover:text-gold">New Arrivals</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "ready-to-wear" }} className="hover:text-gold">Ready-to-Wear</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "accessories-fine-goods" }} className="hover:text-gold">Accessories Fine Goods</Link></li>
-              <li><Link to="/collection/$slug" params={{ slug: "curated-sets" }} className="hover:text-gold">Curated Sets</Link></li>
+              <li>
+                <Link
+                  to="/collection/$slug"
+                  params={{ slug: "signature-collection" }}
+                  className="hover:text-gold"
+                >
+                  Signature Collection
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/collection/$slug"
+                  params={{ slug: "new-arrivals" }}
+                  className="hover:text-gold"
+                >
+                  New Arrivals
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/collection/$slug"
+                  params={{ slug: "ready-to-wear" }}
+                  className="hover:text-gold"
+                >
+                  Ready-to-Wear
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/collection/$slug"
+                  params={{ slug: "accessories-fine-goods" }}
+                  className="hover:text-gold"
+                >
+                  Accessories Fine Goods
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/collection/$slug"
+                  params={{ slug: "curated-sets" }}
+                  className="hover:text-gold"
+                >
+                  Curated Sets
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">Help</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">
+              Help
+            </h4>
             <ul className="mt-4 space-y-2.5 text-sm text-ivory/80">
-              <li><Link to="/track-order" className="hover:text-gold">Track Order</Link></li>
-              <li><Link to="/shipping-policy" className="hover:text-gold">Shipping Policy</Link></li>
-              <li><Link to="/return-policy" className="hover:text-gold">Returns & Refunds</Link></li>
-              <li><Link to="/faq" className="hover:text-gold">FAQs</Link></li>
-              <li><Link to="/contact" className="hover:text-gold">Contact Us</Link></li>
+              <li>
+                <Link to="/track-order" className="hover:text-gold">
+                  Track Order
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-policy" className="hover:text-gold">
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/return-policy" className="hover:text-gold">
+                  Returns & Refunds
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-gold">
+                  FAQs
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-gold">
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </div>
           <div>
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">Company</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-gold">
+              Company
+            </h4>
             <ul className="mt-4 space-y-2.5 text-sm text-ivory/80">
-              <li><Link to="/about" className="hover:text-gold">About Us</Link></li>
-              <li><Link to="/privacy-policy" className="hover:text-gold">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-gold">Terms & Conditions</Link></li>
+              <li>
+                <Link to="/about" className="hover:text-gold">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="hover:text-gold">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="hover:text-gold">
+                  Terms & Conditions
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -151,7 +271,6 @@ export function Footer() {
             <p>Crafted worldwide · Delivered with care</p>
           </div>
         </div>
-
       </div>
     </footer>
   );

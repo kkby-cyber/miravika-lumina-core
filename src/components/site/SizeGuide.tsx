@@ -24,9 +24,7 @@ const APPAREL = [
  */
 export function SizeGuide({ optionValues }: { optionValues: string[] }) {
   const [open, setOpen] = useState(false);
-  const rows = APPAREL.filter((r) =>
-    optionValues.some((v) => v.trim().toUpperCase() === r[0]),
-  );
+  const rows = APPAREL.filter((r) => optionValues.some((v) => v.trim().toUpperCase() === r[0]));
   const table = rows.length ? rows : APPAREL;
 
   return (

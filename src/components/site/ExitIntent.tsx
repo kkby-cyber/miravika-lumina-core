@@ -103,7 +103,10 @@ export function ExitIntent() {
             Claim my 10%
           </button>
         </form>
-        <button onClick={() => setOpen(false)} className="mt-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground hover:text-gold">
+        <button
+          onClick={() => setOpen(false)}
+          className="mt-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground hover:text-gold"
+        >
           No thanks
         </button>
       </div>

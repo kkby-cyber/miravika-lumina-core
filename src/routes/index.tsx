@@ -35,7 +35,8 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "MIRAVIKA — Luxury Redefined" },
       {
         property: "og:description",
-        content: "Premium fashion, jewelry, beauty and lifestyle — curated for the modern global woman.",
+        content:
+          "Premium fashion, jewelry, beauty and lifestyle — curated for the modern global woman.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "MIRAVIKA" },
@@ -95,10 +96,25 @@ export const Route = createFileRoute("/")({
 });
 
 const CATEGORIES = [
-  { slug: "signature-collection", title: "Signature Collection", tag: "The Iconic Edit", img: heroBlackGold.url },
+  {
+    slug: "signature-collection",
+    title: "Signature Collection",
+    tag: "The Iconic Edit",
+    img: heroBlackGold.url,
+  },
   { slug: "new-arrivals", title: "New Arrivals", tag: "Just Landed", img: streetScarf.url },
-  { slug: "ready-to-wear", title: "Ready-to-Wear", tag: "Considered Silhouettes", img: catFashion.url },
-  { slug: "accessories-fine-goods", title: "Accessories Fine Goods", tag: "Finishing Pieces", img: catJewelry.url },
+  {
+    slug: "ready-to-wear",
+    title: "Ready-to-Wear",
+    tag: "Considered Silhouettes",
+    img: catFashion.url,
+  },
+  {
+    slug: "accessories-fine-goods",
+    title: "Accessories Fine Goods",
+    tag: "Finishing Pieces",
+    img: catJewelry.url,
+  },
   { slug: "curated-sets", title: "Curated Sets", tag: "For Every Occasion", img: catGifts.url },
 ] as const;
 
@@ -156,17 +172,29 @@ function Home() {
             <p className="animate-lux-fade-up text-[10px] uppercase tracking-[0.42em] text-foreground/65 md:text-[11px]">
               The New Season · Autumn 2026
             </p>
-            <h1 className="animate-lux-fade-up mt-6 font-display text-[46px] leading-[0.98] tracking-[-0.01em] text-foreground md:mt-7 md:text-[84px]" style={{ animationDelay: "140ms" }}>
+            <h1
+              className="animate-lux-fade-up mt-6 font-display text-[46px] leading-[0.98] tracking-[-0.01em] text-foreground md:mt-7 md:text-[84px]"
+              style={{ animationDelay: "140ms" }}
+            >
               Luxury,
               <br />
               <span className="italic gold-gradient-text">Redefined.</span>
             </h1>
-            <div className="animate-lux-fade-up mt-7 h-px w-20 gold-line" style={{ animationDelay: "260ms" }} />
-            <p className="animate-lux-fade-up mt-6 max-w-md text-[14px] leading-[1.8] text-foreground/70 md:text-[16px]" style={{ animationDelay: "340ms" }}>
-              An international house of fashion, jewelry, beauty and home. Curated for the modern woman — effortless,
-              elegant, everyday.
+            <div
+              className="animate-lux-fade-up mt-7 h-px w-20 gold-line"
+              style={{ animationDelay: "260ms" }}
+            />
+            <p
+              className="animate-lux-fade-up mt-6 max-w-md text-[14px] leading-[1.8] text-foreground/70 md:text-[16px]"
+              style={{ animationDelay: "340ms" }}
+            >
+              An international house of fashion, jewelry, beauty and home. Curated for the modern
+              woman — effortless, elegant, everyday.
             </p>
-            <div className="animate-lux-fade-up mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style={{ animationDelay: "460ms" }}>
+            <div
+              className="animate-lux-fade-up mt-10 flex flex-wrap items-center gap-x-8 gap-y-4"
+              style={{ animationDelay: "460ms" }}
+            >
               <Link
                 to="/collection/$slug"
                 params={{ slug: "new-arrivals" }}
@@ -200,18 +228,28 @@ function Home() {
         src="/video/miravika-signature.mp4"
         poster="/video/miravika-signature-poster.jpg"
         eyebrow="The Film"
-        title={<>The Miravika <span className="italic gold-gradient-text">signature.</span></>}
+        title={
+          <>
+            The Miravika <span className="italic gold-gradient-text">signature.</span>
+          </>
+        }
         copy="A closer look at the craft, the finish and the detail behind every piece we curate."
         ctaLabel="Shop New Arrivals"
         ctaSlug="new-arrivals"
       />
 
       {/* CATEGORIES */}
-      <section aria-labelledby="categories-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
+      <section
+        aria-labelledby="categories-heading"
+        className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32"
+      >
         <Reveal className="mb-10 flex items-end justify-between gap-6 md:mb-16">
           <div>
             <p className="text-[10px] uppercase tracking-[0.34em] text-gold">Shop by Category</p>
-            <h2 id="categories-heading" className="mt-3 font-display text-[28px] leading-tight md:text-5xl">
+            <h2
+              id="categories-heading"
+              className="mt-3 font-display text-[28px] leading-tight md:text-5xl"
+            >
               The Universe of Miravika
             </h2>
           </div>
@@ -224,7 +262,12 @@ function Home() {
         </Reveal>
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-7">
           {CATEGORIES.map((c, i) => (
-            <Reveal as="li" key={c.slug} delay={Math.min(i, 3) * 80} className={i === 0 ? "col-span-2 md:row-span-2" : ""}>
+            <Reveal
+              as="li"
+              key={c.slug}
+              delay={Math.min(i, 3) * 80}
+              className={i === 0 ? "col-span-2 md:row-span-2" : ""}
+            >
               <Link
                 to="/collection/$slug"
                 params={{ slug: c.slug }}
@@ -243,7 +286,9 @@ function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-noir/85 via-noir/30 to-transparent transition-opacity duration-700 group-hover:from-noir/90" />
                 <div className="absolute inset-x-0 bottom-0 p-5 text-ivory md:p-7">
-                  <p className="text-[9px] uppercase leading-[1.6] tracking-[0.3em] text-gold">{c.tag}</p>
+                  <p className="text-[9px] uppercase leading-[1.6] tracking-[0.3em] text-gold">
+                    {c.tag}
+                  </p>
                   <h3 className="mt-2 font-display text-lg leading-[1.2] md:text-2xl">{c.title}</h3>
                   <span className="mt-2 block h-px w-0 bg-gold transition-all duration-700 group-hover:w-12" />
                 </div>
@@ -258,7 +303,11 @@ function Home() {
         src="/video/miravika-rakhi.mp4"
         poster="/video/miravika-rakhi-poster.jpg"
         eyebrow="Gifting Edit"
-        title={<>Gifts wrapped in <span className="italic gold-gradient-text">gold.</span></>}
+        title={
+          <>
+            Gifts wrapped in <span className="italic gold-gradient-text">gold.</span>
+          </>
+        }
         copy="Festive-ready keepsakes, presented in signature Miravika packaging — made to be remembered."
         ctaLabel="Shop Curated Sets"
         ctaSlug="curated-sets"
@@ -267,7 +316,12 @@ function Home() {
 
       {/* SIGNATURE COLLECTION */}
       <div className="bg-beige/40">
-      <CollectionCarousel eyebrow="Signature Collection" title="Most Loved" sub="The definitive Miravika edit — pieces our community returns to, season after season." slug="signature-collection" />
+        <CollectionCarousel
+          eyebrow="Signature Collection"
+          title="Most Loved"
+          sub="The definitive Miravika edit — pieces our community returns to, season after season."
+          slug="signature-collection"
+        />
       </div>
 
       {/* EDITORIAL SPLIT */}
@@ -289,8 +343,8 @@ function Home() {
                 Made for the moment you <span className="italic gold-gradient-text">arrive.</span>
               </h2>
               <p className="mt-6 max-w-md text-[14px] leading-[1.85] text-ivory/70 md:text-base">
-                Considered silhouettes, hand-finished detailing and the quiet confidence of pieces built to be
-                remembered.
+                Considered silhouettes, hand-finished detailing and the quiet confidence of pieces
+                built to be remembered.
               </p>
               <Link
                 to="/collection/$slug"
@@ -306,7 +360,12 @@ function Home() {
       </section>
 
       {/* NEW ARRIVALS */}
-      <CollectionCarousel eyebrow="Just Landed" title="New Arrivals" sub="The newest additions to the boutique." slug="new-arrivals" />
+      <CollectionCarousel
+        eyebrow="Just Landed"
+        title="New Arrivals"
+        sub="The newest additions to the boutique."
+        slug="new-arrivals"
+      />
 
       {/* JEWELRY SPOTLIGHT */}
       <section className="bg-beige">
@@ -318,7 +377,8 @@ function Home() {
                 Little things that <span className="italic gold-gradient-text">shine.</span>
               </h2>
               <p className="mt-6 max-w-md text-[14px] leading-[1.85] text-muted-foreground md:text-base">
-                Sterling silver, moissanite and heirloom-inspired pieces — wear them daily, keep them forever.
+                Sterling silver, moissanite and heirloom-inspired pieces — wear them daily, keep
+                them forever.
               </p>
               <Link
                 to="/collection/$slug"
@@ -344,11 +404,21 @@ function Home() {
 
       {/* READY-TO-WEAR */}
       <div className="bg-beige/40">
-      <CollectionCarousel eyebrow="Ready-to-Wear" title="Considered Silhouettes" sub="Elevated pieces for every day and every occasion." slug="ready-to-wear" />
+        <CollectionCarousel
+          eyebrow="Ready-to-Wear"
+          title="Considered Silhouettes"
+          sub="Elevated pieces for every day and every occasion."
+          slug="ready-to-wear"
+        />
       </div>
 
       {/* ACCESSORIES FINE GOODS */}
-      <CollectionCarousel eyebrow="Accessories Fine Goods" title="Little Things That Shine" sub="Sterling silver, moissanite and heirloom-inspired pieces." slug="accessories-fine-goods" />
+      <CollectionCarousel
+        eyebrow="Accessories Fine Goods"
+        title="Little Things That Shine"
+        sub="Sterling silver, moissanite and heirloom-inspired pieces."
+        slug="accessories-fine-goods"
+      />
 
       {/* PROMISE */}
       <section aria-label="Our promise" className="border-y border-border/50 bg-ivory">
@@ -356,7 +426,9 @@ function Home() {
           {WHY.map((w) => (
             <li key={w.title} className="flex flex-col items-center gap-3 text-center">
               <w.icon className="h-6 w-6 text-gold" strokeWidth={1.2} aria-hidden="true" />
-              <p className="text-[10px] uppercase tracking-[0.22em] text-foreground/80">{w.title}</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-foreground/80">
+                {w.title}
+              </p>
             </li>
           ))}
         </ul>
@@ -369,19 +441,40 @@ function Home() {
       <CustomerGallery />
 
       {/* SHOP BY OCCASION */}
-      <section aria-labelledby="occasion-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
+      <section
+        aria-labelledby="occasion-heading"
+        className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32"
+      >
         <Reveal className="mb-10 text-center md:mb-14">
           <p className="text-[10px] uppercase tracking-[0.34em] text-gold">Shop by Occasion</p>
-          <h2 id="occasion-heading" className="mt-3 font-display text-[28px] leading-tight md:text-5xl">
+          <h2
+            id="occasion-heading"
+            className="mt-3 font-display text-[28px] leading-tight md:text-5xl"
+          >
             Considered Gifting
           </h2>
           <div className="mx-auto mt-5 h-px w-16 gold-line" />
         </Reveal>
         <ul className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-7">
           {[
-            { img: streetScarf.url, title: "For the Traveller", tag: "Ready-to-Wear", slug: "ready-to-wear" },
-            { img: emerald.url, title: "For the Occasion", tag: "Fine Goods", slug: "accessories-fine-goods" },
-            { img: corridor.url, title: "For the Celebration", tag: "Curated Sets", slug: "curated-sets" },
+            {
+              img: streetScarf.url,
+              title: "For the Traveller",
+              tag: "Ready-to-Wear",
+              slug: "ready-to-wear",
+            },
+            {
+              img: emerald.url,
+              title: "For the Occasion",
+              tag: "Fine Goods",
+              slug: "accessories-fine-goods",
+            },
+            {
+              img: corridor.url,
+              title: "For the Celebration",
+              tag: "Curated Sets",
+              slug: "curated-sets",
+            },
           ].map((g, i) => (
             <Reveal as="li" key={g.title} delay={i * 90}>
               <Link
@@ -422,12 +515,16 @@ function Home() {
           </div>
           <Reveal>
             <p className="text-[10px] uppercase tracking-[0.4em] text-gold">Our Story</p>
-            <h2 id="story-heading" className="mt-5 font-display text-[34px] leading-[1.05] md:text-6xl">
+            <h2
+              id="story-heading"
+              className="mt-5 font-display text-[34px] leading-[1.05] md:text-6xl"
+            >
               A house built on <span className="italic gold-gradient-text">elegance.</span>
             </h2>
             <p className="mt-7 text-[14px] leading-[1.9] text-ivory/75 md:text-base">
-              Miravika began with a simple idea — that luxury should feel personal, never distant. We travel the
-              world's trend capitals to bring you carefully curated pieces in fashion, jewelry, beauty and home.
+              Miravika began with a simple idea — that luxury should feel personal, never distant.
+              We travel the world's trend capitals to bring you carefully curated pieces in fashion,
+              jewelry, beauty and home.
             </p>
             <p className="mt-4 text-[14px] leading-[1.9] text-ivory/55">
               Quality-checked, thoughtfully packaged and delivered with care, worldwide.
@@ -444,39 +541,54 @@ function Home() {
       </section>
 
       {/* INSTAGRAM */}
-      <section aria-labelledby="instagram-heading" className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32">
+      <section
+        aria-labelledby="instagram-heading"
+        className="mx-auto max-w-7xl px-5 py-20 md:px-8 md:py-32"
+      >
         <Reveal className="mb-10 text-center">
           <p className="text-[10px] uppercase tracking-[0.34em] text-gold">@miravika.india</p>
-          <h2 id="instagram-heading" className="mt-3 font-display text-[28px] leading-tight md:text-5xl">
+          <h2
+            id="instagram-heading"
+            className="mt-3 font-display text-[28px] leading-tight md:text-5xl"
+          >
             Follow the Journey
           </h2>
           <div className="mx-auto mt-5 h-px w-16 gold-line" />
         </Reveal>
         <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {[streetBeige.url, catJewelry.url, emerald.url, streetScarf.url, catBeauty.url, heroBoutique.url, catGifts.url, heroBlackGold.url].map(
-            (src, i) => (
-              <li key={src + i} className={i > 3 ? "hidden md:block" : undefined}>
-                <a
-                  href="https://instagram.com/miravika.india"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="View MIRAVIKA on Instagram"
-                  className="group relative block aspect-square overflow-hidden rounded-xl bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-                >
-                  <img
-                    src={src}
-                    alt="MIRAVIKA campaign moment"
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.08]"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-noir/45 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                    <span className="text-[10px] uppercase tracking-[0.28em] text-ivory">View Post</span>
-                  </div>
-                </a>
-              </li>
-            ),
-          )}
+          {[
+            streetBeige.url,
+            catJewelry.url,
+            emerald.url,
+            streetScarf.url,
+            catBeauty.url,
+            heroBoutique.url,
+            catGifts.url,
+            heroBlackGold.url,
+          ].map((src, i) => (
+            <li key={src + i} className={i > 3 ? "hidden md:block" : undefined}>
+              <a
+                href="https://instagram.com/miravika.india"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="View MIRAVIKA on Instagram"
+                className="group relative block aspect-square overflow-hidden rounded-xl bg-beige focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+              >
+                <img
+                  src={src}
+                  alt="MIRAVIKA campaign moment"
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.08]"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-noir/45 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                  <span className="text-[10px] uppercase tracking-[0.28em] text-ivory">
+                    View Post
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))}
         </ul>
       </section>
 

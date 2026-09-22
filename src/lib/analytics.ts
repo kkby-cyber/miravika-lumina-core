@@ -30,13 +30,23 @@ export interface GA4Item {
 
 const numericId = (gid: string) => gid.split("/").pop() ?? gid;
 
-export function itemFromProduct(p: FrontendProduct, opts: { variantId?: string; variantTitle?: string; price?: string | number; quantity?: number; index?: number } = {}): GA4Item {
+export function itemFromProduct(
+  p: FrontendProduct,
+  opts: {
+    variantId?: string;
+    variantTitle?: string;
+    price?: string | number;
+    quantity?: number;
+    index?: number;
+  } = {},
+): GA4Item {
   return {
     item_id: opts.variantId ? numericId(opts.variantId) : numericId(p.id),
     item_name: p.title,
     item_brand: "MIRAVIKA",
     item_category: p.productType || undefined,
-    item_variant: opts.variantTitle && opts.variantTitle !== "Default Title" ? opts.variantTitle : undefined,
+    item_variant:
+      opts.variantTitle && opts.variantTitle !== "Default Title" ? opts.variantTitle : undefined,
     price: Number(opts.price ?? p.priceRange.minVariantPrice.amount),
     quantity: opts.quantity ?? 1,
     index: opts.index,
@@ -47,22 +57,43 @@ const value = (items: GA4Item[]) => items.reduce((s, i) => s + i.price * (i.quan
 const contentIds = (items: GA4Item[]) => items.map((i) => i.item_id);
 
 export const trackPageView = (path: string, title: string) =>
-  pushDL({ event: "page_view", page_path: path, page_title: title, page_location: typeof window !== "undefined" ? window.location.href : path });
+  pushDL({
+    event: "page_view",
+    page_path: path,
+    page_title: title,
+    page_location: typeof window !== "undefined" ? window.location.href : path,
+  });
 
 export const trackViewItem = (items: GA4Item[], currency: string) => {
   pushDL({ event: "view_item", ecommerce: { currency, value: value(items), items } });
-  pixelEvent("ViewContent", { content_ids: contentIds(items), content_type: "product", currency, value: value(items) });
+  pixelEvent("ViewContent", {
+    content_ids: contentIds(items),
+    content_type: "product",
+    currency,
+    value: value(items),
+  });
 };
 
 export const trackViewItemList = (items: GA4Item[], listId: string, listName: string) =>
-  pushDL({ event: "view_item_list", ecommerce: { item_list_id: listId, item_list_name: listName, items } });
+  pushDL({
+    event: "view_item_list",
+    ecommerce: { item_list_id: listId, item_list_name: listName, items },
+  });
 
 export const trackSelectItem = (item: GA4Item, listId: string, listName: string) =>
-  pushDL({ event: "select_item", ecommerce: { item_list_id: listId, item_list_name: listName, items: [item] } });
+  pushDL({
+    event: "select_item",
+    ecommerce: { item_list_id: listId, item_list_name: listName, items: [item] },
+  });
 
 export const trackAddToCart = (items: GA4Item[], currency: string) => {
   pushDL({ event: "add_to_cart", ecommerce: { currency, value: value(items), items } });
-  pixelEvent("AddToCart", { content_ids: contentIds(items), content_type: "product", currency, value: value(items) });
+  pixelEvent("AddToCart", {
+    content_ids: contentIds(items),
+    content_type: "product",
+    currency,
+    value: value(items),
+  });
 };
 
 export const trackRemoveFromCart = (items: GA4Item[], currency: string) =>
@@ -73,7 +104,12 @@ export const trackViewCart = (items: GA4Item[], currency: string) =>
 
 export const trackBeginCheckout = (items: GA4Item[], currency: string) => {
   pushDL({ event: "begin_checkout", ecommerce: { currency, value: value(items), items } });
-  pixelEvent("InitiateCheckout", { content_ids: contentIds(items), content_type: "product", currency, value: value(items) });
+  pixelEvent("InitiateCheckout", {
+    content_ids: contentIds(items),
+    content_type: "product",
+    currency,
+    value: value(items),
+  });
 };
 
 /**
@@ -127,14 +163,17 @@ export function trackPurchase(order: {
       value: order.value,
       currency: order.currency,
       content_type: "product",
-      contents: (order.items ?? []).map((i) => ({ id: i.item_id, quantity: i.quantity ?? 1, item_price: i.price })),
+      contents: (order.items ?? []).map((i) => ({
+        id: i.item_id,
+        quantity: i.quantity ?? 1,
+        item_price: i.price,
+      })),
       content_ids: (order.items ?? []).map((i) => i.item_id),
       order_id: order.transaction_id,
     },
     order.transaction_id,
   );
 }
-
 
 export const trackSearch = (term: string, results: number) => {
   pushDL({ event: "search", search_term: term, search_results: results });
@@ -154,7 +193,8 @@ export const trackGenerateLead = (method: string, params: Record<string, unknown
   pixelEvent("Lead", { content_name: method });
 };
 
-export const trackContact = (method: string) => pushDL({ event: "contact", contact_method: method });
+export const trackContact = (method: string) =>
+  pushDL({ event: "contact", contact_method: method });
 
 export const trackLogin = (method: string) => pushDL({ event: "login", method });
 
@@ -162,4 +202,3 @@ export const trackSignUp = (method: string) => {
   pushDL({ event: "sign_up", method });
   pixelEvent("CompleteRegistration", { content_name: method });
 };
-

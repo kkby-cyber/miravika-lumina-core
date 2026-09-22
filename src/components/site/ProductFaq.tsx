@@ -33,7 +33,7 @@ export function faqsForProduct(tags: string[] | undefined, hasSize: boolean): Fa
     },
     {
       q: "Which payment methods are accepted?",
-      a: "UPI, credit and debit cards, net banking and popular wallets. Every payment is processed on Shopify's PCI-DSS compliant checkout.",
+      a: "UPI, credit and debit cards, net banking and popular wallets. Every payment is processed through our secure PCI-DSS compliant payment flow.",
     },
     {
       q: "Can I return or exchange this piece?",
@@ -72,7 +72,9 @@ export function ProductFaq({ faqs }: { faqs: Faq[] }) {
           {faqs.map((f, i) => (
             <AccordionItem key={f.q} value={`faq-${i}`}>
               <AccordionTrigger className="text-left text-sm">{f.q}</AccordionTrigger>
-              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">{f.a}</AccordionContent>
+              <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
+                {f.a}
+              </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>

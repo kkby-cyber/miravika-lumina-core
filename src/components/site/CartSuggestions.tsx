@@ -100,14 +100,28 @@ function MiniAddRow({ product, onDone }: { product: FrontendProduct; onDone?: ()
         params={{ handle: p.handle }}
         className="h-14 w-12 flex-shrink-0 overflow-hidden rounded bg-beige"
       >
-        {img && <img src={img.url} alt={img.altText ?? p.title} loading="lazy" className="h-full w-full object-cover" />}
+        {img && (
+          <img
+            src={img.url}
+            alt={img.altText ?? p.title}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        )}
       </Link>
       <div className="min-w-0 flex-1">
-        <Link to="/product/$handle" params={{ handle: p.handle }} className="line-clamp-1 text-xs font-medium hover:text-gold">
+        <Link
+          to="/product/$handle"
+          params={{ handle: p.handle }}
+          className="line-clamp-1 text-xs font-medium hover:text-gold"
+        >
           {p.title}
         </Link>
         <p className="mt-0.5 text-[11px] text-muted-foreground">
-          {formatPrice(parseFloat(p.priceRange.minVariantPrice.amount), p.priceRange.minVariantPrice.currencyCode)}
+          {formatPrice(
+            parseFloat(p.priceRange.minVariantPrice.amount),
+            p.priceRange.minVariantPrice.currencyCode,
+          )}
         </p>
       </div>
       <button
@@ -149,7 +163,9 @@ export function CartSuggestions({ compact = false }: { compact?: boolean }) {
     <div className="border-t border-border/50 px-6 py-5">
       {crossSell.length > 0 && (
         <>
-          <p className="text-[10px] uppercase tracking-[0.28em] text-gold">Pairs beautifully with</p>
+          <p className="text-[10px] uppercase tracking-[0.28em] text-gold">
+            Pairs beautifully with
+          </p>
           <div className="mt-3 space-y-3">
             {crossSell.map((p) => (
               <MiniAddRow key={p.id} product={p} />

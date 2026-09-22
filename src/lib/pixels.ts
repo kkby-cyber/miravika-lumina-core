@@ -17,7 +17,20 @@ export const PIXEL_IDS = {
   hotjarSiteId: "", // Hotjar site id (numeric)
 } as const;
 
-type W = Window & Record<string, any>;
+type PixelWindow = Window &
+  Record<string, unknown> & {
+    fbq?: (...args: unknown[]) => void;
+    pintrk?: (...args: unknown[]) => void;
+    ttq?: {
+      track?: (...args: unknown[]) => void;
+      page?: () => void;
+    };
+    snaptr?: (...args: unknown[]) => void;
+    clarity?: (...args: unknown[]) => void;
+    hj?: (...args: unknown[]) => void;
+  };
+
+type W = PixelWindow;
 
 const injected = new Set<string>();
 
@@ -80,11 +93,19 @@ export function loadMarketingPixels() {
 /**
  * Mirrors a commerce event to any active platform pixel.
  *
- * `eventID` is Meta's de-duplication key: passing the Shopify order id means a
+ * `eventID` is Meta's de-duplication key: passing the real order id means a
  * browser Purchase and a future server-side CAPI Purchase collapse into one.
  */
 export function pixelEvent(
-  name: "ViewContent" | "AddToCart" | "InitiateCheckout" | "Purchase" | "Search" | "AddToWishlist" | "Lead" | "CompleteRegistration",
+  name:
+    | "ViewContent"
+    | "AddToCart"
+    | "InitiateCheckout"
+    | "Purchase"
+    | "Search"
+    | "AddToWishlist"
+    | "Lead"
+    | "CompleteRegistration",
   params: Record<string, unknown> = {},
   eventID?: string,
 ) {
@@ -99,4 +120,3 @@ export function pixelEvent(
     /* pixels must never break the storefront */
   }
 }
-

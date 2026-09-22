@@ -1,23 +1,38 @@
 import { useEffect } from "react";
-import { Loader2, Minus, Plus, ShoppingBag, Trash2, X, ShieldCheck, Truck, Undo2 } from "lucide-react";
+import {
+  Loader2,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Trash2,
+  X,
+  ShieldCheck,
+  Truck,
+  Undo2,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/format-price";
 import { itemFromProduct, trackBeginCheckout, trackViewCart } from "@/lib/analytics";
 import { CartSuggestions, CouponField } from "@/components/site/CartSuggestions";
 
-
 const FREE_SHIP_INR = 2999;
 const FREE_SHIP_USD = 49;
 
 export function CartDrawer() {
-  const { items, isOpen, setOpen, isLoading, isSyncing, updateQuantity, removeItem, syncCart, cost } = useCartStore();
+  const {
+    items,
+    isOpen,
+    setOpen,
+    isLoading,
+    isSyncing,
+    updateQuantity,
+    removeItem,
+    syncCart,
+    cost,
+  } = useCartStore();
   const totalItems = items.reduce((a, b) => a + b.quantity, 0);
   // Prefer Nexus cart cost; the local sum is only a pre-sync placeholder.
   const currency = cost?.subtotalAmount.currencyCode || items[0]?.price.currencyCode || "INR";
@@ -31,7 +46,13 @@ export function CartDrawer() {
 
   const ga4Items = () =>
     items.map((i, idx) =>
-      itemFromProduct(i.product, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx }),
+      itemFromProduct(i.product, {
+        variantId: i.variantId,
+        variantTitle: i.variantTitle,
+        price: i.price.amount,
+        quantity: i.quantity,
+        index: idx,
+      }),
     );
 
   useEffect(() => {
@@ -61,10 +82,16 @@ export function CartDrawer() {
             <div>
               <p className="text-[10px] uppercase tracking-[0.32em] text-gold">Your Bag</p>
               <h2 className="mt-1 font-display text-2xl tracking-tight">
-                {totalItems === 0 ? "Empty" : `${totalItems} ${totalItems === 1 ? "item" : "items"}`}
+                {totalItems === 0
+                  ? "Empty"
+                  : `${totalItems} ${totalItems === 1 ? "item" : "items"}`}
               </h2>
             </div>
-            <button onClick={() => setOpen(false)} aria-label="Close" className="grid h-9 w-9 place-items-center rounded-full hover:bg-beige">
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Close"
+              className="grid h-9 w-9 place-items-center rounded-full hover:bg-beige"
+            >
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -74,7 +101,11 @@ export function CartDrawer() {
             <div className="mt-4">
               {remaining > 0 ? (
                 <p className="text-xs text-muted-foreground">
-                  Add <span className="font-medium text-foreground">{formatPrice(remaining, currency)}</span> more for <span className="text-gold">free shipping</span>
+                  Add{" "}
+                  <span className="font-medium text-foreground">
+                    {formatPrice(remaining, currency)}
+                  </span>{" "}
+                  more for <span className="text-gold">free shipping</span>
                 </p>
               ) : (
                 <p className="text-xs text-gold">✓ You've unlocked free shipping</p>
@@ -97,7 +128,9 @@ export function CartDrawer() {
                 <ShoppingBag className="h-6 w-6 text-gold" strokeWidth={1.4} />
               </div>
               <h3 className="mt-5 font-display text-xl">Your bag is beautifully empty</h3>
-              <p className="mt-2 text-sm text-muted-foreground">Discover our latest edit — curated for you.</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Discover our latest edit — curated for you.
+              </p>
               <Link
                 to="/collection/$slug"
                 params={{ slug: "new-arrivals" }}
@@ -121,14 +154,23 @@ export function CartDrawer() {
                 {items.map((it) => {
                   const img = it.product.images?.edges?.[0]?.node;
                   return (
-                    <div key={it.variantId} className="flex gap-4 border-b border-border/40 pb-4 last:border-0">
+                    <div
+                      key={it.variantId}
+                      className="flex gap-4 border-b border-border/40 pb-4 last:border-0"
+                    >
                       <Link
                         to="/product/$handle"
                         params={{ handle: it.product.handle }}
                         onClick={() => setOpen(false)}
                         className="h-24 w-20 flex-shrink-0 overflow-hidden rounded bg-beige"
                       >
-                        {img && <img src={img.url} alt={img.altText ?? it.product.title} className="h-full w-full object-cover" />}
+                        {img && (
+                          <img
+                            src={img.url}
+                            alt={img.altText ?? it.product.title}
+                            className="h-full w-full object-cover"
+                          />
+                        )}
                       </Link>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
@@ -172,7 +214,10 @@ export function CartDrawer() {
                             </button>
                           </div>
                           <p className="text-sm font-medium">
-                            {formatPrice(parseFloat(it.price.amount) * it.quantity, it.price.currencyCode)}
+                            {formatPrice(
+                              parseFloat(it.price.amount) * it.quantity,
+                              it.price.currencyCode,
+                            )}
                           </p>
                         </div>
                       </div>
@@ -185,8 +230,6 @@ export function CartDrawer() {
                   <CartSuggestions compact />
                 </div>
               </div>
-
-
 
               {/* Summary */}
               <div className="flex-shrink-0 border-t border-border/60 bg-ivory px-6 py-5">
@@ -205,12 +248,22 @@ export function CartDrawer() {
                   size="lg"
                   className="mt-4 h-12 w-full rounded-full bg-foreground text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/90"
                 >
-                  {isLoading || isSyncing ? <Loader2 className="h-4 w-4 animate-spin" /> : "Secure Checkout"}
+                  {isLoading || isSyncing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Secure Checkout"
+                  )}
                 </Button>
                 <div className="mt-4 flex items-center justify-center gap-4 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  <span className="inline-flex items-center gap-1"><ShieldCheck className="h-3 w-3 text-gold" /> Secure</span>
-                  <span className="inline-flex items-center gap-1"><Truck className="h-3 w-3 text-gold" /> Fast Ship</span>
-                  <span className="inline-flex items-center gap-1"><Undo2 className="h-3 w-3 text-gold" /> Returns</span>
+                  <span className="inline-flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3 text-gold" /> Secure
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <Truck className="h-3 w-3 text-gold" /> Fast Ship
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <Undo2 className="h-3 w-3 text-gold" /> Returns
+                  </span>
                 </div>
               </div>
             </>

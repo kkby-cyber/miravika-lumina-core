@@ -14,7 +14,9 @@ export const useWishlistStore = create<WishlistStore>()(
       handles: [],
       toggle: (handle) =>
         set((s) => ({
-          handles: s.handles.includes(handle) ? s.handles.filter((h) => h !== handle) : [...s.handles, handle],
+          handles: s.handles.includes(handle)
+            ? s.handles.filter((h) => h !== handle)
+            : [...s.handles, handle],
         })),
       has: (handle) => get().handles.includes(handle),
       clear: () => set({ handles: [] }),

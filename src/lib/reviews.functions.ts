@@ -24,7 +24,9 @@ export const getShopRatings = createServerFn({ method: "GET" }).handler(async ()
 });
 
 export const getProductReviews = createServerFn({ method: "GET" })
-  .inputValidator((data: unknown) => z.object({ handle: z.string().trim().min(1).max(200) }).parse(data))
+  .inputValidator((data: unknown) =>
+    z.object({ handle: z.string().trim().min(1).max(200) }).parse(data),
+  )
   .handler(async ({ data }) => {
     const { fetchProductReviews } = await import("./reviews.server");
     try {
@@ -46,5 +48,8 @@ export const submitReview = createServerFn({ method: "POST" })
     if (!result.ok) {
       return { ok: false, message: "We couldn't save your review. Please try again." };
     }
-    return { ok: true, message: "Thank you — your review is in moderation and will appear shortly." };
+    return {
+      ok: true,
+      message: "Thank you — your review is in moderation and will appear shortly.",
+    };
   });

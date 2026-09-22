@@ -16,7 +16,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useProducts } from "@/hooks/useProducts";
-import { itemFromProduct, trackViewItem, trackAddToWishlist, trackRemoveFromWishlist, trackBeginCheckout } from "@/lib/analytics";
+import {
+  itemFromProduct,
+  trackViewItem,
+  trackAddToWishlist,
+  trackRemoveFromWishlist,
+  trackBeginCheckout,
+} from "@/lib/analytics";
 import { ZoomableImage } from "@/components/site/ZoomableImage";
 import { SecurePaymentIcons } from "@/components/site/SecurePaymentIcons";
 import { SizeGuide } from "@/components/site/SizeGuide";
@@ -61,8 +67,18 @@ export const Route = createFileRoute("/product/$handle")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://miravika-lumina-core.lovable.app/" },
-              { "@type": "ListItem", position: 2, name: "Shop", item: "https://miravika-lumina-core.lovable.app/shop" },
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://miravika-lumina-core.lovable.app/",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Shop",
+                item: "https://miravika-lumina-core.lovable.app/shop",
+              },
               { "@type": "ListItem", position: 3, name: readable, item: url },
             ],
           }),
@@ -96,9 +112,15 @@ function ProductPage() {
   const toggleWishRaw = useWishlistStore((s) => s.toggle);
   const toggleWish = (h: string) => {
     if (product) {
-      const ga = [itemFromProduct(product, { variantId: variant?.id, price: variant?.price.amount })];
+      const ga = [
+        itemFromProduct(product, { variantId: variant?.id, price: variant?.price.amount }),
+      ];
       const cur = product.priceRange.minVariantPrice.currencyCode;
-      wished ? trackRemoveFromWishlist(ga, cur) : trackAddToWishlist(ga, cur);
+      if (wished) {
+        trackRemoveFromWishlist(ga, cur);
+      } else {
+        trackAddToWishlist(ga, cur);
+      }
     }
     toggleWishRaw(h);
   };
@@ -119,7 +141,9 @@ function ProductPage() {
     );
   }, [product, selected]);
 
-  const compareAmt = variant?.compareAtPrice?.amount ? parseFloat(variant.compareAtPrice.amount) : null;
+  const compareAmt = variant?.compareAtPrice?.amount
+    ? parseFloat(variant.compareAtPrice.amount)
+    : null;
   const priceAmt = variant ? parseFloat(variant.price.amount) : 0;
   const onSale = compareAmt !== null && compareAmt > priceAmt;
 
@@ -127,7 +151,13 @@ function ProductPage() {
   useEffect(() => {
     if (!product) return;
     trackViewItem(
-      [itemFromProduct(product, { variantId: variant?.id, variantTitle: variant?.title, price: variant?.price.amount })],
+      [
+        itemFromProduct(product, {
+          variantId: variant?.id,
+          variantTitle: variant?.title,
+          price: variant?.price.amount,
+        }),
+      ],
       variant?.price.currencyCode ?? product.priceRange.minVariantPrice.currencyCode,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -135,11 +165,15 @@ function ProductPage() {
 
   // Recently-viewed products list
   const recentlyViewed = useMemo(
-    () => recentHandles.map((h) => recentProducts.find((p) => p.handle === h)).filter(Boolean).slice(0, 4),
+    () =>
+      recentHandles
+        .map((h) => recentProducts.find((p) => p.handle === h))
+        .filter(Boolean)
+        .slice(0, 4),
     [recentHandles, recentProducts],
   );
 
-  // Similar products — same Shopify product type
+  // Similar products — same product category
   const similar = useMemo(() => {
     if (!product?.productType) return [];
     return recentProducts
@@ -164,8 +198,13 @@ function ProductPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
         <h1 className="font-display text-3xl">Product not found</h1>
-        <p className="mt-3 text-sm text-muted-foreground">The piece you're looking for may have moved or sold out.</p>
-        <Link to="/shop" className="mt-8 inline-block rounded-full bg-noir px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/85">
+        <p className="mt-3 text-sm text-muted-foreground">
+          The piece you're looking for may have moved or sold out.
+        </p>
+        <Link
+          to="/shop"
+          className="mt-8 inline-block rounded-full bg-noir px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/85"
+        >
           Continue Shopping
         </Link>
       </div>
@@ -175,7 +214,7 @@ function ProductPage() {
   const images = product.images.edges;
   const aggregate = reviewData?.aggregate ?? null;
 
-  // Product video (Shopify-hosted or embedded), when the merchandiser added one
+  // Product video, when the merchandiser added one
   const videoNode = product.media?.edges
     ?.map((e) => e.node)
     .find((n) => n.mediaContentType === "VIDEO" || n.mediaContentType === "EXTERNAL_VIDEO");
@@ -203,10 +242,17 @@ function ProductPage() {
   const handleBuyNow = async () => {
     if (!variant) return;
     await handleAdd();
-    // handleAdd awaits the Shopify cart mutation, so the checkout URL is ready here.
+    // handleAdd syncs with the Nexus cart before checkout.
     if (openCheckout()) {
       trackBeginCheckout(
-        [itemFromProduct(product, { variantId: variant.id, variantTitle: variant.title, price: variant.price.amount, quantity: qty })],
+        [
+          itemFromProduct(product, {
+            variantId: variant.id,
+            variantTitle: variant.title,
+            price: variant.price.amount,
+            quantity: qty,
+          }),
+        ],
         variant.price.currencyCode,
       );
     }
@@ -215,7 +261,11 @@ function ProductPage() {
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? window.location.href : "";
     if (navigator.share) {
-      try { await navigator.share({ title: product.title, url }); } catch { /* noop */ }
+      try {
+        await navigator.share({ title: product.title, url });
+      } catch {
+        /* noop */
+      }
     } else {
       navigator.clipboard?.writeText(url);
       toast.success("Link copied");
@@ -225,14 +275,28 @@ function ProductPage() {
   const marketplaces = (() => {
     const tags = (product.tags ?? []).map((t) => t.toLowerCase());
     return [
-      { key: "amazon", label: "Buy on Amazon", url: `https://www.amazon.in/s?k=${encodeURIComponent(product.title + " Miravika")}` },
-      { key: "flipkart", label: "Buy on Flipkart", url: `https://www.flipkart.com/search?q=${encodeURIComponent(product.title + " Miravika")}` },
-      { key: "meesho", label: "Buy on Meesho", url: `https://www.meesho.com/search?q=${encodeURIComponent(product.title + " Miravika")}` },
+      {
+        key: "amazon",
+        label: "Buy on Amazon",
+        url: `https://www.amazon.in/s?k=${encodeURIComponent(product.title + " Miravika")}`,
+      },
+      {
+        key: "flipkart",
+        label: "Buy on Flipkart",
+        url: `https://www.flipkart.com/search?q=${encodeURIComponent(product.title + " Miravika")}`,
+      },
+      {
+        key: "meesho",
+        label: "Buy on Meesho",
+        url: `https://www.meesho.com/search?q=${encodeURIComponent(product.title + " Miravika")}`,
+      },
     ].filter((m) => tags.includes(`marketplace:${m.key}`) || tags.includes(m.key));
   })();
 
   // Related & FBT sources
-  const related = (bestSellers?.products ?? recentProducts).filter((p) => p.handle !== handle).slice(0, 4);
+  const related = (bestSellers?.products ?? recentProducts)
+    .filter((p) => p.handle !== handle)
+    .slice(0, 4);
   const fbt = related.slice(0, 3);
 
   // GMC / Performance Max friendly Product schema
@@ -245,11 +309,13 @@ function ProductPage() {
     "@context": "https://schema.org/",
     "@type": "Product",
     name: product.title,
-    description: (product.description || "A signature MIRAVIKA piece — premium materials, considered design.").slice(0, 5000),
+    description: (
+      product.description || "A signature MIRAVIKA piece — premium materials, considered design."
+    ).slice(0, 5000),
     image: images.map((i) => i.node.url),
     sku: variant?.id?.split("/").pop() ?? handle,
     mpn: handle,
-    productID: `shopify_IN_${handle}`,
+    productID: `MIRAVIKA_IN_${handle}`,
     brand: { "@type": "Brand", name: "MIRAVIKA" },
     category: product.productType ?? "Fashion & Lifestyle",
     url: `https://miravika-lumina-core.lovable.app/product/${handle}`,
@@ -265,7 +331,12 @@ function ProductPage() {
           },
           review: (reviewData?.reviews ?? []).slice(0, 5).map((r) => ({
             "@type": "Review",
-            reviewRating: { "@type": "Rating", ratingValue: String(r.rating), bestRating: "5", worstRating: "1" },
+            reviewRating: {
+              "@type": "Rating",
+              ratingValue: String(r.rating),
+              bestRating: "5",
+              worstRating: "1",
+            },
             author: { "@type": "Person", name: r.reviewerName },
             datePublished: r.createdAt?.slice(0, 10),
             name: r.title || undefined,
@@ -324,17 +395,32 @@ function ProductPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
 
       <div className="mx-auto max-w-7xl px-4 py-6 pb-24 md:py-12 md:pb-16">
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="mb-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-          <Link to="/" className="hover:text-gold">Home</Link>
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
+        >
+          <Link to="/" className="hover:text-gold">
+            Home
+          </Link>
           <span className="mx-2">/</span>
-          <Link to="/shop" className="hover:text-gold">Shop</Link>
+          <Link to="/shop" className="hover:text-gold">
+            Shop
+          </Link>
           <span className="mx-2">/</span>
-          <span className="line-clamp-1 inline-block max-w-[240px] align-bottom text-foreground/80">{product.title}</span>
+          <span className="line-clamp-1 inline-block max-w-[240px] align-bottom text-foreground/80">
+            {product.title}
+          </span>
         </nav>
 
         <div className="grid gap-8 md:grid-cols-2 md:gap-14">
@@ -343,7 +429,13 @@ function ProductPage() {
             {showVideo && (videoSrc || videoEmbed) ? (
               <div className="aspect-square overflow-hidden rounded-lg bg-noir">
                 {videoSrc ? (
-                  <video src={videoSrc} controls autoPlay playsInline className="h-full w-full object-cover" />
+                  <video
+                    src={videoSrc}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <iframe
                     src={videoEmbed!}
@@ -369,13 +461,24 @@ function ProductPage() {
                 {images.slice(0, 9).map((img, i) => (
                   <button
                     key={img.node.url}
-                    onClick={() => { setActiveImg(i); setShowVideo(false); }}
+                    onClick={() => {
+                      setActiveImg(i);
+                      setShowVideo(false);
+                    }}
                     aria-label={`View image ${i + 1}`}
                     className={`aspect-square overflow-hidden rounded transition ${
-                      i === activeImg && !showVideo ? "ring-2 ring-gold" : "ring-1 ring-border hover:ring-foreground/40"
+                      i === activeImg && !showVideo
+                        ? "ring-2 ring-gold"
+                        : "ring-1 ring-border hover:ring-foreground/40"
                     }`}
                   >
-                    <img src={img.node.url} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                    <img
+                      src={img.node.url}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
                   </button>
                 ))}
                 {videoNode && (
@@ -387,7 +490,12 @@ function ProductPage() {
                     }`}
                   >
                     {videoNode.previewImage?.url && (
-                      <img src={videoNode.previewImage.url} alt="" loading="lazy" className="h-full w-full object-cover" />
+                      <img
+                        src={videoNode.previewImage.url}
+                        alt=""
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
                     )}
                     <span className="absolute inset-0 grid place-items-center bg-noir/35">
                       <Play className="h-5 w-5 fill-ivory text-ivory" />
@@ -401,7 +509,9 @@ function ProductPage() {
           {/* Info */}
           <div className="md:pl-4">
             <p className="text-[10px] uppercase tracking-[0.32em] text-gold">MIRAVIKA</p>
-            <h1 className="mt-2 font-display text-3xl leading-tight md:text-4xl">{product.title}</h1>
+            <h1 className="mt-2 font-display text-3xl leading-tight md:text-4xl">
+              {product.title}
+            </h1>
 
             {/* Review summary at the top of the PDP (only with genuine reviews) */}
             {aggregate && (
@@ -410,13 +520,15 @@ function ProductPage() {
                 className="mt-3 inline-flex items-center gap-2.5 rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1.5 transition-colors hover:border-gold hover:bg-gold/15"
               >
                 <Stars rating={aggregate.average} size={16} />
-                <span className="text-[13px] font-semibold text-foreground">{aggregate.average.toFixed(1)}</span>
+                <span className="text-[13px] font-semibold text-foreground">
+                  {aggregate.average.toFixed(1)}
+                </span>
                 <span className="text-xs text-muted-foreground">
-                  {aggregate.count} verified {aggregate.count === 1 ? "review" : "reviews"} · Read all
+                  {aggregate.count} verified {aggregate.count === 1 ? "review" : "reviews"} · Read
+                  all
                 </span>
               </a>
             )}
-
 
             <div className="mt-4 flex items-baseline gap-3">
               <p className="font-display text-2xl">
@@ -438,38 +550,60 @@ function ProductPage() {
             </p>
 
             {/* Options */}
-            {product.options.filter((o) => o.values.length > 1 || o.name !== "Title").map((opt) => (
-              <div key={opt.name} className="mt-6">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                  {opt.name}: <span className="text-foreground">{selected[opt.name] ?? variant?.selectedOptions.find((o) => o.name === opt.name)?.value}</span>
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {opt.values.map((v) => {
-                    const active = (selected[opt.name] ?? variant?.selectedOptions.find((o) => o.name === opt.name)?.value) === v;
-                    return (
-                      <button
-                        key={v}
-                        onClick={() => setSelected((s) => ({ ...s, [opt.name]: v }))}
-                        className={`rounded-full border px-4 py-2 text-xs uppercase tracking-wider transition ${
-                          active ? "border-foreground bg-foreground text-ivory" : "border-border bg-ivory hover:border-foreground"
-                        }`}
-                      >
-                        {v}
-                      </button>
-                    );
-                  })}
+            {product.options
+              .filter((o) => o.values.length > 1 || o.name !== "Title")
+              .map((opt) => (
+                <div key={opt.name} className="mt-6">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {opt.name}:{" "}
+                    <span className="text-foreground">
+                      {selected[opt.name] ??
+                        variant?.selectedOptions.find((o) => o.name === opt.name)?.value}
+                    </span>
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {opt.values.map((v) => {
+                      const active =
+                        (selected[opt.name] ??
+                          variant?.selectedOptions.find((o) => o.name === opt.name)?.value) === v;
+                      return (
+                        <button
+                          key={v}
+                          onClick={() => setSelected((s) => ({ ...s, [opt.name]: v }))}
+                          className={`rounded-full border px-4 py-2 text-xs uppercase tracking-wider transition ${
+                            active
+                              ? "border-foreground bg-foreground text-ivory"
+                              : "border-border bg-ivory hover:border-foreground"
+                          }`}
+                        >
+                          {v}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
 
             {sizeOption && <SizeGuide optionValues={sizeOption.values} />}
 
             {/* Qty + CTAs (desktop) */}
             <div className="mt-7 hidden items-center gap-3 md:flex">
               <div className="flex items-center rounded-full border border-border">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease" className="grid h-14 w-12 place-items-center hover:text-gold"><Minus className="h-4 w-4" /></button>
+                <button
+                  onClick={() => setQty((q) => Math.max(1, q - 1))}
+                  aria-label="Decrease"
+                  className="grid h-14 w-12 place-items-center hover:text-gold"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
                 <span className="w-8 text-center text-sm font-semibold">{qty}</span>
-                <button onClick={() => setQty((q) => q + 1)} aria-label="Increase" className="grid h-14 w-12 place-items-center hover:text-gold"><Plus className="h-4 w-4" /></button>
+                <button
+                  onClick={() => setQty((q) => q + 1)}
+                  aria-label="Increase"
+                  className="grid h-14 w-12 place-items-center hover:text-gold"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
               </div>
               <Button
                 onClick={handleAdd}
@@ -477,14 +611,23 @@ function ProductPage() {
                 size="lg"
                 className="h-14 flex-1 rounded-full bg-foreground text-[13px] font-semibold uppercase tracking-[0.22em] text-ivory shadow-[0_14px_36px_-18px_rgba(17,17,17,0.85)] transition-transform hover:-translate-y-0.5 hover:bg-foreground/90"
               >
-                {isLoadingCart ? <Loader2 className="h-5 w-5 animate-spin" /> : variant?.availableForSale ? "Add to Cart" : "Sold Out"}
+                {isLoadingCart ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : variant?.availableForSale ? (
+                  "Add to Cart"
+                ) : (
+                  "Sold Out"
+                )}
               </Button>
               <button
                 onClick={() => toggleWish(handle)}
                 aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
                 className="grid h-14 w-14 place-items-center rounded-full border border-border hover:border-gold"
               >
-                <Heart className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
+                <Heart
+                  className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`}
+                  strokeWidth={1.5}
+                />
               </button>
             </div>
 
@@ -497,16 +640,22 @@ function ProductPage() {
               Buy Now — Secure Checkout
             </Button>
 
-
-            <button onClick={handleShare} className="mt-4 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground hover:text-gold">
+            <button
+              onClick={handleShare}
+              className="mt-4 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground hover:text-gold"
+            >
               <Share2 className="h-3.5 w-3.5" /> Share
             </button>
 
             {/* Marketplaces */}
             {marketplaces.length > 0 && (
               <div className="mt-5">
-                <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">Also available on</p>
-                <div className={`grid gap-2 ${marketplaces.length === 1 ? "grid-cols-1" : marketplaces.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+                <p className="mb-2 text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+                  Also available on
+                </p>
+                <div
+                  className={`grid gap-2 ${marketplaces.length === 1 ? "grid-cols-1" : marketplaces.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}
+                >
                   {marketplaces.map((m) => (
                     <a
                       key={m.key}
@@ -530,9 +679,18 @@ function ProductPage() {
 
             {/* Trust */}
             <div className="mt-6 grid grid-cols-3 gap-3 rounded-lg border border-border/60 bg-beige/40 p-4 text-center">
-              <div><Truck className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">Free ₹2999+</p></div>
-              <div><Undo2 className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">7-day returns</p></div>
-              <div><ShieldCheck className="mx-auto mb-1 h-4 w-4 text-gold" /><p className="text-[10px] uppercase tracking-wider">100% Secure</p></div>
+              <div>
+                <Truck className="mx-auto mb-1 h-4 w-4 text-gold" />
+                <p className="text-[10px] uppercase tracking-wider">Free ₹2999+</p>
+              </div>
+              <div>
+                <Undo2 className="mx-auto mb-1 h-4 w-4 text-gold" />
+                <p className="text-[10px] uppercase tracking-wider">7-day returns</p>
+              </div>
+              <div>
+                <ShieldCheck className="mx-auto mb-1 h-4 w-4 text-gold" />
+                <p className="text-[10px] uppercase tracking-wider">100% Secure</p>
+              </div>
             </div>
 
             {/* Secure payment icons */}
@@ -541,13 +699,18 @@ function ProductPage() {
             {/* Details */}
             <Accordion type="single" collapsible defaultValue="details" className="mt-6">
               <AccordionItem value="details">
-                <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">Description</AccordionTrigger>
+                <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">
+                  Description
+                </AccordionTrigger>
                 <AccordionContent className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                  {product.description || "A signature Miravika piece — crafted from premium materials and finished by hand."}
+                  {product.description ||
+                    "A signature Miravika piece — crafted from premium materials and finished by hand."}
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="shipping">
-                <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">Shipping & Delivery</AccordionTrigger>
+                <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">
+                  Shipping & Delivery
+                </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground">
                   <ul className="list-disc space-y-1 pl-4">
                     <li>Dispatched within 24–48 hours from our warehouse.</li>
@@ -558,13 +721,19 @@ function ProductPage() {
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="returns">
-                <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">Returns & Care</AccordionTrigger>
+                <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">
+                  Returns & Care
+                </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground">
-                  7-day easy returns on unused items in original packaging. Store your Miravika piece in the provided box away from moisture, direct sunlight and chemicals to preserve its finish.
+                  7-day easy returns on unused items in original packaging. Store your Miravika
+                  piece in the provided box away from moisture, direct sunlight and chemicals to
+                  preserve its finish.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="reviews">
-                <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">Reviews</AccordionTrigger>
+                <AccordionTrigger className="text-[11px] uppercase tracking-[0.18em]">
+                  Reviews
+                </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground">
                   {aggregate ? (
                     <a href="#reviews" className="hover:text-gold">
@@ -602,7 +771,9 @@ function ProductPage() {
         {similar.length > 0 && (
           <section className="mt-20 border-t border-border/50 pt-14">
             <div className="mb-8 text-center">
-              <p className="text-[10px] uppercase tracking-[0.32em] text-gold">In the same family</p>
+              <p className="text-[10px] uppercase tracking-[0.32em] text-gold">
+                In the same family
+              </p>
               <h2 className="mt-2 font-display text-2xl md:text-3xl">Similar Products</h2>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
@@ -614,7 +785,11 @@ function ProductPage() {
         )}
 
         {/* REVIEWS */}
-        <ReviewsSection handle={handle} productId={product.id?.split("/").pop()} productTitle={product.title} />
+        <ReviewsSection
+          handle={handle}
+          productId={product.id?.split("/").pop()}
+          productTitle={product.title}
+        />
 
         {/* PRODUCT FAQ */}
         <ProductFaq faqs={faqs} />
@@ -665,7 +840,13 @@ function ProductPage() {
             disabled={isLoadingCart || !variant?.availableForSale}
             className="h-12 flex-1 rounded-full bg-foreground text-[12px] font-semibold uppercase tracking-[0.18em] text-ivory hover:bg-foreground/90"
           >
-            {isLoadingCart ? <Loader2 className="h-4 w-4 animate-spin" /> : variant?.availableForSale ? "Add to Cart" : "Sold Out"}
+            {isLoadingCart ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : variant?.availableForSale ? (
+              "Add to Cart"
+            ) : (
+              "Sold Out"
+            )}
           </Button>
           <Button
             onClick={handleBuyNow}
@@ -675,7 +856,6 @@ function ProductPage() {
             Buy Now
           </Button>
         </div>
-
       </div>
     </>
   );

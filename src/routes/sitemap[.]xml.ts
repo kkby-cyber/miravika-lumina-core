@@ -45,14 +45,17 @@ export const Route = createFileRoute("/sitemap.xml")({
         }
 
         const urls = [
-          ...STATIC_PATHS.map(([path, freq, priority]) =>
-            `  <url><loc>${BASE_URL}${path}</loc><changefreq>${freq}</changefreq>${priority ? `<priority>${priority}</priority>` : ""}</url>`,
+          ...STATIC_PATHS.map(
+            ([path, freq, priority]) =>
+              `  <url><loc>${BASE_URL}${path}</loc><changefreq>${freq}</changefreq>${priority ? `<priority>${priority}</priority>` : ""}</url>`,
           ),
-          ...COLLECTIONS.map((slug) =>
-            `  <url><loc>${BASE_URL}/collection/${slug}</loc><changefreq>daily</changefreq><priority>0.8</priority></url>`,
+          ...COLLECTIONS.map(
+            (slug) =>
+              `  <url><loc>${BASE_URL}/collection/${slug}</loc><changefreq>daily</changefreq><priority>0.8</priority></url>`,
           ),
-          ...productPaths.map((path) =>
-            `  <url><loc>${BASE_URL}${path}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
+          ...productPaths.map(
+            (path) =>
+              `  <url><loc>${BASE_URL}${path}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`,
           ),
         ].join("\n");
 

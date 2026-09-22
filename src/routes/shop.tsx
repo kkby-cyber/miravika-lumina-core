@@ -8,9 +8,16 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Shop All — MIRAVIKA" },
-      { name: "description", content: "Shop the entire MIRAVIKA boutique — fashion, jewelry, beauty and home essentials, curated for the modern woman." },
+      {
+        name: "description",
+        content:
+          "Shop the entire MIRAVIKA boutique — fashion, jewelry, beauty and home essentials, curated for the modern woman.",
+      },
       { property: "og:title", content: "Shop All — MIRAVIKA" },
-      { property: "og:description", content: "The full Miravika edit — fashion, jewelry, beauty and home." },
+      {
+        property: "og:description",
+        content: "The full Miravika edit — fashion, jewelry, beauty and home.",
+      },
       { property: "og:url", content: "https://miravika-lumina-core.lovable.app/shop" },
     ],
     links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/shop" }],
@@ -24,8 +31,18 @@ function Shop() {
 
   const sorted = useMemo(() => {
     const arr = [...products];
-    if (sort === "price-asc") arr.sort((a, b) => parseFloat(a.priceRange.minVariantPrice.amount) - parseFloat(b.priceRange.minVariantPrice.amount));
-    if (sort === "price-desc") arr.sort((a, b) => parseFloat(b.priceRange.minVariantPrice.amount) - parseFloat(a.priceRange.minVariantPrice.amount));
+    if (sort === "price-asc")
+      arr.sort(
+        (a, b) =>
+          parseFloat(a.priceRange.minVariantPrice.amount) -
+          parseFloat(b.priceRange.minVariantPrice.amount),
+      );
+    if (sort === "price-desc")
+      arr.sort(
+        (a, b) =>
+          parseFloat(b.priceRange.minVariantPrice.amount) -
+          parseFloat(a.priceRange.minVariantPrice.amount),
+      );
     if (sort === "title") arr.sort((a, b) => a.title.localeCompare(b.title));
     return arr;
   }, [products, sort]);
@@ -69,7 +86,7 @@ function Shop() {
         <div className="rounded-lg border border-dashed border-border/70 bg-beige/40 p-14 text-center">
           <h3 className="font-display text-2xl">No products found</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Add your first product through Shopify admin, and it will appear here instantly.
+            Our curated collection is synced automatically from the MIRAVIKA product catalog.
           </p>
         </div>
       ) : (

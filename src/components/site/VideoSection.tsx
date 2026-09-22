@@ -82,14 +82,22 @@ export function VideoSection({
               aria-label={playing ? "Pause film" : "Play film"}
               className="grid h-10 w-10 place-items-center rounded-full bg-noir/50 text-ivory backdrop-blur transition hover:bg-noir/75"
             >
-              {playing ? <Pause className="h-4 w-4" strokeWidth={1.5} /> : <Play className="h-4 w-4" strokeWidth={1.5} />}
+              {playing ? (
+                <Pause className="h-4 w-4" strokeWidth={1.5} />
+              ) : (
+                <Play className="h-4 w-4" strokeWidth={1.5} />
+              )}
             </button>
             <button
               onClick={() => setMuted((m) => !m)}
               aria-label={muted ? "Unmute film" : "Mute film"}
               className="grid h-10 w-10 place-items-center rounded-full bg-noir/50 text-ivory backdrop-blur transition hover:bg-noir/75"
             >
-              {muted ? <VolumeX className="h-4 w-4" strokeWidth={1.5} /> : <Volume2 className="h-4 w-4" strokeWidth={1.5} />}
+              {muted ? (
+                <VolumeX className="h-4 w-4" strokeWidth={1.5} />
+              ) : (
+                <Volume2 className="h-4 w-4" strokeWidth={1.5} />
+              )}
             </button>
           </div>
         </div>
@@ -98,7 +106,9 @@ export function VideoSection({
           <Reveal>
             <p className="text-[10px] uppercase tracking-[0.4em] text-gold">{eyebrow}</p>
             <h2 className="mt-5 font-display text-[34px] leading-[1.05] md:text-6xl">{title}</h2>
-            <p className="mt-6 max-w-md text-[14px] leading-[1.85] text-ivory/70 md:text-base">{copy}</p>
+            <p className="mt-6 max-w-md text-[14px] leading-[1.85] text-ivory/70 md:text-base">
+              {copy}
+            </p>
             <Link
               to="/collection/$slug"
               params={{ slug: ctaSlug }}

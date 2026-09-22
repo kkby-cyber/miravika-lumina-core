@@ -37,11 +37,12 @@ function SearchPage() {
   const results = useMemo(() => {
     const term = debounced.trim().toLowerCase();
     if (!term) return [];
-    return products.filter((p) =>
-      p.title.toLowerCase().includes(term) ||
-      p.description?.toLowerCase().includes(term) ||
-      p.productType?.toLowerCase().includes(term) ||
-      p.tags?.some((t: string) => t.toLowerCase().includes(term)),
+    return products.filter(
+      (p) =>
+        p.title.toLowerCase().includes(term) ||
+        p.description?.toLowerCase().includes(term) ||
+        p.productType?.toLowerCase().includes(term) ||
+        p.tags?.some((t: string) => t.toLowerCase().includes(term)),
     );
   }, [products, debounced]);
 
@@ -78,7 +79,11 @@ function SearchPage() {
             className="w-full bg-transparent text-sm outline-none"
           />
           {q && (
-            <button onClick={() => setQ("")} aria-label="Clear" className="grid h-6 w-6 place-items-center rounded-full hover:bg-beige">
+            <button
+              onClick={() => setQ("")}
+              aria-label="Clear"
+              className="grid h-6 w-6 place-items-center rounded-full hover:bg-beige"
+            >
               <X className="h-3.5 w-3.5" />
             </button>
           )}
@@ -106,7 +111,9 @@ function SearchPage() {
       {debounced && (
         <>
           <p className="mt-8 text-center text-xs text-muted-foreground">
-            {isLoading ? "Searching…" : `${results.length} result${results.length === 1 ? "" : "s"} for "${debounced}"`}
+            {isLoading
+              ? "Searching…"
+              : `${results.length} result${results.length === 1 ? "" : "s"} for "${debounced}"`}
           </p>
 
           {/* Predictive image preview strip (top 4) */}
@@ -122,12 +129,23 @@ function SearchPage() {
                     className="group flex items-center gap-3 rounded-lg border border-border/60 bg-card p-2 transition hover:border-gold"
                   >
                     <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded bg-beige">
-                      {img && <img src={img.url} alt={img.altText ?? p.title} className="h-full w-full object-cover" />}
+                      {img && (
+                        <img
+                          src={img.url}
+                          alt={img.altText ?? p.title}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 text-xs font-medium group-hover:text-gold">{p.title}</p>
+                      <p className="line-clamp-2 text-xs font-medium group-hover:text-gold">
+                        {p.title}
+                      </p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {formatPrice(p.priceRange.minVariantPrice.amount, p.priceRange.minVariantPrice.currencyCode)}
+                        {formatPrice(
+                          p.priceRange.minVariantPrice.amount,
+                          p.priceRange.minVariantPrice.currencyCode,
+                        )}
                       </p>
                     </div>
                   </Link>

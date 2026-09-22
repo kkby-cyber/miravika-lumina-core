@@ -5,20 +5,12 @@ import {
   getNexusProducts,
   type NexusCollection,
 } from "@/lib/nexus";
-import {
-  toFrontendProduct,
-  toFrontendProducts,
-  type FrontendProduct,
-} from "@/lib/nexus-product";
+import { toFrontendProduct, toFrontendProducts, type FrontendProduct } from "@/lib/nexus-product";
 
 export type StoreProduct = FrontendProduct;
 export type StoreCollection = NexusCollection;
 
-export function useProducts(
-  query?: string,
-  first = 50,
-  enabled = true,
-) {
+export function useProducts(query?: string, first = 50, enabled = true) {
   return useQuery({
     queryKey: ["nexus-products", query ?? "", first],
     queryFn: async () => {
@@ -59,9 +51,7 @@ export function useCollection(slug: string, first = 24) {
     } | null> => {
       const collectionData = await getNexusCollections();
 
-      const collection = collectionData.collections.find(
-        (item) => item.slug === slug,
-      );
+      const collection = collectionData.collections.find((item) => item.slug === slug);
 
       if (!collection) return null;
 

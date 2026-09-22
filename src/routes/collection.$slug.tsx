@@ -8,19 +8,36 @@ import type { FrontendProduct } from "@/lib/nexus-product";
 import { itemFromProduct, trackViewItemList } from "@/lib/analytics";
 import { useShopRatings } from "@/hooks/useReviews";
 
-
 // Editorial copy for the canonical storefront categories
 const HANDLE_COPY: Record<string, { title: string; sub: string }> = {
-  "signature-collection": { title: "Signature Collection", sub: "The definitive Miravika edit — iconic pieces, hand-finished and made to be remembered." },
-  "new-arrivals": { title: "New Arrivals", sub: "Fresh from the ateliers — the newest additions to the Miravika boutique." },
-  "ready-to-wear": { title: "Ready-to-Wear", sub: "Considered silhouettes, elevated for every day and every occasion." },
-  "accessories-fine-goods": { title: "Accessories Fine Goods", sub: "Sterling silver, moissanite and heirloom-inspired finishing pieces." },
-  "curated-sets": { title: "Curated Sets", sub: "Thoughtfully composed sets — considered gifting for every occasion." },
+  "signature-collection": {
+    title: "Signature Collection",
+    sub: "The definitive Miravika edit — iconic pieces, hand-finished and made to be remembered.",
+  },
+  "new-arrivals": {
+    title: "New Arrivals",
+    sub: "Fresh from the ateliers — the newest additions to the Miravika boutique.",
+  },
+  "ready-to-wear": {
+    title: "Ready-to-Wear",
+    sub: "Considered silhouettes, elevated for every day and every occasion.",
+  },
+  "accessories-fine-goods": {
+    title: "Accessories Fine Goods",
+    sub: "Sterling silver, moissanite and heirloom-inspired finishing pieces.",
+  },
+  "curated-sets": {
+    title: "Curated Sets",
+    sub: "Thoughtfully composed sets — considered gifting for every occasion.",
+  },
 };
 
 export const Route = createFileRoute("/collection/$slug")({
   head: ({ params }) => {
-    const copy = HANDLE_COPY[params.slug] ?? { title: params.slug.replace(/-/g, " "), sub: "Curated by Miravika." };
+    const copy = HANDLE_COPY[params.slug] ?? {
+      title: params.slug.replace(/-/g, " "),
+      sub: "Curated by Miravika.",
+    };
     // Canonical URL is the category slug itself — legacy variants redirect here
     const canonical = `https://miravika-lumina-core.lovable.app/collection/${params.slug}`;
     return {
@@ -43,8 +60,18 @@ export const Route = createFileRoute("/collection/$slug")({
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://miravika-lumina-core.lovable.app/" },
-              { "@type": "ListItem", position: 2, name: "Shop", item: "https://miravika-lumina-core.lovable.app/shop" },
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://miravika-lumina-core.lovable.app/",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Shop",
+                item: "https://miravika-lumina-core.lovable.app/shop",
+              },
               { "@type": "ListItem", position: 3, name: copy.title, item: canonical },
             ],
           }),
@@ -127,8 +154,18 @@ function CollectionPage() {
         return true;
       });
     }
-    if (sort === "price-asc") arr.sort((a, b) => parseFloat(a.priceRange.minVariantPrice.amount) - parseFloat(b.priceRange.minVariantPrice.amount));
-    if (sort === "price-desc") arr.sort((a, b) => parseFloat(b.priceRange.minVariantPrice.amount) - parseFloat(a.priceRange.minVariantPrice.amount));
+    if (sort === "price-asc")
+      arr.sort(
+        (a, b) =>
+          parseFloat(a.priceRange.minVariantPrice.amount) -
+          parseFloat(b.priceRange.minVariantPrice.amount),
+      );
+    if (sort === "price-desc")
+      arr.sort(
+        (a, b) =>
+          parseFloat(b.priceRange.minVariantPrice.amount) -
+          parseFloat(a.priceRange.minVariantPrice.amount),
+      );
     if (sort === "title") arr.sort((a, b) => a.title.localeCompare(b.title));
     if (sort === "rating") {
       const score = (h: string) => shopRatings?.ratings?.[h]?.average ?? -1;
@@ -136,7 +173,6 @@ function CollectionPage() {
     }
     return arr;
   }, [source, sort, band, inStock, category, shopRatings]);
-
 
   useEffect(() => {
     if (!filtered.length) return;
@@ -151,10 +187,17 @@ function CollectionPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-12">
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="mb-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-        <Link to="/" className="hover:text-gold">Home</Link>
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-4 text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
+      >
+        <Link to="/" className="hover:text-gold">
+          Home
+        </Link>
         <span className="mx-2">/</span>
-        <Link to="/shop" className="hover:text-gold">Shop</Link>
+        <Link to="/shop" className="hover:text-gold">
+          Shop
+        </Link>
         <span className="mx-2">/</span>
         <span className="text-foreground/80">{copy.title}</span>
       </nav>
@@ -163,17 +206,25 @@ function CollectionPage() {
       <header className="mb-8 border-b border-border/60 pb-8 text-center">
         <p className="text-[10px] uppercase tracking-[0.32em] text-gold">Collection</p>
         <h1 className="mt-2 font-display text-3xl md:text-5xl">{copy.title}</h1>
-        {copy.sub && <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">{copy.sub}</p>}
+        {copy.sub && (
+          <p className="mx-auto mt-3 max-w-xl text-sm text-muted-foreground">{copy.sub}</p>
+        )}
         <div className="mx-auto mt-5 h-px w-16 gold-line" />
       </header>
 
       <div className="grid gap-8 md:grid-cols-[220px_1fr] md:gap-10">
         {/* SIDEBAR */}
-        <aside className={`${filtersOpen ? "fixed inset-0 z-50 overflow-y-auto bg-ivory p-6" : "hidden"} md:static md:block md:p-0`}>
+        <aside
+          className={`${filtersOpen ? "fixed inset-0 z-50 overflow-y-auto bg-ivory p-6" : "hidden"} md:static md:block md:p-0`}
+        >
           {filtersOpen && (
             <div className="mb-6 flex items-center justify-between md:hidden">
               <h3 className="font-display text-2xl">Filters</h3>
-              <button onClick={() => setFiltersOpen(false)} aria-label="Close filters" className="grid h-9 w-9 place-items-center rounded-full hover:bg-beige">
+              <button
+                onClick={() => setFiltersOpen(false)}
+                aria-label="Close filters"
+                className="grid h-9 w-9 place-items-center rounded-full hover:bg-beige"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -181,22 +232,35 @@ function CollectionPage() {
           <div>
             <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-gold">Availability</p>
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} className="accent-foreground" />
+              <input
+                type="checkbox"
+                checked={inStock}
+                onChange={(e) => setInStock(e.target.checked)}
+                className="accent-foreground"
+              />
               In stock only
             </label>
           </div>
           <div className="mt-6">
             <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-gold">Price</p>
             <div className="flex flex-col gap-2 text-sm">
-              {([
-                ["all", "All prices"],
-                ["under-2500", "Under ₹2,500"],
-                ["2500-7500", "₹2,500 – ₹7,500"],
-                ["7500-15000", "₹7,500 – ₹15,000"],
-                ["over-15000", "Over ₹15,000"],
-              ] as [PriceBand, string][]).map(([v, l]) => (
+              {(
+                [
+                  ["all", "All prices"],
+                  ["under-2500", "Under ₹2,500"],
+                  ["2500-7500", "₹2,500 – ₹7,500"],
+                  ["7500-15000", "₹7,500 – ₹15,000"],
+                  ["over-15000", "Over ₹15,000"],
+                ] as [PriceBand, string][]
+              ).map(([v, l]) => (
                 <label key={v} className="flex items-center gap-2">
-                  <input type="radio" name="band" checked={band === v} onChange={() => setBand(v)} className="accent-foreground" />
+                  <input
+                    type="radio"
+                    name="band"
+                    checked={band === v}
+                    onChange={() => setBand(v)}
+                    className="accent-foreground"
+                  />
                   {l}
                 </label>
               ))}
@@ -207,12 +271,24 @@ function CollectionPage() {
               <p className="mb-3 text-[10px] uppercase tracking-[0.24em] text-gold">Category</p>
               <div className="flex flex-col gap-2 text-sm">
                 <label className="flex items-center gap-2">
-                  <input type="radio" name="category" checked={category === "all"} onChange={() => setCategory("all")} className="accent-foreground" />
+                  <input
+                    type="radio"
+                    name="category"
+                    checked={category === "all"}
+                    onChange={() => setCategory("all")}
+                    className="accent-foreground"
+                  />
                   All categories
                 </label>
                 {categories.map((c) => (
                   <label key={c} className="flex items-center gap-2">
-                    <input type="radio" name="category" checked={category === c} onChange={() => setCategory(c)} className="accent-foreground" />
+                    <input
+                      type="radio"
+                      name="category"
+                      checked={category === c}
+                      onChange={() => setCategory(c)}
+                      className="accent-foreground"
+                    />
                     {c}
                   </label>
                 ))}
@@ -239,7 +315,9 @@ function CollectionPage() {
             >
               <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
             </button>
-            <span className="hidden text-xs text-muted-foreground md:inline">{filtered.length} items</span>
+            <span className="hidden text-xs text-muted-foreground md:inline">
+              {filtered.length} items
+            </span>
             <span className="text-xs text-muted-foreground md:hidden">{filtered.length}</span>
             <div className="relative">
               <select
@@ -253,7 +331,6 @@ function CollectionPage() {
                 <option value="price-desc">Price: High → Low</option>
                 <option value="title">A → Z</option>
                 <option value="rating">Top Rated</option>
-
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             </div>
@@ -273,12 +350,18 @@ function CollectionPage() {
               </p>
               <div className="mt-6 flex justify-center gap-3">
                 <button
-                  onClick={() => { setBand("all"); setInStock(false); }}
+                  onClick={() => {
+                    setBand("all");
+                    setInStock(false);
+                  }}
                   className="rounded-full border border-foreground/20 px-6 py-2.5 text-[11px] uppercase tracking-[0.22em] hover:border-gold hover:text-gold"
                 >
                   Clear filters
                 </button>
-                <Link to="/shop" className="rounded-full bg-noir px-6 py-2.5 text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/85">
+                <Link
+                  to="/shop"
+                  className="rounded-full bg-noir px-6 py-2.5 text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/85"
+                >
                   Shop All
                 </Link>
               </div>

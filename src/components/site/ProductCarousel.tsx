@@ -52,7 +52,9 @@ export function ProductCarousel({
       <div className="mx-auto max-w-7xl px-4 md:px-6">
         <Reveal className="mb-6 flex items-end justify-between gap-4 md:mb-8">
           <div>
-            {eyebrow && <p className="text-[10px] uppercase tracking-[0.32em] text-gold">{eyebrow}</p>}
+            {eyebrow && (
+              <p className="text-[10px] uppercase tracking-[0.32em] text-gold">{eyebrow}</p>
+            )}
             <h2 className="mt-2 font-display text-2xl md:text-4xl">{title}</h2>
             {subtitle && <p className="mt-2 max-w-md text-sm text-muted-foreground">{subtitle}</p>}
           </div>
@@ -92,10 +94,7 @@ export function ProductCarousel({
         >
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="w-[46%] shrink-0 snap-start md:w-[calc((100%-4.5rem)/4)]"
-                >
+                <div key={i} className="w-[46%] shrink-0 snap-start md:w-[calc((100%-4.5rem)/4)]">
                   <div className="aspect-[4/5] animate-pulse rounded-xl bg-beige" />
                 </div>
               ))

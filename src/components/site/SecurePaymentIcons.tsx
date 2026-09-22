@@ -7,7 +7,7 @@ const METHODS = [
   { icon: Wallet, label: "Wallets" },
 ];
 
-/** Payment methods available on the MIRAVIKA (Shopify) checkout. */
+/** Payment methods available on the MIRAVIKA checkout. */
 export function SecurePaymentIcons({ className = "" }: { className?: string }) {
   return (
     <div className={`rounded-lg border border-border/60 bg-beige/30 p-4 ${className}`}>
@@ -26,7 +26,8 @@ export function SecurePaymentIcons({ className = "" }: { className?: string }) {
         ))}
       </div>
       <p className="mt-2.5 text-[11px] leading-relaxed text-muted-foreground">
-        Payments are processed on Shopify's PCI-DSS compliant checkout. MIRAVIKA never stores your card details.
+        Payments are processed through our secure PCI-DSS compliant checkout. MIRAVIKA never stores
+        your card details.
       </p>
     </div>
   );

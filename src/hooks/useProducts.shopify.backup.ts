@@ -19,7 +19,6 @@ export function useProducts(query?: string, first = 50, enabled = true) {
   });
 }
 
-
 export function useProduct(handle: string) {
   return useQuery({
     queryKey: ["shopify-product", handle],

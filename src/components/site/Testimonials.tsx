@@ -51,9 +51,11 @@ export function Testimonials() {
 /** Real customer photos pulled from published photo reviews. */
 export function CustomerGallery() {
   const { data } = useShopRatings();
-  const photos = (data?.featured ?? []).flatMap((r) =>
-    r.pictures.map((url) => ({ url, handle: r.productHandle, name: r.reviewerName })),
-  ).slice(0, 8);
+  const photos = (data?.featured ?? [])
+    .flatMap((r) =>
+      r.pictures.map((url) => ({ url, handle: r.productHandle, name: r.reviewerName })),
+    )
+    .slice(0, 8);
   if (photos.length < 4) return null;
 
   return (
@@ -81,7 +83,10 @@ export function CustomerGallery() {
                 />
               </Link>
             ) : (
-              <div key={`${p.url}-${i}`} className="aspect-square overflow-hidden rounded-md bg-beige">
+              <div
+                key={`${p.url}-${i}`}
+                className="aspect-square overflow-hidden rounded-md bg-beige"
+              >
                 <img
                   src={p.url}
                   alt={`Customer photo from ${p.name}`}

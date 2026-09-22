@@ -44,7 +44,6 @@ export function Header() {
     return () => clearInterval(id);
   }, []);
 
-
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
@@ -73,7 +72,9 @@ export function Header() {
               key={i}
               aria-hidden={i !== announceIdx}
               className={`absolute inset-0 flex items-center justify-center text-center text-[10px] font-light uppercase tracking-[0.3em] transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] md:text-[10.5px] ${
-                i === announceIdx ? "opacity-100 translate-y-0" : "pointer-events-none -translate-y-1 opacity-0"
+                i === announceIdx
+                  ? "opacity-100 translate-y-0"
+                  : "pointer-events-none -translate-y-1 opacity-0"
               }`}
             >
               {msg}
@@ -108,13 +109,25 @@ export function Header() {
 
         {/* RIGHT: icons */}
         <div className="flex items-center justify-end gap-0.5">
-          <Link to="/search" aria-label="Search" className="grid h-11 w-11 place-items-center transition-colors hover:text-gold">
+          <Link
+            to="/search"
+            aria-label="Search"
+            className="grid h-11 w-11 place-items-center transition-colors hover:text-gold"
+          >
             <Search className="h-[18px] w-[18px]" strokeWidth={1.25} />
           </Link>
-          <Link to="/account" aria-label="Account" className="hidden h-11 w-11 place-items-center transition-colors hover:text-gold sm:grid">
+          <Link
+            to="/account"
+            aria-label="Account"
+            className="hidden h-11 w-11 place-items-center transition-colors hover:text-gold sm:grid"
+          >
             <User className="h-[18px] w-[18px]" strokeWidth={1.25} />
           </Link>
-          <Link to="/wishlist" aria-label={`Wishlist (${wishlistCount})`} className="relative grid h-11 w-11 place-items-center transition-colors hover:text-gold">
+          <Link
+            to="/wishlist"
+            aria-label={`Wishlist (${wishlistCount})`}
+            className="relative grid h-11 w-11 place-items-center transition-colors hover:text-gold"
+          >
             <Heart className="h-[18px] w-[18px]" strokeWidth={1.25} />
             {wishlistCount > 0 && (
               <span className="absolute right-1 top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground">
@@ -137,10 +150,10 @@ export function Header() {
         </div>
       </div>
 
-
-
       {/* DESKTOP NAV ROW — single centered row, luxury spacing */}
-      <nav className={`hidden border-t transition-colors duration-500 lg:block ${transparent ? "border-white/10" : "border-border/30"}`}>
+      <nav
+        className={`hidden border-t transition-colors duration-500 lg:block ${transparent ? "border-white/10" : "border-border/30"}`}
+      >
         <ul className="mx-auto flex max-w-7xl items-center justify-center gap-8 px-8 py-3.5 xl:gap-10">
           {NAV.map((n) => (
             <li key={n.slug}>
@@ -170,7 +183,9 @@ export function Header() {
             <X className="h-[22px] w-[22px]" strokeWidth={1.25} />
           </button>
         </div>
-        <nav className={`flex flex-col overflow-y-auto px-6 py-6 transition-all duration-500 ${menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+        <nav
+          className={`flex flex-col overflow-y-auto px-6 py-6 transition-all duration-500 ${menuOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+        >
           {NAV.map((n, i) => (
             <Link
               key={n.slug}
@@ -184,10 +199,18 @@ export function Header() {
             </Link>
           ))}
           <div className="mt-8 flex flex-col gap-4 text-xs uppercase tracking-[0.24em] text-muted-foreground">
-            <Link to="/account" onClick={() => setMenuOpen(false)} className="hover:text-gold">Account</Link>
-            <Link to="/wishlist" onClick={() => setMenuOpen(false)} className="hover:text-gold">Wishlist</Link>
-            <Link to="/track-order" onClick={() => setMenuOpen(false)} className="hover:text-gold">Track Order</Link>
-            <Link to="/contact" onClick={() => setMenuOpen(false)} className="hover:text-gold">Contact</Link>
+            <Link to="/account" onClick={() => setMenuOpen(false)} className="hover:text-gold">
+              Account
+            </Link>
+            <Link to="/wishlist" onClick={() => setMenuOpen(false)} className="hover:text-gold">
+              Wishlist
+            </Link>
+            <Link to="/track-order" onClick={() => setMenuOpen(false)} className="hover:text-gold">
+              Track Order
+            </Link>
+            <Link to="/contact" onClick={() => setMenuOpen(false)} className="hover:text-gold">
+              Contact
+            </Link>
           </div>
         </nav>
       </div>

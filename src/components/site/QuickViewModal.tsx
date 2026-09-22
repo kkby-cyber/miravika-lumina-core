@@ -58,7 +58,11 @@ export function QuickViewModal({
         <div className="grid gap-0 sm:grid-cols-[minmax(0,150px)_1fr]">
           {img && (
             <div className="hidden aspect-[4/5] overflow-hidden rounded-l-xl bg-beige sm:block">
-              <img src={img.url} alt={img.altText ?? p.title} className="h-full w-full object-cover" />
+              <img
+                src={img.url}
+                alt={img.altText ?? p.title}
+                className="h-full w-full object-cover"
+              />
             </div>
           )}
           <div className="p-5">

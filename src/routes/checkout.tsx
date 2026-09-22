@@ -104,9 +104,7 @@ function CheckoutPage() {
   const cartItems = useMemo(
     () =>
       items.map((item) => {
-        const variant = item.product.variants.edges.find(
-          ({ node }) => node.id === item.variantId,
-        );
+        const variant = item.product.variants.edges.find(({ node }) => node.id === item.variantId);
 
         return {
           sku: variant?.node.sku || item.product.sku,
@@ -169,9 +167,7 @@ function CheckoutPage() {
       setShippingQuote(quote);
 
       if (!quote.serviceable) {
-        setShippingError(
-          "Delivery is currently unavailable for this PIN code.",
-        );
+        setShippingError("Delivery is currently unavailable for this PIN code.");
       }
     } catch (quoteError) {
       setShippingQuote(null);
@@ -248,9 +244,7 @@ function CheckoutPage() {
       const result = (await response.json()) as CheckoutResponse;
 
       if (!response.ok || !result.success || !result.data) {
-        throw new Error(
-          result.error?.message || "We could not create your order.",
-        );
+        throw new Error(result.error?.message || "We could not create your order.");
       }
 
       const checkout = result.data;
@@ -292,34 +286,26 @@ function CheckoutPage() {
           razorpay_signature: string;
         }) => {
           try {
-            const verifyResponse = await fetch(
-              "/api/public/payments/verify",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payment),
+            const verifyResponse = await fetch("/api/public/payments/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            );
+              body: JSON.stringify(payment),
+            });
 
-            const verification =
-              (await verifyResponse.json()) as {
-                success: boolean;
-                data?: {
-                  order_number: string;
-                  status: string;
-                };
-                error?: {
-                  message?: string;
-                };
+            const verification = (await verifyResponse.json()) as {
+              success: boolean;
+              data?: {
+                order_number: string;
+                status: string;
               };
+              error?: {
+                message?: string;
+              };
+            };
 
-            if (
-              !verifyResponse.ok ||
-              !verification.success ||
-              !verification.data
-            ) {
+            if (!verifyResponse.ok || !verification.success || !verification.data) {
               throw new Error(
                 verification.error?.message ||
                   "Payment was received but the order could not be confirmed.",
@@ -355,9 +341,7 @@ function CheckoutPage() {
     } catch (checkoutError) {
       setLoading(false);
       setError(
-        checkoutError instanceof Error
-          ? checkoutError.message
-          : "Checkout could not be completed.",
+        checkoutError instanceof Error ? checkoutError.message : "Checkout could not be completed.",
       );
     }
   };
@@ -389,12 +373,8 @@ function CheckoutPage() {
       <div className="mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-12">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <p className="text-xs tracking-[0.25em] uppercase text-[#8b7654]">
-              MIRAVIKA
-            </p>
-            <h1 className="mt-2 font-serif text-3xl md:text-4xl">
-              Secure Checkout
-            </h1>
+            <p className="text-xs tracking-[0.25em] uppercase text-[#8b7654]">MIRAVIKA</p>
+            <h1 className="mt-2 font-serif text-3xl md:text-4xl">Secure Checkout</h1>
           </div>
 
           <Link
@@ -410,9 +390,7 @@ function CheckoutPage() {
           <section className="rounded-2xl bg-white p-5 shadow-sm md:p-8">
             <div className="mb-6 flex items-center gap-2">
               <LockKeyhole className="h-4 w-4 text-[#8b7654]" />
-              <span className="text-sm">
-                Your payment is securely processed by Razorpay.
-              </span>
+              <span className="text-sm">Your payment is securely processed by Razorpay.</span>
             </div>
 
             <h2 className="font-serif text-2xl">Delivery Details</h2>
@@ -511,10 +489,7 @@ function CheckoutPage() {
                       inputMode="numeric"
                       value={form.postal_code}
                       onChange={(e) => {
-                        setField(
-                          "postal_code",
-                          e.target.value.replace(/\D/g, "").slice(0, 6),
-                        );
+                        setField("postal_code", e.target.value.replace(/\D/g, "").slice(0, 6));
                         setShippingQuote(null);
                         setShippingError("");
                       }}
@@ -543,49 +518,32 @@ function CheckoutPage() {
 
                   {shippingQuote?.serviceable && (
                     <div className="mt-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm">
-                      <p className="font-medium text-green-800">
-                        Delivery available
-                      </p>
+                      <p className="font-medium text-green-800">Delivery available</p>
 
                       <div className="mt-1 space-y-1 text-green-700">
                         <p>
                           Shipping:{" "}
-                          {formatPrice(
-                            shippingQuote.shipping_charge,
-                            shippingQuote.currency,
-                          )}
+                          {formatPrice(shippingQuote.shipping_charge, shippingQuote.currency)}
                         </p>
 
                         {shippingQuote.estimated_days && (
                           <p>
-                            Estimated delivery:{" "}
-                            {shippingQuote.estimated_days}{" "}
-                            {shippingQuote.estimated_days === 1
-                              ? "day"
-                              : "days"}
+                            Estimated delivery: {shippingQuote.estimated_days}{" "}
+                            {shippingQuote.estimated_days === 1 ? "day" : "days"}
                           </p>
                         )}
 
-                        {shippingQuote.etd && (
-                          <p>Expected by: {shippingQuote.etd}</p>
-                        )}
+                        {shippingQuote.etd && <p>Expected by: {shippingQuote.etd}</p>}
 
                         {shippingQuote.cod_available !== undefined && (
-                          <p>
-                            COD:{" "}
-                            {shippingQuote.cod_available
-                              ? "Available"
-                              : "Not available"}
-                          </p>
+                          <p>COD: {shippingQuote.cod_available ? "Available" : "Not available"}</p>
                         )}
                       </div>
                     </div>
                   )}
 
                   {shippingError && (
-                    <p className="mt-2 text-sm text-destructive">
-                      {shippingError}
-                    </p>
+                    <p className="mt-2 text-sm text-destructive">{shippingError}</p>
                   )}
                 </div>
               </div>
@@ -623,10 +581,7 @@ function CheckoutPage() {
 
             <div className="mt-6 space-y-4">
               {items.map((item) => (
-                <div
-                  key={`${item.product.id}-${item.variantId}`}
-                  className="flex gap-3"
-                >
+                <div key={`${item.product.id}-${item.variantId}`} className="flex gap-3">
                   <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-[#EFE7DD]">
                     {item.product.images.edges[0]?.node.url ? (
                       <img
@@ -638,19 +593,12 @@ function CheckoutPage() {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="line-clamp-2 text-sm font-medium">
-                      {item.product.title}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Qty {item.quantity}
-                    </p>
+                    <p className="line-clamp-2 text-sm font-medium">{item.product.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Qty {item.quantity}</p>
                   </div>
 
                   <p className="text-sm font-medium">
-                    {formatPrice(
-                      Number(item.price.amount) * item.quantity,
-                      currency,
-                    )}
+                    {formatPrice(Number(item.price.amount) * item.quantity, currency)}
                   </p>
                 </div>
               ))}
@@ -668,10 +616,7 @@ function CheckoutPage() {
                 <span className="text-muted-foreground">Shipping</span>
                 <span>
                   {shippingQuote?.serviceable
-                    ? formatPrice(
-                        shippingQuote.shipping_charge,
-                        shippingQuote.currency,
-                      )
+                    ? formatPrice(shippingQuote.shipping_charge, shippingQuote.currency)
                     : "Calculated at checkout"}
                 </span>
               </div>
@@ -693,18 +638,13 @@ function CheckoutPage() {
 
               <div className="flex justify-between text-base font-semibold">
                 <span>Estimated Total</span>
-                <span>
-                  {formatPrice(
-                    cost?.totalAmount?.amount ?? "0",
-                    currency,
-                  )}
-                </span>
+                <span>{formatPrice(cost?.totalAmount?.amount ?? "0", currency)}</span>
               </div>
             </div>
 
             <div className="mt-6 rounded-xl bg-[#F8F5F1] p-4 text-xs leading-5 text-muted-foreground">
-              Final shipping, tax and applicable discounts are calculated
-              securely by MIRAVIKA before payment.
+              Final shipping, tax and applicable discounts are calculated securely by MIRAVIKA
+              before payment.
             </div>
           </aside>
         </div>

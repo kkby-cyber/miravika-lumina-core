@@ -28,11 +28,18 @@ function Wishlist() {
         <div className="mt-10 rounded-md border border-dashed border-border/70 bg-beige/30 p-12 text-center">
           <Heart className="mx-auto mb-3 h-8 w-8 text-gold" />
           <h3 className="font-display text-xl">Your wishlist is empty</h3>
-          <Link to="/shop" className="mt-4 inline-block text-xs uppercase tracking-[0.18em] underline-offset-4 hover:underline">Start shopping</Link>
+          <Link
+            to="/shop"
+            className="mt-4 inline-block text-xs uppercase tracking-[0.18em] underline-offset-4 hover:underline"
+          >
+            Start shopping
+          </Link>
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
-          {items.map((p) => <ProductCard key={p.id} product={p} />)}
+          {items.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
         </div>
       )}
     </div>

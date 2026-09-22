@@ -33,10 +33,14 @@ function ReviewCard({ review }: { review: Review }) {
             <CheckCircle2 className="h-3 w-3" /> Verified Buyer
           </span>
         )}
-        <span className="ml-auto text-[11px] text-muted-foreground">{formatDate(review.createdAt)}</span>
+        <span className="ml-auto text-[11px] text-muted-foreground">
+          {formatDate(review.createdAt)}
+        </span>
       </div>
       {review.title && <h4 className="mt-3 font-display text-lg leading-snug">{review.title}</h4>}
-      <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{review.body}</p>
+      <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+        {review.body}
+      </p>
 
       {(review.pictures.length > 0 || review.videos.length > 0) && (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -50,7 +54,13 @@ function ReviewCard({ review }: { review: Review }) {
             />
           ))}
           {review.videos.map((src) => (
-            <video key={src} src={src} controls preload="none" className="h-20 w-32 rounded-md bg-beige object-cover" />
+            <video
+              key={src}
+              src={src}
+              controls
+              preload="none"
+              className="h-20 w-32 rounded-md bg-beige object-cover"
+            />
           ))}
         </div>
       )}
@@ -99,7 +109,17 @@ function ReviewForm({
     const videoUrls = urls.filter((u) => /\.(mp4|mov|webm)(\?|$)/i.test(u)).slice(0, 2);
 
     try {
-      const res = await mutateAsync({ handle, productId, name, email, rating, title, body, pictureUrls, videoUrls });
+      const res = await mutateAsync({
+        handle,
+        productId,
+        name,
+        email,
+        rating,
+        title,
+        body,
+        pictureUrls,
+        videoUrls,
+      });
       if (res.ok) {
         toast.success(res.message, { position: "top-center" });
         onDone();
@@ -133,7 +153,14 @@ function ReviewForm({
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Input required maxLength={80} value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="bg-ivory" />
+        <Input
+          required
+          maxLength={80}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Your name"
+          className="bg-ivory"
+        />
         <Input
           required
           type="email"
@@ -172,8 +199,8 @@ function ReviewForm({
         />
       </label>
       <p className="mt-2 text-[11px] text-muted-foreground">
-        Reviews are matched to your order email — verified purchases receive a Verified Buyer badge. You can update your
-        review later from the link in your review confirmation email.
+        Reviews are matched to your order email — verified purchases receive a Verified Buyer badge.
+        You can update your review later from the link in your review confirmation email.
       </p>
       <div className="mt-4 flex gap-2">
         <Button
@@ -183,7 +210,12 @@ function ReviewForm({
         >
           {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit Review"}
         </Button>
-        <Button type="button" variant="ghost" onClick={onDone} className="h-11 rounded-full text-[11px] uppercase tracking-[0.22em]">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onDone}
+          className="h-11 rounded-full text-[11px] uppercase tracking-[0.22em]"
+        >
           Cancel
         </Button>
       </div>
@@ -212,12 +244,17 @@ export function ReviewsSection({
     let arr = [...reviews];
     if (starFilter) arr = arr.filter((r) => Math.round(r.rating) === starFilter);
     if (sort === "newest") arr.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-    if (sort === "highest") arr.sort((a, b) => b.rating - a.rating || (a.createdAt < b.createdAt ? 1 : -1));
-    if (sort === "helpful") arr.sort((a, b) => b.helpfulVotes - a.helpfulVotes || (a.createdAt < b.createdAt ? 1 : -1));
+    if (sort === "highest")
+      arr.sort((a, b) => b.rating - a.rating || (a.createdAt < b.createdAt ? 1 : -1));
+    if (sort === "helpful")
+      arr.sort((a, b) => b.helpfulVotes - a.helpfulVotes || (a.createdAt < b.createdAt ? 1 : -1));
     return arr;
   }, [reviews, sort, starFilter]);
 
-  const photos = useMemo(() => reviews.flatMap((r) => r.pictures.map((p) => ({ src: p, name: r.reviewerName }))), [reviews]);
+  const photos = useMemo(
+    () => reviews.flatMap((r) => r.pictures.map((p) => ({ src: p, name: r.reviewerName }))),
+    [reviews],
+  );
 
   return (
     <section id="reviews" className="mt-20 border-t border-border/50 pt-14">
@@ -272,11 +309,17 @@ export function ReviewsSection({
                     className="flex w-full items-center gap-3 text-left"
                     aria-pressed={active}
                   >
-                    <span className={`w-9 text-[11px] ${active ? "text-gold" : "text-muted-foreground"}`}>{star} ★</span>
+                    <span
+                      className={`w-9 text-[11px] ${active ? "text-gold" : "text-muted-foreground"}`}
+                    >
+                      {star} ★
+                    </span>
                     <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-ivory">
                       <span className="block h-full bg-gold/80" style={{ width: `${pct}%` }} />
                     </span>
-                    <span className="w-8 text-right text-[11px] text-muted-foreground">{count}</span>
+                    <span className="w-8 text-right text-[11px] text-muted-foreground">
+                      {count}
+                    </span>
                   </button>
                 );
               })}
@@ -291,14 +334,16 @@ export function ReviewsSection({
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Every review on MIRAVIKA comes from a real order. Once your piece arrives, we'll invite you to share your
-              experience — with photos or video if you like.
+              Every review on MIRAVIKA comes from a real order. Once your piece arrives, we'll
+              invite you to share your experience — with photos or video if you like.
             </p>
           )}
         </div>
       </div>
 
-      {writing && <ReviewForm handle={handle} productId={productId} onDone={() => setWriting(false)} />}
+      {writing && (
+        <ReviewForm handle={handle} productId={productId} onDone={() => setWriting(false)} />
+      )}
 
       {/* CUSTOMER PHOTOS */}
       {photos.length > 0 && (
@@ -327,13 +372,17 @@ export function ReviewsSection({
                 key={key}
                 onClick={() => setSort(key)}
                 className={`rounded-full border px-4 py-2 text-[11px] uppercase tracking-[0.16em] transition ${
-                  sort === key ? "border-foreground bg-foreground text-ivory" : "border-border hover:border-foreground"
+                  sort === key
+                    ? "border-foreground bg-foreground text-ivory"
+                    : "border-border hover:border-foreground"
                 }`}
               >
                 {label}
               </button>
             ))}
-            <span className="ml-auto text-[11px] text-muted-foreground">{visible.length} shown</span>
+            <span className="ml-auto text-[11px] text-muted-foreground">
+              {visible.length} shown
+            </span>
           </div>
           <div>
             {visible.map((r) => (
@@ -343,7 +392,9 @@ export function ReviewsSection({
         </>
       )}
 
-      {isLoading && <p className="mt-8 text-center text-sm text-muted-foreground">Loading reviews…</p>}
+      {isLoading && (
+        <p className="mt-8 text-center text-sm text-muted-foreground">Loading reviews…</p>
+      )}
     </section>
   );
 }

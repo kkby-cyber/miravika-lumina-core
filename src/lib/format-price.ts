@@ -1,7 +1,4 @@
-export function formatPrice(
-  amount: string | number,
-  currencyCode = "INR",
-): string {
+export function formatPrice(amount: string | number, currencyCode = "INR"): string {
   const value = Number(amount);
 
   if (!Number.isFinite(value)) return String(amount);

@@ -103,12 +103,17 @@ async function addLine(cartId: string, item: CartItem) {
   if (cartNotFound(errs)) return { success: false, cartNotFound: true };
   if (errs.length) return { success: false };
   const lines = data?.data?.cartLinesAdd?.cart?.lines?.edges ?? [];
-  const newLine = lines.find((l: { node: { merchandise: { id: string } } }) => l.node.merchandise.id === item.variantId);
+  const newLine = lines.find(
+    (l: { node: { merchandise: { id: string } } }) => l.node.merchandise.id === item.variantId,
+  );
   return { success: true, lineId: newLine?.node?.id as string | undefined };
 }
 
 async function updateLine(cartId: string, lineId: string, quantity: number) {
-  const data = await storefrontApiRequest(CART_UPDATE, { cartId, lines: [{ id: lineId, quantity }] });
+  const data = await storefrontApiRequest(CART_UPDATE, {
+    cartId,
+    lines: [{ id: lineId, quantity }],
+  });
   const errs: UserErr[] = data?.data?.cartLinesUpdate?.userErrors ?? [];
   if (cartNotFound(errs)) return { success: false, cartNotFound: true };
   return { success: !errs.length };
@@ -141,7 +146,11 @@ export const useCartStore = create<CartStore>()(
           if (!cartId) {
             const r = await createShopifyCart({ ...item, lineId: null });
             if (r) {
-              set({ cartId: r.cartId, checkoutUrl: r.checkoutUrl, items: [{ ...item, lineId: r.lineId ?? null }] });
+              set({
+                cartId: r.cartId,
+                checkoutUrl: r.checkoutUrl,
+                items: [{ ...item, lineId: r.lineId ?? null }],
+              });
               added = true;
             } else {
               cartError("This item couldn't be added right now. Please try again.");
@@ -151,7 +160,11 @@ export const useCartStore = create<CartStore>()(
             const newQ = existing.quantity + item.quantity;
             const r = await updateLine(cartId, existing.lineId, newQ);
             if (r.success) {
-              set({ items: get().items.map((i) => (i.variantId === item.variantId ? { ...i, quantity: newQ } : i)) });
+              set({
+                items: get().items.map((i) =>
+                  i.variantId === item.variantId ? { ...i, quantity: newQ } : i,
+                ),
+              });
               added = true;
             } else if (r.cartNotFound) {
               clearCart();
@@ -179,7 +192,14 @@ export const useCartStore = create<CartStore>()(
         }
         if (added) {
           trackAddToCart(
-            [itemFromProduct(item.product.node, { variantId: item.variantId, variantTitle: item.variantTitle, price: item.price.amount, quantity: item.quantity })],
+            [
+              itemFromProduct(item.product.node, {
+                variantId: item.variantId,
+                variantTitle: item.variantTitle,
+                price: item.price.amount,
+                quantity: item.quantity,
+              }),
+            ],
             item.price.currencyCode,
           );
         }
@@ -195,10 +215,21 @@ export const useCartStore = create<CartStore>()(
         try {
           const r = await updateLine(cartId, item.lineId, quantity);
           if (r.success) {
-            set({ items: get().items.map((i) => (i.variantId === variantId ? { ...i, quantity } : i)) });
+            set({
+              items: get().items.map((i) => (i.variantId === variantId ? { ...i, quantity } : i)),
+            });
             if (delta !== 0) {
-              const ga = [itemFromProduct(item.product.node, { variantId, variantTitle: item.variantTitle, price: item.price.amount, quantity: Math.abs(delta) })];
-              delta > 0 ? trackAddToCart(ga, item.price.currencyCode) : trackRemoveFromCart(ga, item.price.currencyCode);
+              const ga = [
+                itemFromProduct(item.product.node, {
+                  variantId,
+                  variantTitle: item.variantTitle,
+                  price: item.price.amount,
+                  quantity: Math.abs(delta),
+                }),
+              ];
+              delta > 0
+                ? trackAddToCart(ga, item.price.currencyCode)
+                : trackRemoveFromCart(ga, item.price.currencyCode);
             }
           } else if (r.cartNotFound) {
             clearCart();
@@ -223,7 +254,14 @@ export const useCartStore = create<CartStore>()(
           const r = await removeLine(cartId, item.lineId);
           if (r.success) {
             trackRemoveFromCart(
-              [itemFromProduct(item.product.node, { variantId, variantTitle: item.variantTitle, price: item.price.amount, quantity: item.quantity })],
+              [
+                itemFromProduct(item.product.node, {
+                  variantId,
+                  variantTitle: item.variantTitle,
+                  price: item.price.amount,
+                  quantity: item.quantity,
+                }),
+              ],
               item.price.currencyCode,
             );
             const next = get().items.filter((i) => i.variantId !== variantId);
@@ -237,7 +275,6 @@ export const useCartStore = create<CartStore>()(
           set({ isLoading: false });
         }
       },
-
 
       clearCart: () => set({ items: [], cartId: null, checkoutUrl: null, cost: null }),
 
@@ -309,7 +346,12 @@ export const useCartStore = create<CartStore>()(
     {
       name: "miravika-cart",
       storage: createJSONStorage(() => localStorage),
-      partialize: (s) => ({ items: s.items, cartId: s.cartId, checkoutUrl: s.checkoutUrl, discountCode: s.discountCode }),
+      partialize: (s) => ({
+        items: s.items,
+        cartId: s.cartId,
+        checkoutUrl: s.checkoutUrl,
+        discountCode: s.discountCode,
+      }),
     },
   ),
 );

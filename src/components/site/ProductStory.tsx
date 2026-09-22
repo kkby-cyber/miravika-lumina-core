@@ -56,7 +56,8 @@ export function EstimatedDelivery() {
           Estimated delivery {fmt(4)} – {fmt(9)}
         </p>
         <p className="mt-0.5 text-[11px] text-muted-foreground">
-          India 3–7 business days · International 7–14 business days. Order today and we dispatch within 24–48 hours.
+          India 3–7 business days · International 7–14 business days. Order today and we dispatch
+          within 24–48 hours.
         </p>
       </div>
     </div>
@@ -74,19 +75,25 @@ export function LuxuryProductStory({ title }: { title: string }) {
         </h2>
         <div className="mt-5 grid gap-6 text-sm leading-relaxed text-muted-foreground md:grid-cols-3">
           <p>
-            <span className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-foreground">Curation</span>
-            Every piece in the boutique is selected by our studio team for material quality, finish and how it wears in
-            real life — not for how quickly it can be shipped.
+            <span className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-foreground">
+              Curation
+            </span>
+            Every piece in the boutique is selected by our studio team for material quality, finish
+            and how it wears in real life — not for how quickly it can be shipped.
           </p>
           <p>
-            <span className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-foreground">Presentation</span>
-            Orders arrive in MIRAVIKA's signature packaging, sealed and gift-ready, so the piece feels considered from the
-            moment it reaches your door.
+            <span className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-foreground">
+              Presentation
+            </span>
+            Orders arrive in MIRAVIKA's signature packaging, sealed and gift-ready, so the piece
+            feels considered from the moment it reaches your door.
           </p>
           <p>
-            <span className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-foreground">Aftercare</span>
-            Real people on support@miravika.com, 7-day easy returns and honest guidance on fit, care and styling — before
-            and after you buy.
+            <span className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-foreground">
+              Aftercare
+            </span>
+            Real people on support@miravika.com, 7-day easy returns and honest guidance on fit, care
+            and styling — before and after you buy.
           </p>
         </div>
       </div>

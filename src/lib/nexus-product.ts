@@ -99,9 +99,7 @@ function money(value: number | string | null | undefined) {
   };
 }
 
-function variantAttributes(
-  variant: NexusVariant,
-): Array<{ name: string; value: string }> {
+function variantAttributes(variant: NexusVariant): Array<{ name: string; value: string }> {
   if (!variant.attributes || typeof variant.attributes !== "object") {
     return variant.title && variant.title !== "Default Title"
       ? [{ name: "Title", value: variant.title }]
@@ -143,9 +141,7 @@ export function toFrontendProduct(product: NexusProduct): FrontendProduct {
     }));
 
   const variants = (product.product_variants ?? []).map((variant) => {
-    const inventory = product.inventory?.find(
-      (item) => item.sku === variant.sku,
-    );
+    const inventory = product.inventory?.find((item) => item.sku === variant.sku);
 
     return {
       node: toFrontendVariant(variant, inventory?.available_quantity ?? 0),
@@ -163,24 +159,15 @@ export function toFrontendProduct(product: NexusProduct): FrontendProduct {
     selectedOptions: [],
   };
 
-  const normalizedVariants =
-    variants.length > 0 ? variants : [{ node: fallbackVariant }];
+  const normalizedVariants = variants.length > 0 ? variants : [{ node: fallbackVariant }];
 
-  const minPrice = Math.min(
-    ...normalizedVariants.map((v) => Number(v.node.price.amount)),
+  const minPrice = Math.min(...normalizedVariants.map((v) => Number(v.node.price.amount)));
+
+  const compareAt = product.compare_at_price != null ? money(product.compare_at_price) : null;
+
+  const tags = [product.product_type, product.material, product.color, product.size].filter(
+    (value): value is string => Boolean(value),
   );
-
-  const compareAt =
-    product.compare_at_price != null
-      ? money(product.compare_at_price)
-      : null;
-
-  const tags = [
-    product.product_type,
-    product.material,
-    product.color,
-    product.size,
-  ].filter((value): value is string => Boolean(value));
 
   const optionMap = new Map<string, Set<string>>();
 
@@ -207,18 +194,15 @@ export function toFrontendProduct(product: NexusProduct): FrontendProduct {
     shortDescription: product.short_description ?? "",
     handle: product.slug,
     availableForSale:
-      (product.inventory ?? []).some(
-        (inventory) => inventory.available_quantity > 0,
-      ) || normalizedVariants.some((variant) => variant.node.availableForSale),
+      (product.inventory ?? []).some((inventory) => inventory.available_quantity > 0) ||
+      normalizedVariants.some((variant) => variant.node.availableForSale),
     productType: product.product_type ?? "",
     tags,
     priceRange: {
       minVariantPrice: money(minPrice),
     },
     compareAtPrice: compareAt,
-    compareAtPriceRange: compareAt
-      ? { minVariantPrice: compareAt }
-      : undefined,
+    compareAtPriceRange: compareAt ? { minVariantPrice: compareAt } : undefined,
     images: {
       edges: images,
     },
@@ -234,10 +218,8 @@ export function toFrontendProduct(product: NexusProduct): FrontendProduct {
     mrp: product.mrp != null ? String(product.mrp) : null,
     price: String(product.price),
     inventoryQuantity:
-      product.inventory?.reduce(
-        (total, item) => total + Number(item.available_quantity || 0),
-        0,
-      ) ?? 0,
+      product.inventory?.reduce((total, item) => total + Number(item.available_quantity || 0), 0) ??
+      0,
   };
 }
 

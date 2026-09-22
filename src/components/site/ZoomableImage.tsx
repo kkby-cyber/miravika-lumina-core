@@ -31,7 +31,6 @@ export function ZoomableImage({
   };
   const srcSet = [800, 1200, 1600, 2048].map((w) => `${sized(w)} ${w}w`).join(", ");
 
-
   const move = (clientX: number, clientY: number) => {
     const el = ref.current;
     if (!el) return;

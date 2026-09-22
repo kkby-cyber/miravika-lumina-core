@@ -21,14 +21,20 @@ export function Newsletter() {
     <section aria-labelledby="newsletter-heading" className="border-y border-border/50 bg-beige/40">
       <div className="mx-auto max-w-2xl px-6 py-20 text-center md:py-28">
         <p className="text-[10px] uppercase tracking-[0.36em] text-gold">The Miravika List</p>
-        <h2 id="newsletter-heading" className="mt-4 font-display text-3xl leading-tight md:text-[42px]">
+        <h2
+          id="newsletter-heading"
+          className="mt-4 font-display text-3xl leading-tight md:text-[42px]"
+        >
           Everyday luxury, delivered.
         </h2>
         <div className="mx-auto mt-5 h-px w-16 gold-line" />
         <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-muted-foreground">
           Private access to new arrivals, editorial stories and 10% off your first order.
         </p>
-        <form onSubmit={onSubmit} className="mx-auto mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row">
+        <form
+          onSubmit={onSubmit}
+          className="mx-auto mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row"
+        >
           <label htmlFor="home-newsletter-email" className="sr-only">
             Email address
           </label>

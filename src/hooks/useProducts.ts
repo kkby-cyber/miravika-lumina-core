@@ -1,62 +1,90 @@
 import { useQuery } from "@tanstack/react-query";
 import {
-  PRODUCTS_QUERY,
-  PRODUCT_BY_HANDLE_QUERY,
-  COLLECTION_PRODUCTS_QUERY,
-  storefrontApiRequest,
-  type ShopifyProduct,
-} from "@/lib/shopify";
+  getNexusCollections,
+  getNexusProduct,
+  getNexusProducts,
+  type NexusCollection,
+} from "@/lib/nexus";
+import {
+  toFrontendProduct,
+  toFrontendProducts,
+  type FrontendProduct,
+} from "@/lib/nexus-product";
 
-export function useProducts(query?: string, first = 50, enabled = true) {
+export type StoreProduct = FrontendProduct;
+export type StoreCollection = NexusCollection;
+
+export function useProducts(
+  query?: string,
+  first = 50,
+  enabled = true,
+) {
   return useQuery({
-    queryKey: ["shopify-products", query ?? "", first],
+    queryKey: ["nexus-products", query ?? "", first],
     queryFn: async () => {
-      const data = await storefrontApiRequest(PRODUCTS_QUERY, { first, query: query ?? null });
-      return (data?.data?.products?.edges ?? []) as ShopifyProduct[];
+      const data = await getNexusProducts({
+        limit: first,
+        query,
+      });
+
+      return toFrontendProducts(data.products);
     },
     enabled,
     staleTime: 60_000,
   });
 }
 
-
-export function useProduct(handle: string) {
+export function useProduct(slug: string) {
   return useQuery({
-    queryKey: ["shopify-product", handle],
+    queryKey: ["nexus-product", slug],
     queryFn: async () => {
-      const data = await storefrontApiRequest(PRODUCT_BY_HANDLE_QUERY, { handle });
-      return data?.data?.product as ShopifyProduct["node"] | null;
+      const data = await getNexusProduct(slug);
+      return data.product ? toFrontendProduct(data.product) : null;
     },
-    enabled: !!handle,
+    enabled: !!slug,
+    staleTime: 60_000,
   });
 }
 
-export interface ShopifyCollection {
-  id: string;
-  handle: string;
-  title: string;
-  description: string;
-  image: { url: string; altText: string | null } | null;
-  products: ShopifyProduct[];
-}
-
-export function useCollection(handle: string, first = 24) {
+export function useCollection(slug: string, first = 24) {
   return useQuery({
-    queryKey: ["shopify-collection", handle, first],
-    queryFn: async (): Promise<ShopifyCollection | null> => {
-      const data = await storefrontApiRequest(COLLECTION_PRODUCTS_QUERY, { handle, first });
-      const c = data?.data?.collection;
-      if (!c) return null;
+    queryKey: ["nexus-collection", slug, first],
+    queryFn: async (): Promise<{
+      id: string;
+      handle: string;
+      title: string;
+      description: string;
+      image: { url: string; altText: string | null } | null;
+      products: FrontendProduct[];
+    } | null> => {
+      const collectionData = await getNexusCollections();
+
+      const collection = collectionData.collections.find(
+        (item) => item.slug === slug,
+      );
+
+      if (!collection) return null;
+
+      const productsData = await getNexusProducts({
+        limit: first,
+        collection: slug,
+      });
+
       return {
-        id: c.id,
-        handle: c.handle,
-        title: c.title,
-        description: c.description,
-        image: c.image,
-        products: (c.products?.edges ?? []) as ShopifyProduct[],
+        id: collection.id,
+        handle: collection.slug,
+        title: collection.title,
+        description: collection.description ?? "",
+        image: collection.image_url
+          ? {
+              url: collection.image_url,
+              altText: collection.title,
+            }
+          : null,
+        products: toFrontendProducts(productsData.products),
       };
     },
-    enabled: !!handle,
+    enabled: !!slug,
     staleTime: 60_000,
   });
 }

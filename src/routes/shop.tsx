@@ -24,9 +24,9 @@ function Shop() {
 
   const sorted = useMemo(() => {
     const arr = [...products];
-    if (sort === "price-asc") arr.sort((a, b) => parseFloat(a.node.priceRange.minVariantPrice.amount) - parseFloat(b.node.priceRange.minVariantPrice.amount));
-    if (sort === "price-desc") arr.sort((a, b) => parseFloat(b.node.priceRange.minVariantPrice.amount) - parseFloat(a.node.priceRange.minVariantPrice.amount));
-    if (sort === "title") arr.sort((a, b) => a.node.title.localeCompare(b.node.title));
+    if (sort === "price-asc") arr.sort((a, b) => parseFloat(a.priceRange.minVariantPrice.amount) - parseFloat(b.priceRange.minVariantPrice.amount));
+    if (sort === "price-desc") arr.sort((a, b) => parseFloat(b.priceRange.minVariantPrice.amount) - parseFloat(a.priceRange.minVariantPrice.amount));
+    if (sort === "title") arr.sort((a, b) => a.title.localeCompare(b.title));
     return arr;
   }, [products, sort]);
 
@@ -75,7 +75,7 @@ function Shop() {
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
           {sorted.map((p, i) => (
-            <ProductCard key={p.node.id} product={p} priority={i < 4} />
+            <ProductCard key={p.id} product={p} priority={i < 4} />
           ))}
         </div>
       )}

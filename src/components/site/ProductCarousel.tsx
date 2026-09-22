@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ProductCard } from "@/components/site/ProductCard";
 import { Reveal } from "@/components/site/Reveal";
-import type { ShopifyProduct } from "@/lib/shopify";
+import type { FrontendProduct } from "@/lib/nexus-product";
 
 /**
  * Editorial horizontal carousel for a live Shopify collection.
@@ -21,7 +21,7 @@ export function ProductCarousel({
   title: string;
   subtitle?: string;
   slug: string;
-  products: ShopifyProduct[];
+  products: FrontendProduct[];
   isLoading?: boolean;
 }) {
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -101,7 +101,7 @@ export function ProductCarousel({
               ))
             : products.map((p, i) => (
                 <Reveal
-                  key={p.node.id}
+                  key={p.id}
                   delay={Math.min(i, 5) * 70}
                   className="w-[46%] shrink-0 snap-start md:w-[calc((100%-4.5rem)/4)]"
                 >

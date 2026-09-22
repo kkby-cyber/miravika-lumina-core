@@ -8,7 +8,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useCartStore } from "@/stores/cartStore";
-import { formatPrice } from "@/lib/shopify";
+import { formatPrice } from "@/lib/format-price";
 import { itemFromProduct, trackBeginCheckout, trackViewCart } from "@/lib/analytics";
 import { CartSuggestions, CouponField } from "@/components/site/CartSuggestions";
 
@@ -31,7 +31,7 @@ export function CartDrawer() {
 
   const ga4Items = () =>
     items.map((i, idx) =>
-      itemFromProduct(i.product.node, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx }),
+      itemFromProduct(i.product, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx }),
     );
 
   useEffect(() => {
@@ -119,26 +119,26 @@ export function CartDrawer() {
             <>
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
                 {items.map((it) => {
-                  const img = it.product.node.images?.edges?.[0]?.node;
+                  const img = it.product.images?.edges?.[0]?.node;
                   return (
                     <div key={it.variantId} className="flex gap-4 border-b border-border/40 pb-4 last:border-0">
                       <Link
                         to="/product/$handle"
-                        params={{ handle: it.product.node.handle }}
+                        params={{ handle: it.product.handle }}
                         onClick={() => setOpen(false)}
                         className="h-24 w-20 flex-shrink-0 overflow-hidden rounded bg-beige"
                       >
-                        {img && <img src={img.url} alt={img.altText ?? it.product.node.title} className="h-full w-full object-cover" />}
+                        {img && <img src={img.url} alt={img.altText ?? it.product.title} className="h-full w-full object-cover" />}
                       </Link>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
                           <Link
                             to="/product/$handle"
-                            params={{ handle: it.product.node.handle }}
+                            params={{ handle: it.product.handle }}
                             onClick={() => setOpen(false)}
                             className="line-clamp-2 text-sm font-medium hover:text-gold"
                           >
-                            {it.product.node.title}
+                            {it.product.title}
                           </Link>
                           <button
                             onClick={() => removeItem(it.variantId)}

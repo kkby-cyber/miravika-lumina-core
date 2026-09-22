@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
-import { formatPrice } from "@/lib/shopify";
+import { formatPrice } from "@/lib/format-price";
 import { Button } from "@/components/ui/button";
 import { itemFromProduct, trackBeginCheckout } from "@/lib/analytics";
 import { CartSuggestions, CouponField } from "@/components/site/CartSuggestions";
@@ -40,7 +40,7 @@ function CartPage() {
         <div className="mt-8 grid gap-8 md:grid-cols-[1fr_320px]">
           <div className="space-y-4">
             {items.map((it) => {
-              const img = it.product.node.images?.edges?.[0]?.node;
+              const img = it.product.images?.edges?.[0]?.node;
               return (
                 <div key={it.variantId} className="flex gap-4 rounded-md border border-border/60 bg-card p-4">
                   <div className="h-28 w-28 flex-shrink-0 overflow-hidden rounded-md bg-beige">
@@ -48,7 +48,7 @@ function CartPage() {
                   </div>
                   <div className="flex flex-1 flex-col justify-between">
                     <div>
-                      <h3 className="font-medium">{it.product.node.title}</h3>
+                      <h3 className="font-medium">{it.product.title}</h3>
                       <p className="text-xs text-muted-foreground">{it.selectedOptions.map((o) => o.value).join(" · ")}</p>
                     </div>
                     <div className="flex items-center justify-between">
@@ -81,7 +81,7 @@ function CartPage() {
             <Button onClick={() => {
               if (!openCheckout()) return;
               trackBeginCheckout(
-                items.map((i, idx) => itemFromProduct(i.product.node, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx })),
+                items.map((i, idx) => itemFromProduct(i.product, { variantId: i.variantId, variantTitle: i.variantTitle, price: i.price.amount, quantity: i.quantity, index: idx })),
                 currency,
               );
             }} size="lg" className="w-full rounded-full bg-foreground text-ivory hover:bg-foreground/90">

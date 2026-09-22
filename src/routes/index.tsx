@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Award, Globe, Handshake, Heart, ShieldCheck, Sparkles } from "lucide-react";
 import { useCollection } from "@/hooks/useProducts";
-import { resolveCollectionHandle } from "@/lib/shopify";
+import { resolveCollectionHandle } from "@/lib/collections";
 import { ProductCarousel } from "@/components/site/ProductCarousel";
 import { VideoSection } from "@/components/site/VideoSection";
 import { Reveal } from "@/components/site/Reveal";

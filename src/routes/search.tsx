@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Search as SearchIcon, X } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/site/ProductCard";
-import { formatPrice } from "@/lib/shopify";
+import { formatPrice } from "@/lib/format-price";
 import { itemFromProduct, trackSearch, trackViewItemList } from "@/lib/analytics";
 
 export const Route = createFileRoute("/search")({
@@ -38,10 +38,10 @@ function SearchPage() {
     const term = debounced.trim().toLowerCase();
     if (!term) return [];
     return products.filter((p) =>
-      p.node.title.toLowerCase().includes(term) ||
-      p.node.description?.toLowerCase().includes(term) ||
-      p.node.productType?.toLowerCase().includes(term) ||
-      p.node.tags?.some((t) => t.toLowerCase().includes(term)),
+      p.title.toLowerCase().includes(term) ||
+      p.description?.toLowerCase().includes(term) ||
+      p.productType?.toLowerCase().includes(term) ||
+      p.tags?.some((t: string) => t.toLowerCase().includes(term)),
     );
   }, [products, debounced]);
 
@@ -51,7 +51,7 @@ function SearchPage() {
     trackSearch(term, results.length);
     if (results.length) {
       trackViewItemList(
-        results.slice(0, 20).map((p, i) => itemFromProduct(p.node, { index: i })),
+        results.slice(0, 20).map((p, i) => itemFromProduct(p, { index: i })),
         "search_results",
         `Search: ${term}`,
       );
@@ -113,21 +113,21 @@ function SearchPage() {
           {results.length > 0 && (
             <div className="mx-auto mt-6 grid max-w-4xl grid-cols-2 gap-3 md:grid-cols-4">
               {results.slice(0, 4).map((p) => {
-                const img = p.node.images.edges[0]?.node;
+                const img = p.images.edges[0]?.node;
                 return (
                   <Link
-                    key={p.node.id}
+                    key={p.id}
                     to="/product/$handle"
-                    params={{ handle: p.node.handle }}
+                    params={{ handle: p.handle }}
                     className="group flex items-center gap-3 rounded-lg border border-border/60 bg-card p-2 transition hover:border-gold"
                   >
                     <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded bg-beige">
-                      {img && <img src={img.url} alt={img.altText ?? p.node.title} className="h-full w-full object-cover" />}
+                      {img && <img src={img.url} alt={img.altText ?? p.title} className="h-full w-full object-cover" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 text-xs font-medium group-hover:text-gold">{p.node.title}</p>
+                      <p className="line-clamp-2 text-xs font-medium group-hover:text-gold">{p.title}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
-                        {formatPrice(p.node.priceRange.minVariantPrice.amount, p.node.priceRange.minVariantPrice.currencyCode)}
+                        {formatPrice(p.priceRange.minVariantPrice.amount, p.priceRange.minVariantPrice.currencyCode)}
                       </p>
                     </div>
                   </Link>
@@ -138,7 +138,7 @@ function SearchPage() {
 
           <div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
             {results.map((p) => (
-              <ProductCard key={p.node.id} product={p} />
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
 

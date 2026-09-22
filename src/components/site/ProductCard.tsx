@@ -2,7 +2,8 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Check, Eye, Heart, Loader2, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { formatPrice, type ShopifyProduct } from "@/lib/shopify";
+import { formatPrice } from "@/lib/format-price";
+import type { FrontendProduct } from "@/lib/nexus-product";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useProductRating } from "@/hooks/useReviews";
@@ -11,8 +12,8 @@ import { QuickViewModal } from "@/components/site/QuickViewModal";
 import { itemFromProduct, trackAddToWishlist, trackRemoveFromWishlist } from "@/lib/analytics";
 
 
-export function ProductCard({ product, priority = false }: { product: ShopifyProduct; priority?: boolean }) {
-  const p = product.node;
+export function ProductCard({ product, priority = false }: { product: FrontendProduct; priority?: boolean }) {
+  const p = product;
   const variantEdges = p.variants.edges;
   // Prefer the first purchasable variant — never judge stock by variant #1 alone.
   const variant = (variantEdges.find((v) => v.node.availableForSale) ?? variantEdges[0])?.node;

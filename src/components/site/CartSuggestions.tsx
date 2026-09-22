@@ -4,7 +4,8 @@ import { Gift, Loader2, Plus, Tag, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 import { useCollection, useProducts } from "@/hooks/useProducts";
-import { formatPrice, type ShopifyProduct } from "@/lib/shopify";
+import { formatPrice } from "@/lib/format-price";
+import type { FrontendProduct } from "@/lib/nexus-product";
 import { Button } from "@/components/ui/button";
 
 /** Coupon entry — the code is applied on Shopify's hosted checkout. */
@@ -66,10 +67,10 @@ export function CouponField() {
   );
 }
 
-function MiniAddRow({ product, onDone }: { product: ShopifyProduct; onDone?: () => void }) {
+function MiniAddRow({ product, onDone }: { product: FrontendProduct; onDone?: () => void }) {
   const addItem = useCartStore((s) => s.addItem);
   const [busy, setBusy] = useState(false);
-  const p = product.node;
+  const p = product;
   const variant = p.variants.edges[0]?.node;
   const img = p.images.edges[0]?.node;
 
@@ -128,18 +129,18 @@ function MiniAddRow({ product, onDone }: { product: ShopifyProduct; onDone?: () 
  */
 export function CartSuggestions({ compact = false }: { compact?: boolean }) {
   const items = useCartStore((s) => s.items);
-  const inBag = new Set(items.map((i) => i.product.node.handle));
+  const inBag = new Set(items.map((i) => i.product.handle));
 
   const { data: best } = useCollection("best-sellers", 10);
   const { data: gifts } = useCollection("gifting", 10);
   const { data: fallback = [] } = useProducts(undefined, 10);
 
-  const crossSell = ((best?.products ?? fallback) as ShopifyProduct[])
-    .filter((p) => !inBag.has(p.node.handle))
+  const crossSell = (best?.products ?? fallback)
+    .filter((p) => !inBag.has(p.handle))
     .slice(0, compact ? 3 : 4);
 
-  const giftPicks = ((gifts?.products ?? []) as ShopifyProduct[])
-    .filter((p) => !inBag.has(p.node.handle) && !crossSell.some((c) => c.node.handle === p.node.handle))
+  const giftPicks = (gifts?.products ?? [])
+    .filter((p) => !inBag.has(p.handle) && !crossSell.some((c) => c.handle === p.handle))
     .slice(0, compact ? 2 : 3);
 
   if (!items.length || (!crossSell.length && !giftPicks.length)) return null;
@@ -151,7 +152,7 @@ export function CartSuggestions({ compact = false }: { compact?: boolean }) {
           <p className="text-[10px] uppercase tracking-[0.28em] text-gold">Pairs beautifully with</p>
           <div className="mt-3 space-y-3">
             {crossSell.map((p) => (
-              <MiniAddRow key={p.node.id} product={p} />
+              <MiniAddRow key={p.id} product={p} />
             ))}
           </div>
         </>
@@ -164,7 +165,7 @@ export function CartSuggestions({ compact = false }: { compact?: boolean }) {
           </p>
           <div className="mt-3 space-y-3">
             {giftPicks.map((p) => (
-              <MiniAddRow key={p.node.id} product={p} />
+              <MiniAddRow key={p.id} product={p} />
             ))}
           </div>
         </>

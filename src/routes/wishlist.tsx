@@ -18,7 +18,7 @@ export const Route = createFileRoute("/wishlist")({
 function Wishlist() {
   const handles = useWishlistStore((s) => s.handles);
   const { data: products = [] } = useProducts(undefined, 100);
-  const items = products.filter((p) => handles.includes(p.node.handle));
+  const items = products.filter((p) => handles.includes(p.handle));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:py-16">
@@ -32,7 +32,7 @@ function Wishlist() {
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
-          {items.map((p) => <ProductCard key={p.node.id} product={p} />)}
+          {items.map((p) => <ProductCard key={p.id} product={p} />)}
         </div>
       )}
     </div>

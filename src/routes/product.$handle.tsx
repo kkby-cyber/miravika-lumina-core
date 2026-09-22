@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { Heart, Loader2, Minus, Plus, ShieldCheck, Truck, Undo2, Share2, Play } from "lucide-react";
 import { useProduct, useCollection } from "@/hooks/useProducts";
-import { formatPrice } from "@/lib/shopify";
+import { formatPrice } from "@/lib/format-price";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useRecordView, useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -135,7 +135,7 @@ function ProductPage() {
 
   // Recently-viewed products list
   const recentlyViewed = useMemo(
-    () => recentHandles.map((h) => recentProducts.find((p) => p.node.handle === h)).filter(Boolean).slice(0, 4),
+    () => recentHandles.map((h) => recentProducts.find((p) => p.handle === h)).filter(Boolean).slice(0, 4),
     [recentHandles, recentProducts],
   );
 
@@ -143,7 +143,7 @@ function ProductPage() {
   const similar = useMemo(() => {
     if (!product?.productType) return [];
     return recentProducts
-      .filter((p) => p.node.productType === product.productType && p.node.handle !== handle)
+      .filter((p) => p.productType === product.productType && p.handle !== handle)
       .slice(0, 4);
   }, [recentProducts, product?.productType, handle]);
 
@@ -189,7 +189,7 @@ function ProductPage() {
   const handleAdd = async () => {
     if (!variant) return;
     await addItem({
-      product: { node: product },
+      product,
       variantId: variant.id,
       variantTitle: variant.title,
       price: variant.price,
@@ -232,7 +232,7 @@ function ProductPage() {
   })();
 
   // Related & FBT sources
-  const related = (bestSellers?.products ?? recentProducts).filter((p) => p.node.handle !== handle).slice(0, 4);
+  const related = (bestSellers?.products ?? recentProducts).filter((p) => p.handle !== handle).slice(0, 4);
   const fbt = related.slice(0, 3);
 
   // GMC / Performance Max friendly Product schema
@@ -592,7 +592,7 @@ function ProductPage() {
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
               {fbt.map((p) => (
-                <ProductCard key={p.node.id} product={p} />
+                <ProductCard key={p.id} product={p} />
               ))}
             </div>
           </section>
@@ -607,7 +607,7 @@ function ProductPage() {
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
               {similar.map((p) => (
-                <ProductCard key={p.node.id} product={p} />
+                <ProductCard key={p.id} product={p} />
               ))}
             </div>
           </section>
@@ -629,7 +629,7 @@ function ProductPage() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
-              {recentlyViewed.map((p) => p && <ProductCard key={p.node.id} product={p} />)}
+              {recentlyViewed.map((p) => p && <ProductCard key={p.id} product={p} />)}
             </div>
           </section>
         )}
@@ -643,7 +643,7 @@ function ProductPage() {
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
               {related.map((p) => (
-                <ProductCard key={p.node.id} product={p} />
+                <ProductCard key={p.id} product={p} />
               ))}
             </div>
           </section>

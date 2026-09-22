@@ -8,7 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatPrice, type ShopifyProduct } from "@/lib/shopify";
+import { formatPrice } from "@/lib/format-price";
+import type { FrontendProduct } from "@/lib/nexus-product";
 import { useCartStore } from "@/stores/cartStore";
 
 export function QuickViewModal({
@@ -16,11 +17,11 @@ export function QuickViewModal({
   open,
   onOpenChange,
 }: {
-  product: ShopifyProduct;
+  product: FrontendProduct;
   open: boolean;
   onOpenChange: (o: boolean) => void;
 }) {
-  const p = product.node;
+  const p = product;
   const variants = p.variants.edges.map((v) => v.node);
   const firstAvailable = variants.find((v) => v.availableForSale) ?? variants[0];
   const [selectedId, setSelectedId] = useState(firstAvailable?.id);

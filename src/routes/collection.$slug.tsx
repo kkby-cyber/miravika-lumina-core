@@ -3,8 +3,8 @@ import { useState, useMemo, useEffect } from "react";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useCollection, useProducts } from "@/hooks/useProducts";
 import { ProductCard } from "@/components/site/ProductCard";
-import { resolveCollectionHandle, LEGACY_SLUG_REDIRECTS } from "@/lib/shopify";
-import type { ShopifyProduct } from "@/lib/shopify";
+import { resolveCollectionHandle, LEGACY_SLUG_REDIRECTS } from "@/lib/collections";
+import type { FrontendProduct } from "@/lib/nexus-product";
 import { itemFromProduct, trackViewItemList } from "@/lib/analytics";
 import { useShopRatings } from "@/hooks/useReviews";
 
@@ -92,7 +92,7 @@ function CollectionPage() {
     100,
   );
 
-  const source: ShopifyProduct[] = collection?.products?.length ? collection.products : fallback;
+  const source: FrontendProduct[] = collection?.products?.length ? collection.products : fallback;
   const isLoading = colLoading || fbLoading;
 
   const [sort, setSort] = useState<Sort>("featured");
@@ -105,7 +105,7 @@ function CollectionPage() {
   // Category options come from the real Shopify product types inside this collection
   const categories = useMemo(() => {
     const set = new Set<string>();
-    source.forEach((p) => p.node.productType && set.add(p.node.productType));
+    source.forEach((p) => p.productType && set.add(p.productType));
     return [...set].sort();
   }, [source]);
 
@@ -115,11 +115,11 @@ function CollectionPage() {
 
   const filtered = useMemo(() => {
     let arr = [...source];
-    if (inStock) arr = arr.filter((p) => p.node.variants.edges.some((v) => v.node.availableForSale));
-    if (category !== "all") arr = arr.filter((p) => p.node.productType === category);
+    if (inStock) arr = arr.filter((p) => p.variants.edges.some((v) => v.node.availableForSale));
+    if (category !== "all") arr = arr.filter((p) => p.productType === category);
     if (band !== "all") {
       arr = arr.filter((p) => {
-        const price = parseFloat(p.node.priceRange.minVariantPrice.amount);
+        const price = parseFloat(p.priceRange.minVariantPrice.amount);
         if (band === "under-2500") return price < 2500;
         if (band === "2500-7500") return price >= 2500 && price < 7500;
         if (band === "7500-15000") return price >= 7500 && price < 15000;
@@ -127,12 +127,12 @@ function CollectionPage() {
         return true;
       });
     }
-    if (sort === "price-asc") arr.sort((a, b) => parseFloat(a.node.priceRange.minVariantPrice.amount) - parseFloat(b.node.priceRange.minVariantPrice.amount));
-    if (sort === "price-desc") arr.sort((a, b) => parseFloat(b.node.priceRange.minVariantPrice.amount) - parseFloat(a.node.priceRange.minVariantPrice.amount));
-    if (sort === "title") arr.sort((a, b) => a.node.title.localeCompare(b.node.title));
+    if (sort === "price-asc") arr.sort((a, b) => parseFloat(a.priceRange.minVariantPrice.amount) - parseFloat(b.priceRange.minVariantPrice.amount));
+    if (sort === "price-desc") arr.sort((a, b) => parseFloat(b.priceRange.minVariantPrice.amount) - parseFloat(a.priceRange.minVariantPrice.amount));
+    if (sort === "title") arr.sort((a, b) => a.title.localeCompare(b.title));
     if (sort === "rating") {
       const score = (h: string) => shopRatings?.ratings?.[h]?.average ?? -1;
-      arr.sort((a, b) => score(b.node.handle) - score(a.node.handle));
+      arr.sort((a, b) => score(b.handle) - score(a.handle));
     }
     return arr;
   }, [source, sort, band, inStock, category, shopRatings]);
@@ -141,7 +141,7 @@ function CollectionPage() {
   useEffect(() => {
     if (!filtered.length) return;
     trackViewItemList(
-      filtered.slice(0, 24).map((p, i) => itemFromProduct(p.node, { index: i })),
+      filtered.slice(0, 24).map((p, i) => itemFromProduct(p, { index: i })),
       handle,
       copy.title,
     );
@@ -286,7 +286,7 @@ function CollectionPage() {
           ) : (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-6">
               {filtered.map((p, i) => (
-                <ProductCard key={p.node.id} product={p} priority={i < 3} />
+                <ProductCard key={p.id} product={p} priority={i < 3} />
               ))}
             </div>
           )}

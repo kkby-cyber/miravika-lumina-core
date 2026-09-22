@@ -3,7 +3,7 @@
  * Every event is pushed to window.dataLayer so GTM (GTM-PVNR5BST) can route it
  * to GA4 Enhanced Ecommerce, Google Ads conversions and remarketing audiences.
  */
-import type { ShopifyProduct } from "@/lib/shopify";
+import type { FrontendProduct } from "@/lib/nexus-product";
 import { pixelEvent } from "@/lib/pixels";
 
 type DL = Record<string, unknown>;
@@ -30,7 +30,7 @@ export interface GA4Item {
 
 const numericId = (gid: string) => gid.split("/").pop() ?? gid;
 
-export function itemFromProduct(p: ShopifyProduct["node"], opts: { variantId?: string; variantTitle?: string; price?: string | number; quantity?: number; index?: number } = {}): GA4Item {
+export function itemFromProduct(p: FrontendProduct, opts: { variantId?: string; variantTitle?: string; price?: string | number; quantity?: number; index?: number } = {}): GA4Item {
   return {
     item_id: opts.variantId ? numericId(opts.variantId) : numericId(p.id),
     item_name: p.title,

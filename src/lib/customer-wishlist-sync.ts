@@ -6,21 +6,18 @@ let syncPromise: Promise<{
   authenticated: boolean;
   merged: number;
   unresolved: string[];
-  handles: string[];
 }> | null = null;
 
 async function performCustomerWishlistSync() {
   const session = await getCustomerSession();
 
   if (!session.session) {
-    const handles = useWishlistStore.getState().handles;
     useWishlistStore.getState().setHydrated(true);
 
     return {
       authenticated: false,
       merged: 0,
       unresolved: [],
-      handles,
     };
   }
 
@@ -48,7 +45,6 @@ async function performCustomerWishlistSync() {
     authenticated: true,
     merged: merge.merged,
     unresolved: merge.unresolved,
-    handles: [...new Set(entries.map((entry) => entry.handle))],
   };
 }
 
@@ -56,7 +52,6 @@ export async function syncCustomerWishlist(): Promise<{
   authenticated: boolean;
   merged: number;
   unresolved: string[];
-  handles: string[];
 }> {
   if (!syncPromise) {
     syncPromise = performCustomerWishlistSync().finally(() => {

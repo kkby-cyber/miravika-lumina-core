@@ -8,13 +8,11 @@ export interface WishlistEntry {
 
 interface WishlistStore {
   entries: WishlistEntry[];
-  handles: string[];
   hydrated: boolean;
   toggle: (handle: string, variantId?: string | null) => void;
   has: (handle: string, variantId?: string | null) => boolean;
   remove: (handle: string, variantId?: string | null) => void;
   setEntries: (entries: WishlistEntry[]) => void;
-  setHandles: (handles: string[]) => void;
   setHydrated: (hydrated: boolean) => void;
   clear: () => void;
 }
@@ -36,7 +34,6 @@ export const useWishlistStore = create<WishlistStore>()(
   persist(
     (set, get) => ({
       entries: [],
-      handles: [],
       hydrated: false,
 
       toggle: (handle, variantId = null) =>
@@ -51,10 +48,7 @@ export const useWishlistStore = create<WishlistStore>()(
             ? state.entries.filter((entry) => entryKey(entry) !== key)
             : [...state.entries, { handle, variantId }];
 
-          return {
-            entries,
-            handles: [...new Set(entries.map((entry) => entry.handle))],
-          };
+          return { entries };
         }),
 
       has: (handle, variantId = null) =>
@@ -72,10 +66,7 @@ export const useWishlistStore = create<WishlistStore>()(
                     entryKey(entry) !== entryKey({ handle, variantId }),
                 );
 
-          return {
-            entries,
-            handles: [...new Set(entries.map((entry) => entry.handle))],
-          };
+          return { entries };
         }),
 
       setEntries: (entries) =>
@@ -85,26 +76,12 @@ export const useWishlistStore = create<WishlistStore>()(
               all.findIndex((candidate) => entryKey(candidate) === entryKey(entry)) ===
               index,
           ),
-          handles: [...new Set(entries.map((entry) => entry.handle))],
         }),
-
-      setHandles: (handles) => {
-        const uniqueHandles = [...new Set(handles)];
-
-        set({
-          entries: uniqueHandles.map((handle) => ({
-            handle,
-            variantId: null,
-          })),
-          handles: uniqueHandles,
-        });
-      },
 
       setHydrated: (hydrated) => set({ hydrated }),
 
       clear: () => set({
         entries: [],
-        handles: [],
         hydrated: false,
       }),
     }),
@@ -122,24 +99,18 @@ export const useWishlistStore = create<WishlistStore>()(
               handle,
               variantId: null,
             })),
-            handles,
           } satisfies PersistedWishlistV1;
         }
 
         const current = persistedState as PersistedWishlistV1;
         const entries = current.entries ?? [];
-        const handles =
-          current.handles ??
-          [...new Set(entries.map((entry) => entry.handle))];
 
         return {
           entries,
-          handles,
         } satisfies PersistedWishlistV1;
       },
       partialize: (state) => ({
         entries: state.entries,
-        handles: state.handles,
       }),
     },
   ),

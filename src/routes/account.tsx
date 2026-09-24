@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { getCustomerSession, signOutCustomer } from "@/lib/customer-auth";
+import { useWishlistStore } from "@/stores/wishlistStore";
 import {
   createNexusCustomerAddress,
   deleteNexusCustomerAddress,
@@ -310,6 +311,7 @@ function Account() {
       return;
     }
 
+    useWishlistStore.getState().clear();
     await navigate({ to: "/auth" });
   }
 

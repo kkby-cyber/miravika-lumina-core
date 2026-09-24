@@ -138,6 +138,53 @@ export async function getNexusProduct(slug: string) {
   }>(`/api/public/products/${encodeURIComponent(slug)}`);
 }
 
+export interface NexusWishlistProduct {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  deleted_at: string | null;
+}
+
+export interface NexusWishlistItem {
+  id: string;
+  product_id: string;
+  variant_id: string | null;
+  created_at: string;
+  products?: NexusWishlistProduct | null;
+}
+
+export interface NexusWishlist {
+  id: string;
+  user_id: string;
+}
+
+export async function getNexusCustomerWishlist() {
+  return nexusRequest<{
+    wishlist: NexusWishlist;
+    items: NexusWishlistItem[];
+  }>("/api/public/wishlist");
+}
+
+export async function mutateNexusCustomerWishlist(input: {
+  action: "add" | "remove";
+  product_id: string;
+  variant_id?: string | null;
+}) {
+  return nexusRequest<{
+    wishlist: NexusWishlist;
+    items: NexusWishlistItem[];
+  }>("/api/public/wishlist", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: input.action,
+      product_id: input.product_id,
+      variant_id: input.variant_id ?? null,
+    }),
+  });
+}
+
 export async function getNexusCollections() {
   return nexusRequest<{
     collections: NexusCollection[];

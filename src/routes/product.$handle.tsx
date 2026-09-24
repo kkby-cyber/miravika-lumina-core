@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Heart, Loader2, Minus, Plus, ShieldCheck, Truck, Undo2, Share2, Play } from "lucide-react";
 import { useProduct, useCollection } from "@/hooks/useProducts";
 import { formatPrice } from "@/lib/format-price";
+import { toggleWishlistItem } from "@/lib/wishlist-actions";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { useRecordView, useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -109,21 +110,7 @@ function ProductPage() {
   const isLoadingCart = useCartStore((s) => s.isLoading);
   const openCheckout = useCartStore((s) => s.openCheckout);
   const wished = useWishlistStore((s) => s.has(handle));
-  const toggleWishRaw = useWishlistStore((s) => s.toggle);
-  const toggleWish = (h: string) => {
-    if (product) {
-      const ga = [
-        itemFromProduct(product, { variantId: variant?.id, price: variant?.price.amount }),
-      ];
-      const cur = product.priceRange.minVariantPrice.currencyCode;
-      if (wished) {
-        trackRemoveFromWishlist(ga, cur);
-      } else {
-        trackAddToWishlist(ga, cur);
-      }
-    }
-    toggleWishRaw(h);
-  };
+  const [wishlistBusy, setWishlistBusy] = useState(false);
 
   useEffect(() => {
     setActiveImg(0);
@@ -140,6 +127,33 @@ function ProductPage() {
       ) ?? variants[0]
     );
   }, [product, selected]);
+
+  const toggleWish = async () => {
+    if (!product || wishlistBusy) return;
+
+    setWishlistBusy(true);
+
+    try {
+      const result = await toggleWishlistItem(product, variant?.id ?? null);
+      const ga = [
+        itemFromProduct(product, {
+          variantId: variant?.id,
+          price: variant?.price.amount,
+        }),
+      ];
+      const cur = product.priceRange.minVariantPrice.currencyCode;
+
+      if (result.wished) {
+        trackAddToWishlist(ga, cur);
+      } else {
+        trackRemoveFromWishlist(ga, cur);
+      }
+    } catch (error) {
+      console.error("Wishlist update failed:", error);
+    } finally {
+      setWishlistBusy(false);
+    }
+  };
 
   const compareAmt = variant?.compareAtPrice?.amount
     ? parseFloat(variant.compareAtPrice.amount)
@@ -620,14 +634,19 @@ function ProductPage() {
                 )}
               </Button>
               <button
-                onClick={() => toggleWish(handle)}
+                onClick={() => void toggleWish()}
+                disabled={wishlistBusy}
                 aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-                className="grid h-14 w-14 place-items-center rounded-full border border-border hover:border-gold"
+                className="grid h-14 w-14 place-items-center rounded-full border border-border hover:border-gold disabled:cursor-wait disabled:opacity-60"
               >
-                <Heart
-                  className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`}
-                  strokeWidth={1.5}
-                />
+                {wishlistBusy ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Heart
+                    className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`}
+                    strokeWidth={1.5}
+                  />
+                )}
               </button>
             </div>
 
@@ -829,11 +848,19 @@ function ProductPage() {
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-ivory/95 backdrop-blur-md md:hidden">
         <div className="flex items-center gap-2 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
           <button
-            onClick={() => toggleWish(handle)}
-            aria-label="Wishlist"
-            className="grid h-12 w-12 flex-none place-items-center rounded-full border border-border"
+            onClick={() => void toggleWish()}
+            disabled={wishlistBusy}
+            aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+            className="grid h-12 w-12 flex-none place-items-center rounded-full border border-border disabled:cursor-wait disabled:opacity-60"
           >
-            <Heart className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`} strokeWidth={1.5} />
+            {wishlistBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Heart
+                className={`h-5 w-5 ${wished ? "fill-gold text-gold" : ""}`}
+                strokeWidth={1.5}
+              />
+            )}
           </button>
           <Button
             onClick={handleAdd}

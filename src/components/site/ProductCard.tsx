@@ -3,6 +3,7 @@ import { Check, Eye, Heart, Loader2, Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/format-price";
+import { toggleWishlistItem } from "@/lib/wishlist-actions";
 import type { FrontendProduct } from "@/lib/nexus-product";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
@@ -31,7 +32,7 @@ export function ProductCard({
   const [quickView, setQuickView] = useState(false);
   const addedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const wished = useWishlistStore((s) => s.has(p.handle));
-  const toggleWish = useWishlistStore((s) => s.toggle);
+  const [wishlistBusy, setWishlistBusy] = useState(false);
   const navigate = useNavigate();
   const rating = useProductRating(p.handle);
 
@@ -117,24 +118,41 @@ export function ProductCard({
           <div className="absolute right-3 top-3 flex flex-col gap-2">
             <button
               aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-              onClick={(e) => {
+              disabled={wishlistBusy}
+              onClick={async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const ga = [itemFromProduct(p)];
-                const cur = p.priceRange.minVariantPrice.currencyCode;
-                if (wished) {
-                  trackRemoveFromWishlist(ga, cur);
-                } else {
-                  trackAddToWishlist(ga, cur);
+
+                if (wishlistBusy) return;
+
+                setWishlistBusy(true);
+
+                try {
+                  const result = await toggleWishlistItem(p, variant?.id ?? null);
+                  const ga = [itemFromProduct(p, { variantId: variant?.id })];
+                  const cur = p.priceRange.minVariantPrice.currencyCode;
+
+                  if (result.wished) {
+                    trackAddToWishlist(ga, cur);
+                  } else {
+                    trackRemoveFromWishlist(ga, cur);
+                  }
+                } catch (error) {
+                  console.error("Wishlist update failed:", error);
+                } finally {
+                  setWishlistBusy(false);
                 }
-                toggleWish(p.handle);
               }}
-              className="grid h-9 w-9 place-items-center rounded-full bg-ivory/90 backdrop-blur transition-transform duration-300 hover:bg-ivory active:scale-90"
+              className="grid h-9 w-9 place-items-center rounded-full bg-ivory/90 backdrop-blur transition-transform duration-300 hover:bg-ivory active:scale-90 disabled:cursor-wait disabled:opacity-60"
             >
-              <Heart
-                className={`h-4 w-4 transition-transform duration-300 ${wished ? "scale-110 fill-gold text-gold" : "text-foreground/70"}`}
-                strokeWidth={1.5}
-              />
+              {wishlistBusy ? (
+                <Loader2 className="h-4 w-4 animate-spin text-foreground/70" />
+              ) : (
+                <Heart
+                  className={`h-4 w-4 transition-transform duration-300 ${wished ? "scale-110 fill-gold text-gold" : "text-foreground/70"}`}
+                  strokeWidth={1.5}
+                />
+              )}
             </button>
             <button
               aria-label="Quick view"

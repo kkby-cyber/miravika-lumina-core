@@ -11,6 +11,7 @@ import {
   signInCustomer,
   signUpCustomer,
 } from "@/lib/customer-auth";
+import { syncCustomerWishlist } from "@/lib/customer-wishlist-sync";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -96,6 +97,7 @@ function AuthPage() {
           return;
         }
 
+        await syncCustomerWishlist();
         toast.success("Welcome back to MIRAVIKA.");
         await navigate({ to: "/account", replace: true });
         return;
@@ -112,6 +114,7 @@ function AuthPage() {
         const session = await getCustomerSession();
 
         if (session.session) {
+          await syncCustomerWishlist();
           toast.success("Your MIRAVIKA account is ready.");
           await navigate({ to: "/account", replace: true });
         } else {

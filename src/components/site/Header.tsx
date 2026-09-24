@@ -3,6 +3,7 @@ import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
+import { syncCustomerWishlist } from "@/lib/customer-wishlist-sync";
 
 type NavItem = { label: string; slug: string };
 
@@ -31,6 +32,12 @@ export function Header() {
   const [announceIdx, setAnnounceIdx] = useState(0);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
+
+  useEffect(() => {
+    void syncCustomerWishlist().catch((error) => {
+      console.error("Wishlist hydration failed:", error);
+    });
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);

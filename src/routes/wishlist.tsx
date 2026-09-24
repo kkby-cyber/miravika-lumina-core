@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Heart } from "lucide-react";
-import { useWishlistStore } from "@/stores/wishlistStore";
-import { useProducts } from "@/hooks/useProducts";
+import { Heart, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/site/ProductCard";
+import { syncCustomerWishlist } from "@/lib/customer-wishlist-sync";
+import { getNexusProduct } from "@/lib/nexus";
+import { toFrontendProduct, type FrontendProduct } from "@/lib/nexus-product";
+import { useWishlistStore } from "@/stores/wishlistStore";
 
 export const Route = createFileRoute("/wishlist")({
   head: () => ({
@@ -17,14 +20,74 @@ export const Route = createFileRoute("/wishlist")({
 
 function Wishlist() {
   const handles = useWishlistStore((s) => s.handles);
-  const { data: products = [] } = useProducts(undefined, 100);
-  const items = products.filter((p) => handles.includes(p.handle));
+  const [items, setItems] = useState<FrontendProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+
+      try {
+        await syncCustomerWishlist();
+
+        const currentHandles = [...useWishlistStore.getState().handles];
+
+        const results = await Promise.all(
+          currentHandles.map(async (handle) => {
+            try {
+              const data = await getNexusProduct(handle);
+              return data.product ? toFrontendProduct(data.product) : null;
+            } catch {
+              return null;
+            }
+          }),
+        );
+
+        if (!cancelled) {
+          setItems(results.filter((product): product is FrontendProduct => product !== null));
+        }
+      } catch (error) {
+        console.error("Wishlist page load failed:", error);
+
+        if (!cancelled) {
+          setItems([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const visibleItems = new Set(handles);
+    setItems((current) => current.filter((product) => visibleItems.has(product.handle)));
+  }, [handles, loading]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:py-16">
       <h1 className="font-display text-3xl md:text-5xl">Wishlist</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{items.length} saved</p>
-      {items.length === 0 ? (
+
+      <p className="mt-2 text-sm text-muted-foreground">
+        {loading ? "Loading your saved pieces…" : `${items.length} saved`}
+      </p>
+
+      {loading ? (
+        <div className="mt-10 flex min-h-48 items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-gold" />
+        </div>
+      ) : items.length === 0 ? (
         <div className="mt-10 rounded-md border border-dashed border-border/70 bg-beige/30 p-12 text-center">
           <Heart className="mx-auto mb-3 h-8 w-8 text-gold" />
           <h3 className="font-display text-xl">Your wishlist is empty</h3>

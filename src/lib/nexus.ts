@@ -79,12 +79,21 @@ interface NexusResponse<T> {
 }
 
 async function nexusRequest<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${NEXUS_API_URL}${path}`, {
+  const { supabase } = await import("@/integrations/supabase/client");
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const headers = new Headers(init?.headers);
+  headers.set("Accept", "application/json");
+
+  if (session?.access_token) {
+    headers.set("Authorization", `Bearer ${session.access_token}`);
+  }
+
+  const response = await fetch(`${getNexusApiUrl()}${path}`, {
     ...init,
-    headers: {
-      Accept: "application/json",
-      ...(init?.headers ?? {}),
-    },
+    headers,
   });
 
   if (!response.ok) {
@@ -149,6 +158,140 @@ export interface NexusShippingQuote {
     etd?: string | null;
   }>;
   source?: string;
+}
+
+export interface NexusCustomerProfile {
+  id: string;
+  email: string | null;
+  full_name: string | null;
+  phone: string | null;
+  marketing_opt_in: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NexusCustomerOrderItem {
+  title: string;
+  sku: string | null;
+  quantity: number;
+  line_total: number | string;
+}
+
+export interface NexusCustomerOrder {
+  id: string;
+  order_number: string;
+  status: string;
+  payment_status: string;
+  grand_total: number | string;
+  currency: string;
+  created_at: string;
+  paid_at?: string | null;
+  tracking_number?: string | null;
+  tracking_url?: string | null;
+  order_items?: NexusCustomerOrderItem[];
+}
+
+export interface NexusAddress {
+  id: string;
+  user_id: string;
+  address_type: "shipping" | "billing";
+  label: string | null;
+  full_name: string;
+  phone: string;
+  line1: string;
+  line2: string | null;
+  landmark: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getNexusCustomerProfile() {
+  return nexusRequest<{ profile: NexusCustomerProfile | null }>("/api/public/customer");
+}
+
+export async function updateNexusCustomerProfile(input: {
+  full_name?: string;
+  phone?: string;
+  marketing_opt_in?: boolean;
+}) {
+  return nexusRequest<{ profile: NexusCustomerProfile }>("/api/public/customer", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function getNexusCustomerOrders() {
+  return nexusRequest<{ orders: NexusCustomerOrder[] }>("/api/public/customer-orders");
+}
+
+export async function getNexusCustomerAddresses() {
+  return nexusRequest<{ addresses: NexusAddress[] }>("/api/public/addresses");
+}
+
+export async function createNexusCustomerAddress(input: {
+  address_type?: "shipping" | "billing";
+  label?: string | null;
+  full_name: string;
+  phone: string;
+  line1: string;
+  line2?: string | null;
+  landmark?: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  country?: string;
+  is_default?: boolean;
+}) {
+  return nexusRequest<{ address: NexusAddress }>("/api/public/addresses", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(input),
+  });
+}
+
+export async function updateNexusCustomerAddress(
+  addressId: string,
+  input: Partial<{
+    address_type: "shipping" | "billing";
+    label: string | null;
+    full_name: string;
+    phone: string;
+    line1: string;
+    line2: string | null;
+    landmark: string | null;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: string;
+    is_default: boolean;
+  }>,
+) {
+  return nexusRequest<{ address: NexusAddress }>(
+    `/api/public/addresses/${encodeURIComponent(addressId)}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+export async function deleteNexusCustomerAddress(addressId: string) {
+  return nexusRequest<{ ok: boolean }>(`/api/public/addresses/${encodeURIComponent(addressId)}`, {
+    method: "DELETE",
+  });
 }
 
 export async function getNexusShippingQuote(options: {

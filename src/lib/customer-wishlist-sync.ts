@@ -27,18 +27,28 @@ async function performCustomerWishlistSync() {
   const merge = await mergeGuestWishlistIntoCustomer();
   const data = await loadCustomerWishlist();
 
-  const handles = (data.items ?? [])
-    .map((item) => item.products?.slug)
-    .filter((handle): handle is string => Boolean(handle));
+  const entries = (data.items ?? [])
+    .map((item) => {
+      const handle = item.products?.slug;
+      if (!handle) return null;
 
-  useWishlistStore.getState().setHandles(handles);
+      return {
+        handle,
+        variantId: item.variant_id ?? null,
+      };
+    })
+    .filter(
+      (entry): entry is { handle: string; variantId: string | null } => Boolean(entry),
+    );
+
+  useWishlistStore.getState().setEntries(entries);
   useWishlistStore.getState().setHydrated(true);
 
   return {
     authenticated: true,
     merged: merge.merged,
     unresolved: merge.unresolved,
-    handles,
+    handles: [...new Set(entries.map((entry) => entry.handle))],
   };
 }
 

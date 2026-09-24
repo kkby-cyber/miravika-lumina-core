@@ -31,7 +31,7 @@ export function ProductCard({
   const [added, setAdded] = useState(false);
   const [quickView, setQuickView] = useState(false);
   const addedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const wished = useWishlistStore((s) => s.has(p.handle));
+  const wished = useWishlistStore((s) => s.has(p.handle, variant?.id ?? null));
   const [wishlistBusy, setWishlistBusy] = useState(false);
   const navigate = useNavigate();
   const rating = useProductRating(p.handle);

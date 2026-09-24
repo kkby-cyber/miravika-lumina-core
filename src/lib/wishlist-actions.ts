@@ -12,9 +12,9 @@ export async function toggleWishlistItem(
 
   if (!session.session) {
     const store = useWishlistStore.getState();
-    const wished = store.has(product.handle);
+    const wished = store.has(product.handle, variantId);
 
-    store.toggle(product.handle);
+    store.toggle(product.handle, variantId);
 
     return {
       wished: !wished,
@@ -29,7 +29,7 @@ export async function toggleWishlistItem(
   }
 
   const latest = useWishlistStore.getState();
-  const wished = latest.has(product.handle);
+  const wished = latest.has(product.handle, variantId);
 
   if (wished) {
     await removeCustomerWishlistItem(product.id, variantId);
@@ -38,9 +38,9 @@ export async function toggleWishlistItem(
   }
 
   if (wished) {
-    latest.remove(product.handle);
+    latest.remove(product.handle, variantId);
   } else {
-    latest.toggle(product.handle);
+    latest.toggle(product.handle, variantId);
   }
 
   return {

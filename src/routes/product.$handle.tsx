@@ -109,7 +109,6 @@ function ProductPage() {
   const setOpen = useCartStore((s) => s.setOpen);
   const isLoadingCart = useCartStore((s) => s.isLoading);
   const openCheckout = useCartStore((s) => s.openCheckout);
-  const wished = useWishlistStore((s) => s.has(handle));
   const [wishlistBusy, setWishlistBusy] = useState(false);
 
   useEffect(() => {
@@ -127,6 +126,8 @@ function ProductPage() {
       ) ?? variants[0]
     );
   }, [product, selected]);
+
+  const wished = useWishlistStore((s) => s.has(handle, variant?.id ?? null));
 
   const toggleWish = async () => {
     if (!product || wishlistBusy) return;

@@ -44,9 +44,9 @@ export async function removeCustomerWishlistItem(
 }
 
 export async function mergeGuestWishlistIntoCustomer() {
-  const handles = [...useWishlistStore.getState().handles];
+  const entries = [...useWishlistStore.getState().entries];
 
-  if (handles.length === 0) {
+  if (entries.length === 0) {
     return {
       merged: 0,
       unresolved: [],
@@ -56,22 +56,25 @@ export async function mergeGuestWishlistIntoCustomer() {
   let merged = 0;
   const unresolved: string[] = [];
 
-  for (const handle of handles) {
+  for (const entry of entries) {
     try {
-      const data = await getNexusProduct(handle);
+      const data = await getNexusProduct(entry.handle);
       const product = data.product;
 
       if (!product) {
-        unresolved.push(handle);
+        unresolved.push(entry.handle);
         continue;
       }
 
-      await addCustomerWishlistItem(toFrontendProduct(product));
+      await addCustomerWishlistItem(
+        toFrontendProduct(product),
+        entry.variantId,
+      );
 
-      useWishlistStore.getState().remove(handle);
+      useWishlistStore.getState().remove(entry.handle, entry.variantId);
       merged += 1;
     } catch {
-      unresolved.push(handle);
+      unresolved.push(entry.handle);
     }
   }
 

@@ -110,7 +110,7 @@ export function pixelEvent(
   eventID?: string,
 ) {
   if (typeof window === "undefined") return;
-  const w = window as W;
+  const w = window as unknown as W;
   try {
     w.fbq?.("track", name, params, eventID ? { eventID } : undefined);
     w.ttq?.track?.(name, params);

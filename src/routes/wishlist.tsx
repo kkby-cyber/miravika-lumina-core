@@ -20,9 +20,9 @@ export const Route = createFileRoute("/wishlist")({
 
 function Wishlist() {
   const entries = useWishlistStore((s) => s.entries);
-  const [items, setItems] = useState<
-    Array<{ product: FrontendProduct; variantId: string | null }>
-  >([]);
+  const [items, setItems] = useState<Array<{ product: FrontendProduct; variantId: string | null }>>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -91,9 +91,7 @@ function Wishlist() {
 
     setItems((current) =>
       current.filter((item) =>
-        visibleEntries.has(
-          `${item.product.handle}::${item.variantId ?? "product"}`,
-        ),
+        visibleEntries.has(`${item.product.handle}::${item.variantId ?? "product"}`),
       ),
     );
   }, [entries, loading]);

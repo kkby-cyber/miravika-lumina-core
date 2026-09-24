@@ -66,10 +66,7 @@ export async function mergeGuestWishlistIntoCustomer() {
         continue;
       }
 
-      await addCustomerWishlistItem(
-        toFrontendProduct(product),
-        entry.variantId,
-      );
+      await addCustomerWishlistItem(toFrontendProduct(product), entry.variantId);
 
       useWishlistStore.getState().remove(entry.handle, entry.variantId);
       merged += 1;

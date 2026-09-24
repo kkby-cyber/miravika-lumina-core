@@ -40,9 +40,7 @@ export const useWishlistStore = create<WishlistStore>()(
         set((state) => {
           const key = entryKey({ handle, variantId });
 
-          const exists = state.entries.some(
-            (entry) => entryKey(entry) === key,
-          );
+          const exists = state.entries.some((entry) => entryKey(entry) === key);
 
           const entries = exists
             ? state.entries.filter((entry) => entryKey(entry) !== key)
@@ -52,9 +50,7 @@ export const useWishlistStore = create<WishlistStore>()(
         }),
 
       has: (handle, variantId = null) =>
-        get().entries.some(
-          (entry) => entryKey(entry) === entryKey({ handle, variantId }),
-        ),
+        get().entries.some((entry) => entryKey(entry) === entryKey({ handle, variantId })),
 
       remove: (handle, variantId) =>
         set((state) => {
@@ -62,8 +58,7 @@ export const useWishlistStore = create<WishlistStore>()(
             variantId === undefined
               ? state.entries.filter((entry) => entry.handle !== handle)
               : state.entries.filter(
-                  (entry) =>
-                    entryKey(entry) !== entryKey({ handle, variantId }),
+                  (entry) => entryKey(entry) !== entryKey({ handle, variantId }),
                 );
 
           return { entries };
@@ -73,17 +68,17 @@ export const useWishlistStore = create<WishlistStore>()(
         set({
           entries: entries.filter(
             (entry, index, all) =>
-              all.findIndex((candidate) => entryKey(candidate) === entryKey(entry)) ===
-              index,
+              all.findIndex((candidate) => entryKey(candidate) === entryKey(entry)) === index,
           ),
         }),
 
       setHydrated: (hydrated) => set({ hydrated }),
 
-      clear: () => set({
-        entries: [],
-        hydrated: false,
-      }),
+      clear: () =>
+        set({
+          entries: [],
+          hydrated: false,
+        }),
     }),
     {
       name: "miravika-wishlist",

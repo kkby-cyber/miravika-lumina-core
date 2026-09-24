@@ -25,9 +25,7 @@ export function ProductCard({
   const variantEdges = p.variants.edges;
   // Prefer the first purchasable variant — never judge stock by variant #1 alone.
   const variant =
-    (variantId
-      ? variantEdges.find((v) => v.node.id === variantId)?.node
-      : undefined) ??
+    (variantId ? variantEdges.find((v) => v.node.id === variantId)?.node : undefined) ??
     (variantEdges.find((v) => v.node.availableForSale) ?? variantEdges[0])?.node;
   const img = p.images.edges[0]?.node;
   const img2 = p.images.edges[1]?.node;

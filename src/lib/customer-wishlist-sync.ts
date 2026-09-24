@@ -34,9 +34,7 @@ async function performCustomerWishlistSync() {
         variantId: item.variant_id ?? null,
       };
     })
-    .filter(
-      (entry): entry is { handle: string; variantId: string | null } => Boolean(entry),
-    );
+    .filter((entry): entry is { handle: string; variantId: string | null } => Boolean(entry));
 
   useWishlistStore.getState().setEntries(entries);
   useWishlistStore.getState().setHydrated(true);

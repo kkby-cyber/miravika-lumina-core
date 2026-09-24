@@ -18,9 +18,9 @@ export const Route = createFileRoute("/shop")({
         property: "og:description",
         content: "The full Miravika edit — fashion, jewelry, beauty and home.",
       },
-      { property: "og:url", content: "https://miravika-lumina-core.lovable.app/shop" },
+      { property: "og:url", content: "https://miravika.com/shop" },
     ],
-    links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/shop" }],
+    links: [{ rel: "canonical", href: "https://miravika.com/shop" }],
   }),
   component: Shop,
 });

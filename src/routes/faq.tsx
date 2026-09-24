@@ -22,9 +22,9 @@ export const Route = createFileRoute("/faq")({
           property: "og:description",
           content: "Everything you need to know about shopping with MIRAVIKA.",
         },
-        { property: "og:url", content: "https://miravika-lumina-core.lovable.app/faq" },
+        { property: "og:url", content: "https://miravika.com/faq" },
       ],
-      links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/faq" }],
+      links: [{ rel: "canonical", href: "https://miravika.com/faq" }],
       scripts: [
         {
           type: "application/ld+json",
@@ -48,13 +48,13 @@ export const Route = createFileRoute("/faq")({
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://miravika-lumina-core.lovable.app/",
+                item: "https://miravika.com/",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "FAQs",
-                item: "https://miravika-lumina-core.lovable.app/faq",
+                item: "https://miravika.com/faq",
               },
             ],
           }),

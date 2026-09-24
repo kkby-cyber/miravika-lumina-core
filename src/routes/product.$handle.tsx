@@ -45,7 +45,7 @@ function titleCase(s: string) {
 export const Route = createFileRoute("/product/$handle")({
   head: ({ params }) => {
     const readable = titleCase(params.handle);
-    const url = `https://miravika-lumina-core.lovable.app/product/${params.handle}`;
+    const url = `https://miravika.com/product/${params.handle}`;
     // Unique description per product handle so no two PDPs share the same meta description
     const description = `Shop ${readable} at MIRAVIKA — a curated piece from our premium global lifestyle edit. Worldwide shipping, 7-day easy returns and a secure encrypted checkout.`;
     return {
@@ -72,13 +72,13 @@ export const Route = createFileRoute("/product/$handle")({
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://miravika-lumina-core.lovable.app/",
+                item: "https://miravika.com/",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Shop",
-                item: "https://miravika-lumina-core.lovable.app/shop",
+                item: "https://miravika.com/shop",
               },
               { "@type": "ListItem", position: 3, name: readable, item: url },
             ],
@@ -334,7 +334,7 @@ function ProductPage() {
     productID: `MIRAVIKA_IN_${handle}`,
     brand: { "@type": "Brand", name: "MIRAVIKA" },
     category: product.productType ?? "Fashion & Lifestyle",
-    url: `https://miravika-lumina-core.lovable.app/product/${handle}`,
+    url: `https://miravika.com/product/${handle}`,
     // Only emitted when genuine, published reviews exist
     ...(aggregate
       ? {
@@ -369,7 +369,7 @@ function ProductPage() {
       availability: variant?.availableForSale
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
-      url: `https://miravika-lumina-core.lovable.app/product/${handle}`,
+      url: `https://miravika.com/product/${handle}`,
       seller: { "@type": "Organization", name: "MIRAVIKA" },
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/about")({
         content: "Affordable luxury, thoughtfully curated. Discover the story behind MIRAVIKA.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/about" }],
+    links: [{ rel: "canonical", href: "https://miravika.com/about" }],
   }),
   component: About,
 });

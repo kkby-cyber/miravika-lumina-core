@@ -6,4 +6,4 @@ Disallow: /account
 Disallow: /thank-you
 Disallow: /search
 
-Sitemap: https://miravika-lumina-core.lovable.app/sitemap.xml
+Sitemap: https://miravika.com/sitemap.xml

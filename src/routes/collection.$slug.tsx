@@ -39,7 +39,7 @@ export const Route = createFileRoute("/collection/$slug")({
       sub: "Curated by Miravika.",
     };
     // Canonical URL is the category slug itself — legacy variants redirect here
-    const canonical = `https://miravika-lumina-core.lovable.app/collection/${params.slug}`;
+    const canonical = `https://miravika.com/collection/${params.slug}`;
     return {
       meta: [
         { title: `${copy.title} — Shop the Edit | MIRAVIKA` },
@@ -64,13 +64,13 @@ export const Route = createFileRoute("/collection/$slug")({
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://miravika-lumina-core.lovable.app/",
+                item: "https://miravika.com/",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Shop",
-                item: "https://miravika-lumina-core.lovable.app/shop",
+                item: "https://miravika.com/shop",
               },
               { "@type": "ListItem", position: 3, name: copy.title, item: canonical },
             ],
@@ -87,7 +87,7 @@ export const Route = createFileRoute("/collection/$slug")({
             isPartOf: {
               "@type": "WebSite",
               name: "MIRAVIKA",
-              url: "https://miravika-lumina-core.lovable.app/",
+              url: "https://miravika.com/",
             },
           }),
         },

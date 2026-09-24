@@ -124,7 +124,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "MIRAVIKA",
-          url: "https://miravika-lumina-core.lovable.app/",
+          url: "https://miravika.com/",
           sameAs: [
             "https://instagram.com/miravika.india",
             "https://facebook.com/miravika",

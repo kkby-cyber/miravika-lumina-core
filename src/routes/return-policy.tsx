@@ -11,7 +11,7 @@ export const Route = createFileRoute("/return-policy")({
           "Easy 7-day returns and exchanges on eligible MIRAVIKA orders. Read the full return and refund policy.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/return-policy" }],
+    links: [{ rel: "canonical", href: "https://miravika.com/return-policy" }],
   }),
   component: () => (
     <PolicyPage title="Returns & Exchanges">

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/terms")({
           "The terms and conditions governing your use of miravika.com and purchases from MIRAVIKA.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/terms" }],
+    links: [{ rel: "canonical", href: "https://miravika.com/terms" }],
   }),
   component: () => (
     <PolicyPage title="Terms & Conditions">

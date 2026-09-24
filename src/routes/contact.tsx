@@ -17,7 +17,7 @@ export const Route = createFileRoute("/contact")({
           "Reach the MIRAVIKA customer care team by email, WhatsApp or Instagram. We reply within 24 hours, Monday to Saturday.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/contact" }],
+    links: [{ rel: "canonical", href: "https://miravika.com/contact" }],
   }),
   component: Contact,
 });

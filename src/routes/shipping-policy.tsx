@@ -11,7 +11,7 @@ export const Route = createFileRoute("/shipping-policy")({
           "MIRAVIKA shipping timelines, charges, payment options and international delivery.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/shipping-policy" }],
+    links: [{ rel: "canonical", href: "https://miravika.com/shipping-policy" }],
   }),
   component: () => (
     <PolicyPage title="Shipping Policy">

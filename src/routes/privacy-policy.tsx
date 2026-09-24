@@ -10,7 +10,7 @@ export const Route = createFileRoute("/privacy-policy")({
         content: "How MIRAVIKA collects, uses and protects your personal information.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://miravika-lumina-core.lovable.app/privacy-policy" }],
+    links: [{ rel: "canonical", href: "https://miravika.com/privacy-policy" }],
   }),
   component: () => (
     <PolicyPage title="Privacy Policy">

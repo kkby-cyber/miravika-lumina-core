@@ -71,7 +71,7 @@ function MiniAddRow({ product, onDone }: { product: FrontendProduct; onDone?: ()
   const addItem = useCartStore((s) => s.addItem);
   const [busy, setBusy] = useState(false);
   const p = product;
-  const variant = p.variants.edges[0]?.node;
+  const variant = p.variants.edges.find((v) => v.node.availableForSale)?.node ?? p.variants.edges[0]?.node;
   const img = p.images.edges[0]?.node;
 
   const add = async () => {

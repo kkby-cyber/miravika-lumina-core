@@ -119,11 +119,12 @@ function ProductPage() {
   const variant = useMemo(() => {
     if (!product) return null;
     const variants = product.variants.edges.map((e) => e.node);
-    if (Object.keys(selected).length === 0) return variants[0];
+    const firstAvailable = variants.find((v) => v.availableForSale) ?? variants[0];
+    if (Object.keys(selected).length === 0) return firstAvailable;
     return (
       variants.find((v) =>
         v.selectedOptions.every((o) => !selected[o.name] || selected[o.name] === o.value),
-      ) ?? variants[0]
+      ) ?? firstAvailable
     );
   }, [product, selected]);
 

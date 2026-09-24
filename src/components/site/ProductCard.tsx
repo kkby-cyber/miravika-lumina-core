@@ -14,15 +14,21 @@ import { itemFromProduct, trackAddToWishlist, trackRemoveFromWishlist } from "@/
 
 export function ProductCard({
   product,
+  variantId,
   priority = false,
 }: {
   product: FrontendProduct;
+  variantId?: string | null;
   priority?: boolean;
 }) {
   const p = product;
   const variantEdges = p.variants.edges;
   // Prefer the first purchasable variant — never judge stock by variant #1 alone.
-  const variant = (variantEdges.find((v) => v.node.availableForSale) ?? variantEdges[0])?.node;
+  const variant =
+    (variantId
+      ? variantEdges.find((v) => v.node.id === variantId)?.node
+      : undefined) ??
+    (variantEdges.find((v) => v.node.availableForSale) ?? variantEdges[0])?.node;
   const img = p.images.edges[0]?.node;
   const img2 = p.images.edges[1]?.node;
   const addItem = useCartStore((s) => s.addItem);

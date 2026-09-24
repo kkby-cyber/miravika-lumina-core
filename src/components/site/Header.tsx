@@ -26,7 +26,7 @@ const ANNOUNCEMENTS = [
 export function Header() {
   const totalItems = useCartStore((s) => s.items.reduce((a, b) => a + b.quantity, 0));
   const setOpen = useCartStore((s) => s.setOpen);
-  const wishlistCount = useWishlistStore((s) => s.handles.length);
+  const wishlistCount = useWishlistStore((s) => s.entries.length);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [announceIdx, setAnnounceIdx] = useState(0);

@@ -19,8 +19,10 @@ export const Route = createFileRoute("/wishlist")({
 });
 
 function Wishlist() {
-  const handles = useWishlistStore((s) => s.handles);
-  const [items, setItems] = useState<FrontendProduct[]>([]);
+  const entries = useWishlistStore((s) => s.entries);
+  const [items, setItems] = useState<
+    Array<{ product: FrontendProduct; variantId: string | null }>
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +34,8 @@ function Wishlist() {
       try {
         await syncCustomerWishlist();
 
-        const currentHandles = [...useWishlistStore.getState().handles];
+        const currentEntries = [...useWishlistStore.getState().entries];
+        const currentHandles = [...new Set(currentEntries.map((entry) => entry.handle))];
 
         const results = await Promise.all(
           currentHandles.map(async (handle) => {
@@ -46,7 +49,18 @@ function Wishlist() {
         );
 
         if (!cancelled) {
-          setItems(results.filter((product): product is FrontendProduct => product !== null));
+          const products = new Map(
+            results
+              .filter((product): product is FrontendProduct => product !== null)
+              .map((product) => [product.handle, product]),
+          );
+
+          setItems(
+            currentEntries.flatMap((entry) => {
+              const product = products.get(entry.handle);
+              return product ? [{ product, variantId: entry.variantId }] : [];
+            }),
+          );
         }
       } catch (error) {
         console.error("Wishlist page load failed:", error);
@@ -71,9 +85,18 @@ function Wishlist() {
   useEffect(() => {
     if (loading) return;
 
-    const visibleItems = new Set(handles);
-    setItems((current) => current.filter((product) => visibleItems.has(product.handle)));
-  }, [handles, loading]);
+    const visibleEntries = new Set(
+      entries.map((entry) => `${entry.handle}::${entry.variantId ?? "product"}`),
+    );
+
+    setItems((current) =>
+      current.filter((item) =>
+        visibleEntries.has(
+          `${item.product.handle}::${item.variantId ?? "product"}`,
+        ),
+      ),
+    );
+  }, [entries, loading]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:py-16">
@@ -100,8 +123,12 @@ function Wishlist() {
         </div>
       ) : (
         <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6">
-          {items.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {items.map(({ product, variantId }) => (
+            <ProductCard
+              key={`${product.id}-${variantId ?? "product"}`}
+              product={product}
+              variantId={variantId}
+            />
           ))}
         </div>
       )}

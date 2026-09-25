@@ -18,9 +18,10 @@ export const Route = createFileRoute("/thank-you")({
 });
 
 /**
- * Fires the GA4/Ads purchase conversion when Shopify returns the shopper here
- * with order details (?order_id=&value=&currency=). De-duplicated per order id
- * inside trackPurchase, so refreshes never double-count a conversion.
+ * Fires the GA4/Ads purchase conversion after Nexus/Razorpay checkout redirects
+ * the verified shopper here with order details (?order_id=&value=&currency=).
+ * De-duplicated per order id inside trackPurchase, so refreshes never
+ * double-count a conversion.
  */
 function usePurchaseConversion() {
   useEffect(() => {

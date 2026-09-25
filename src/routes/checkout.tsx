@@ -72,7 +72,7 @@ declare global {
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { items, cost, isLoading, syncCart } = useCartStore();
+  const { items, cost, isLoading, clearCart, syncCart } = useCartStore();
 
   const [form, setForm] = useState<FormState>({
     full_name: "",
@@ -312,7 +312,7 @@ function CheckoutPage() {
               );
             }
 
-            await syncCart();
+            await clearCart();
 
             const params = new URLSearchParams({
               order_id: verification.data.order_number,

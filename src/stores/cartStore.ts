@@ -71,7 +71,7 @@ interface CartStore {
   addItem: (item: Omit<CartItem, "lineId">) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number) => Promise<void>;
   removeItem: (variantId: string) => Promise<void>;
-  clearCart: () => void;
+  clearCart: () => Promise<void>;
   syncCart: () => Promise<void>;
   getCheckoutUrl: () => string | null;
   discountCode: string | null;
@@ -331,7 +331,7 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      clearCart: () => {
+      clearCart: async () => {
         set({
           items: [],
           cartId: null,
@@ -339,7 +339,11 @@ export const useCartStore = create<CartStore>()(
           cost: null,
         });
 
-        void nexusCartRequest("POST", { action: "clear" }).catch((error) => console.error(error));
+        try {
+          await nexusCartRequest("POST", { action: "clear" });
+        } catch (error) {
+          console.error("Failed to clear Nexus cart after checkout:", error);
+        }
       },
 
       syncCart: async () => {

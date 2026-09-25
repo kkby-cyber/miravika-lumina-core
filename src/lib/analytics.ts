@@ -115,15 +115,12 @@ export const trackBeginCheckout = (items: GA4Item[], currency: string) => {
 /**
  * Purchase / conversion event — the ONLY place a purchase may be reported.
  *
- * Shopify hosts checkout and owns the order, so this is called from exactly two
- * genuine post-order surfaces:
- *   1. the Shopify Customer Events "Custom Pixel" (checkout_completed), which
- *      pushes the same payload into GTM-PVNR5BST on Shopify's own thank-you page;
- *   2. /thank-you, as a fallback when Shopify returns the shopper here with
- *      order parameters.
- * Both paths key off the real Shopify order id, and the de-duplication guard
- * below is persistent, so a refresh, a re-visit or both surfaces firing can
- * never produce a second conversion.
+ * MIRAVIKA uses Nexus for order creation and Razorpay for payment processing.
+ * The verified post-payment /thank-you surface reports the Nexus order number
+ * as the transaction id.
+ *
+ * The persistent localStorage guard prevents refreshes or re-visits from
+ * reporting the same order more than once.
  */
 export function trackPurchase(order: {
   transaction_id: string;
@@ -134,7 +131,7 @@ export function trackPurchase(order: {
   coupon?: string;
   items?: GA4Item[];
 }) {
-  // Only a real, Shopify-confirmed order with a positive amount may convert.
+  // Only a verified MIRAVIKA order with a positive amount may convert.
   if (typeof window === "undefined" || !order.transaction_id) return;
   if (!Number.isFinite(order.value) || order.value <= 0) return;
   const key = `miravika_purchase_${order.transaction_id}`;

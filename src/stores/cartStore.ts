@@ -332,18 +332,17 @@ export const useCartStore = create<CartStore>()(
       },
 
       clearCart: async () => {
+        // Clear Nexus first so a successful payment never leaves the
+        // authoritative server cart populated while the local UI appears empty.
+        await nexusCartRequest("POST", { action: "clear" });
+
+        // Only clear local state after the authoritative Nexus cart clear succeeds.
         set({
           items: [],
           cartId: null,
           checkoutUrl: null,
           cost: null,
         });
-
-        try {
-          await nexusCartRequest("POST", { action: "clear" });
-        } catch (error) {
-          console.error("Failed to clear Nexus cart after checkout:", error);
-        }
       },
 
       syncCart: async () => {

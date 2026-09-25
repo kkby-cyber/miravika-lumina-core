@@ -312,7 +312,15 @@ function CheckoutPage() {
               );
             }
 
-            await clearCart();
+            try {
+              await clearCart();
+            } catch (clearError) {
+              console.error("Payment verified but Nexus cart cleanup failed:", clearError);
+              throw new Error(
+                "Payment was confirmed, but your shopping bag could not be cleared. " +
+                  "Please refresh the page or contact MIRAVIKA support if the bag still shows items.",
+              );
+            }
 
             const params = new URLSearchParams({
               order_id: verification.data.order_number,

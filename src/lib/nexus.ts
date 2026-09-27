@@ -1,6 +1,8 @@
+import { getCartToken, setCartToken } from "@/lib/nexus-cart-token";
+
 const NEXUS_API_URL = import.meta.env.VITE_NEXUS_API_URL;
 
-function getNexusApiUrl(): string {
+export function getNexusApiUrl(): string {
   if (!NEXUS_API_URL) {
     throw new Error(
       "MIRAVIKA Nexus API is not configured. Set VITE_NEXUS_API_URL in the deployment environment.",
@@ -8,6 +10,75 @@ function getNexusApiUrl(): string {
   }
 
   return NEXUS_API_URL.replace(/\/$/, "");
+}
+
+/** Narrows an unknown JSON payload to the `{ success, data, error }` envelope. */
+function parseEnvelope<T>(body: unknown): NexusResponse<T> {
+  if (!body || typeof body !== "object") {
+    throw new NexusApiError("MALFORMED_RESPONSE", "The store could not be reached.", 0);
+  }
+  return body as NexusResponse<T>;
+}
+
+/**
+ * Error raised by the Nexus client. `code` is the backend's stable machine code
+ * (e.g. `OUT_OF_STOCK`) so callers can branch on it; `message` is always a
+ * user-safe string produced by Nexus, never a raw provider or SQL error.
+ */
+export class NexusApiError extends Error {
+  readonly code: string;
+  readonly status: number;
+
+  constructor(code: string, message: string, status: number) {
+    super(message);
+    this.name = "NexusApiError";
+    this.code = code;
+    this.status = status;
+  }
+}
+
+async function nexusRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  const { supabase } = await import("@/integrations/supabase/client");
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  const headers = new Headers(init?.headers);
+  headers.set("Accept", "application/json");
+
+  if (session?.access_token) {
+    headers.set("Authorization", `Bearer ${session.access_token}`);
+  }
+
+  // Guest carts are identified by the server-issued token, never a local one.
+  const cartToken = getCartToken();
+  if (cartToken) headers.set("x-cart-token", cartToken);
+
+  let response: Response;
+  try {
+    response = await fetch(`${getNexusApiUrl()}${path}`, {
+      ...init,
+      headers,
+    });
+  } catch {
+    throw new NexusApiError(
+      "NETWORK_UNAVAILABLE",
+      "We could not reach MIRAVIKA. Please check your connection and try again.",
+      0,
+    );
+  }
+
+  const body = parseEnvelope<T>(await response.json().catch(() => null));
+
+  if (!response.ok || !body.success) {
+    throw new NexusApiError(
+      body.error?.code ?? "REQUEST_FAILED",
+      body.error?.message ?? "Something went wrong. Please try again.",
+      response.status,
+    );
+  }
+
+  return body.data;
 }
 
 export interface NexusImage {
@@ -76,37 +147,6 @@ interface NexusResponse<T> {
     code?: string;
     message?: string;
   };
-}
-
-async function nexusRequest<T>(path: string, init?: RequestInit): Promise<T> {
-  const { supabase } = await import("@/integrations/supabase/client");
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const headers = new Headers(init?.headers);
-  headers.set("Accept", "application/json");
-
-  if (session?.access_token) {
-    headers.set("Authorization", `Bearer ${session.access_token}`);
-  }
-
-  const response = await fetch(`${getNexusApiUrl()}${path}`, {
-    ...init,
-    headers,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Nexus API request failed: ${response.status}`);
-  }
-
-  const body = (await response.json()) as NexusResponse<T>;
-
-  if (!body.success) {
-    throw new Error(body.error?.message || "Nexus API request failed");
-  }
-
-  return body.data;
 }
 
 export async function getNexusProducts(
@@ -359,5 +399,92 @@ export async function getNexusShippingQuote(options: {
       items: options.items,
       cod: options.cod ?? false,
     }),
+  });
+}
+
+/* -------------------------------------------------------------------------- */
+/* Checkout & payments                                                        */
+/* -------------------------------------------------------------------------- */
+
+/** Address shape required by the Nexus checkout contract. */
+export interface NexusCheckoutAddress {
+  full_name: string;
+  phone: string;
+  line1: string;
+  line2?: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+}
+
+export interface NexusCheckoutTotals {
+  subtotal: number;
+  discount: number;
+  tax: number;
+  shipping: number;
+  total: number;
+  currency: string;
+}
+
+export interface NexusCheckoutResult {
+  order_id: string;
+  order_number: string;
+  totals: NexusCheckoutTotals;
+  razorpay: {
+    key_id: string;
+    order_id: string;
+    amount: number;
+    currency: string;
+  };
+}
+
+/**
+ * Creates the Nexus order and its Razorpay order.
+ *
+ * Only customer/contact details, the address, and line identifiers are sent.
+ * Prices, tax, shipping, discounts and inventory are computed by Nexus from the
+ * `sku`/`quantity` pairs and are never taken from the browser.
+ */
+export async function createNexusCheckout(input: {
+  email: string;
+  phone: string;
+  full_name: string;
+  items: Array<{ sku: string; quantity: number }>;
+  shipping_address: NexusCheckoutAddress;
+  billing_address?: NexusCheckoutAddress | null;
+  billing_same_as_shipping: boolean;
+  shipping_method_id?: string | null;
+  coupon_code?: string | null;
+}) {
+  return nexusRequest<NexusCheckoutResult>("/api/public/checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+}
+
+export interface NexusPaymentProof {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+export interface NexusPaymentVerification {
+  order_number: string;
+  status: string;
+  duplicate: boolean;
+}
+
+/**
+ * Hands the Razorpay callback to Nexus, which verifies the signature server-side
+ * and confirms the payment with the provider. The browser never decides that an
+ * order is paid; this response is the only accepted proof.
+ */
+export async function verifyNexusPayment(proof: NexusPaymentProof) {
+  return nexusRequest<NexusPaymentVerification>("/api/public/payments/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(proof),
   });
 }

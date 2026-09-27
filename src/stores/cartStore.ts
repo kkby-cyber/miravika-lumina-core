@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { FrontendProduct } from "@/lib/nexus-product";
 import { itemFromProduct, trackAddToCart, trackRemoveFromCart } from "@/lib/analytics";
+import { getCartToken, setCartToken } from "@/lib/nexus-cart-token";
 import { toast } from "sonner";
 
 function cartError(message = "We couldn't update your bag. Please try again.") {
@@ -66,6 +67,12 @@ interface CartStore {
   checkoutUrl: string | null;
   isLoading: boolean;
   isSyncing: boolean;
+  /**
+   * True once the authoritative Nexus cart has been fetched at least once.
+   * Checkout stays disabled until then so a stale localStorage bag can never be
+   * submitted before Nexus has validated it.
+   */
+  isHydrated: boolean;
   isOpen: boolean;
   setOpen: (o: boolean) => void;
   addItem: (item: Omit<CartItem, "lineId">) => Promise<void>;
@@ -82,55 +89,137 @@ interface CartStore {
 
 const NEXUS_API_URL = import.meta.env.VITE_NEXUS_API_URL;
 
-function getCartToken() {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("miravika-cart-token");
-}
-
-function setCartToken(token: string | null) {
-  if (typeof window === "undefined") return;
-  if (token) localStorage.setItem("miravika-cart-token", token);
-  else localStorage.removeItem("miravika-cart-token");
-}
+/** Monotonic request id so a slow response can never overwrite a newer one. */
+let latestSyncRequest = 0;
 
 async function nexusCartRequest(
   method: "GET" | "POST",
   body?: Record<string, unknown>,
 ): Promise<NexusCartResponse> {
+  const { supabase } = await import("@/integrations/supabase/client");
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   const token = getCartToken();
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
+  // Authenticated customers are keyed by user id on Nexus; guests by cart token.
+  if (session?.access_token) {
+    headers["Authorization"] = `Bearer ${session.access_token}`;
+  }
   if (token) headers["x-cart-token"] = token;
 
-  const response = await fetch(`${NEXUS_API_URL}/api/public/cart`, {
-    method,
-    headers,
-    body: method === "POST" ? JSON.stringify(body ?? {}) : undefined,
-    credentials: "include",
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${NEXUS_API_URL}/api/public/cart`, {
+      method,
+      headers,
+      body: method === "POST" ? JSON.stringify(body ?? {}) : undefined,
+    });
+  } catch {
+    throw new Error("CART_UNAVAILABLE");
+  }
 
-  const data = (await response.json()) as NexusCartResponse;
+  const data = (await response.json().catch(() => null)) as NexusCartResponse | null;
+
+  if (!data) {
+    throw new Error("CART_UNAVAILABLE");
+  }
 
   if (!response.ok || !data.success) {
     const code = data.error?.code ?? "CART_UNAVAILABLE";
     throw new Error(code);
   }
 
-  if (data.cart_token) setCartToken(data.cart_token);
+  // Persist exactly the token Nexus issued; never mint one locally.
+  if (data.data?.cart_token) setCartToken(data.data.cart_token);
 
   return data;
 }
 
-function cartItemToLocal(item: NexusCartItem, existing: CartItem | undefined): CartItem | null {
-  if (!existing) return null;
+/**
+ * Builds a displayable product for a line the server returned but that has no
+ * local counterpart (another device, or a bag persisted before the sync).
+ *
+ * The Nexus cart projection carries only `title`, `slug`, `price` and the
+ * variant's `title`/`sku`/`price` — so the line is rendered with the
+ * server-authoritative price and a graceful, image-less placeholder. Returning
+ * `null` here would silently drop a real item from the customer's bag.
+ */
+function placeholderProduct(item: NexusCartItem): FrontendProduct | null {
+  const title = item.products?.title?.trim();
+  const slug = item.products?.slug?.trim();
+
+  if (!title || !slug) return null;
+
+  const price = item.product_variants?.price ?? item.products?.price ?? 0;
+  const variantId = item.variant_id ?? item.product_id;
+  const sku = item.product_variants?.sku ?? item.product_id;
+  const variantTitle = item.product_variants?.title ?? "Default Title";
 
   return {
-    ...existing,
+    id: item.product_id,
+    title,
+    description: "",
+    shortDescription: "",
+    handle: slug,
+    availableForSale: true,
+    productType: "",
+    tags: [],
+    priceRange: { minVariantPrice: { amount: String(price), currencyCode: "INR" } },
+    compareAtPrice: null,
+    images: { edges: [] },
+    variants: {
+      edges: [
+        {
+          node: {
+            id: variantId,
+            sku,
+            title: variantTitle,
+            price: { amount: String(price), currencyCode: "INR" },
+            mrp: null,
+            compareAtPrice: null,
+            availableForSale: true,
+            selectedOptions: [],
+          },
+        },
+      ],
+    },
+    options: [],
+    media: { edges: [] },
+    brand: "MIRAVIKA",
+    sku,
+    mrp: null,
+    price: String(price),
+    inventoryQuantity: Number(item.quantity),
+  };
+}
+
+function cartItemToLocal(item: NexusCartItem, existing: CartItem | undefined): CartItem | null {
+  // The server price is authoritative; only presentation data is reused locally.
+  const product = existing?.product ?? placeholderProduct(item);
+  if (!product) return null;
+
+  const serverPrice = item.product_variants?.price ?? item.products?.price;
+  const price =
+    serverPrice != null
+      ? { amount: String(serverPrice), currencyCode: existing?.price.currencyCode ?? "INR" }
+      : (existing?.price ?? { amount: "0", currencyCode: "INR" });
+
+  const variantId = item.variant_id ?? item.product_id;
+
+  return {
     lineId: item.id,
-    quantity: Number(item.quantity),
+    product,
+    variantId,
+    variantTitle: item.product_variants?.title ?? existing?.variantTitle ?? "Default Title",
+    price,
+    quantity: Math.max(1, Number(item.quantity) || 1),
+    selectedOptions: existing?.selectedOptions ?? [],
   };
 }
 
@@ -154,6 +243,7 @@ export const useCartStore = create<CartStore>()(
       checkoutUrl: null,
       isLoading: false,
       isSyncing: false,
+      isHydrated: false,
       isOpen: false,
 
       setOpen: (isOpen) => set({ isOpen }),
@@ -346,13 +436,17 @@ export const useCartStore = create<CartStore>()(
       },
 
       syncCart: async () => {
-        const { isSyncing } = get();
-        if (isSyncing) return;
+        // Sequence every request; a slow earlier response must never overwrite a
+        // newer authoritative snapshot (and must never resurrect removed lines).
+        const requestId = ++latestSyncRequest;
 
         set({ isSyncing: true });
 
         try {
           const result = await nexusCartRequest("GET");
+
+          if (requestId !== latestSyncRequest) return;
+
           const serverItems = result.data?.items ?? [];
           const localItems = get().items;
 
@@ -361,7 +455,9 @@ export const useCartStore = create<CartStore>()(
           for (const serverItem of serverItems) {
             const existing = localItems.find(
               (localItem) =>
-                localItem.lineId === serverItem.id || localItem.variantId === serverItem.variant_id,
+                localItem.lineId === serverItem.id ||
+                (!!serverItem.variant_id && localItem.variantId === serverItem.variant_id) ||
+                (!!serverItem.product_id && localItem.product.id === serverItem.product_id),
             );
 
             const mapped = cartItemToLocal(serverItem, existing);
@@ -372,11 +468,15 @@ export const useCartStore = create<CartStore>()(
             items: reconciled,
             cartId: result.data?.cart?.id ?? null,
             cost: reconciled.length ? calculateCost(reconciled) : null,
+            isHydrated: true,
           });
         } catch (error) {
+          if (requestId !== latestSyncRequest) return;
+          // Nexus is unreachable: keep the local bag so nothing is lost, but leave
+          // `isHydrated` false so checkout stays disabled until Nexus validates.
           console.error(error);
         } finally {
-          set({ isSyncing: false });
+          if (requestId === latestSyncRequest) set({ isSyncing: false });
         }
       },
 

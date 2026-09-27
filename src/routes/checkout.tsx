@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, LockKeyhole, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,12 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/format-price";
 import { trackBeginCheckout } from "@/lib/analytics";
 import { loadRazorpay } from "@/lib/razorpay";
-import { getNexusShippingQuote } from "@/lib/nexus";
+import { createNexusCheckout, getNexusShippingQuote, type NexusCheckoutTotals } from "@/lib/nexus";
+import {
+  completeVerifiedPayment,
+  createSubmissionGuard,
+  isRetryableVerificationFailure,
+} from "@/lib/payment-completion";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -37,31 +42,6 @@ type FormState = {
   postal_code: string;
 };
 
-type CheckoutResponse = {
-  success: boolean;
-  data?: {
-    order_id: string;
-    order_number: string;
-    totals: {
-      subtotal: number;
-      discount: number;
-      tax: number;
-      shipping: number;
-      total: number;
-      currency: string;
-    };
-    razorpay: {
-      key_id: string;
-      order_id: string;
-      amount: number;
-      currency: string;
-    };
-  };
-  error?: {
-    message?: string;
-  };
-};
-
 declare global {
   interface Window {
     Razorpay?: new (options: Record<string, unknown>) => {
@@ -72,7 +52,12 @@ declare global {
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { items, cost, isLoading, clearCart, syncCart } = useCartStore();
+  const { items, cost, isLoading, isHydrated, isSyncing, clearCart, syncCart } = useCartStore();
+
+  // Guards against a second submission while one is already in flight. `loading`
+  // alone is not enough: state updates are async, so two rapid clicks could both
+  // pass the `disabled` check and create two Nexus orders.
+  const submitting = useRef(createSubmissionGuard());
 
   const [form, setForm] = useState<FormState>({
     full_name: "",
@@ -182,72 +167,69 @@ function CheckoutPage() {
   };
 
   const submitCheckout = async () => {
-    setError("");
-
-    if (!items.length) {
-      setError("Your bag is empty.");
-      return;
-    }
-
-    const required: Array<keyof FormState> = [
-      "full_name",
-      "email",
-      "phone",
-      "line1",
-      "city",
-      "state",
-      "postal_code",
-    ];
-
-    if (required.some((field) => !form[field].trim())) {
-      setError("Please complete all required delivery details.");
-      return;
-    }
-
-    if (!/^\d{10}$/.test(form.phone.replace(/\D/g, ""))) {
-      setError("Please enter a valid 10-digit mobile number.");
-      return;
-    }
-
-    if (!/^\d{6}$/.test(form.postal_code.trim())) {
-      setError("Please enter a valid 6-digit PIN code.");
-      return;
-    }
-
-    setLoading(true);
+    // Synchronous guard: two rapid clicks must never create two Nexus orders.
+    if (!submitting.current.begin()) return;
 
     try {
-      const response = await fetch("/api/public/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.email.trim(),
-          phone: form.phone.replace(/\D/g, ""),
-          full_name: form.full_name.trim(),
-          items: cartItems,
-          shipping_address: {
-            full_name: form.full_name.trim(),
-            phone: form.phone.replace(/\D/g, ""),
-            line1: form.line1.trim(),
-            ...(form.line2.trim() ? { line2: form.line2.trim() } : {}),
-            city: form.city.trim(),
-            state: form.state.trim(),
-            postal_code: form.postal_code.trim(),
-            country: "IN",
-          },
-          billing_same_as_shipping: true,
-        }),
-      });
+      setError("");
 
-      const result = (await response.json()) as CheckoutResponse;
-
-      if (!response.ok || !result.success || !result.data) {
-        throw new Error(result.error?.message || "We could not create your order.");
+      if (!items.length) {
+        setError("Your bag is empty.");
+        return;
       }
 
-      const checkout = result.data;
+      // Never submit a bag Nexus has not validated yet.
+      if (!isHydrated) {
+        setError("We're confirming your bag with MIRAVIKA. Please try again in a moment.");
+        return;
+      }
+
+      const required: Array<keyof FormState> = [
+        "full_name",
+        "email",
+        "phone",
+        "line1",
+        "city",
+        "state",
+        "postal_code",
+      ];
+
+      if (required.some((field) => !form[field].trim())) {
+        setError("Please complete all required delivery details.");
+        return;
+      }
+
+      if (!/^\d{10}$/.test(form.phone.replace(/\D/g, ""))) {
+        setError("Please enter a valid 10-digit mobile number.");
+        return;
+      }
+
+      if (!/^\d{6}$/.test(form.postal_code.trim())) {
+        setError("Please enter a valid 6-digit PIN code.");
+        return;
+      }
+
+      setLoading(true);
+
+      // Only identifiers and quantities leave the browser. Nexus re-prices the
+      // cart, applies tax/shipping/coupons and reserves inventory server-side.
+      const checkout = await createNexusCheckout({
+        email: form.email.trim(),
+        phone: form.phone.replace(/\D/g, ""),
+        full_name: form.full_name.trim(),
+        items: cartItems,
+        shipping_address: {
+          full_name: form.full_name.trim(),
+          phone: form.phone.replace(/\D/g, ""),
+          line1: form.line1.trim(),
+          ...(form.line2.trim() ? { line2: form.line2.trim() } : {}),
+          city: form.city.trim(),
+          state: form.state.trim(),
+          postal_code: form.postal_code.trim(),
+          country: "IN",
+        },
+        billing_same_as_shipping: true,
+      });
 
       await loadRazorpay();
 
@@ -276,7 +258,9 @@ function CheckoutPage() {
           color: "#C9A86A",
         },
         modal: {
+          // Dismissing the modal is not a failure; the customer may retry.
           ondismiss: () => {
+            submitting.current.release();
             setLoading(false);
           },
         },
@@ -285,76 +269,49 @@ function CheckoutPage() {
           razorpay_payment_id: string;
           razorpay_signature: string;
         }) => {
-          try {
-            const verifyResponse = await fetch("/api/public/payments/verify", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(payment),
-            });
+          // Nexus verifies the signature and confirms with Razorpay. The browser
+          // never marks the order paid on its own.
+          await completeVerifiedPayment({
+            proof: payment,
+            clearCart,
+            syncCart,
+            onSuccess: (verification) => {
+              const params = new URLSearchParams({
+                order_id: verification.order_number,
+                value: String(checkout.totals.total),
+                currency: checkout.totals.currency,
+                shipping: String(checkout.totals.shipping),
+                tax: String(checkout.totals.tax),
+              });
 
-            const verification = (await verifyResponse.json()) as {
-              success: boolean;
-              data?: {
-                order_number: string;
-                status: string;
-              };
-              error?: {
-                message?: string;
-              };
-            };
-
-            if (!verifyResponse.ok || !verification.success || !verification.data) {
-              throw new Error(
-                verification.error?.message ||
-                  "Payment was received but the order could not be confirmed.",
-              );
-            }
-
-            try {
-              await clearCart();
-            } catch (clearError) {
-              console.error("Payment verified but Nexus cart cleanup failed:", clearError);
-              throw new Error(
-                "Payment was confirmed, but your shopping bag could not be cleared. " +
-                  "Please refresh the page or contact MIRAVIKA support if the bag still shows items.",
-              );
-            }
-
-            const params = new URLSearchParams({
-              order_id: verification.data.order_number,
-              value: String(checkout.totals.total),
-              currency: checkout.totals.currency,
-              shipping: String(checkout.totals.shipping),
-              tax: String(checkout.totals.tax),
-            });
-
-            navigate({
-              to: "/thank-you",
-              search: Object.fromEntries(params.entries()),
-            });
-          } catch (verificationError) {
-            setLoading(false);
-            setError(
-              verificationError instanceof Error
-                ? verificationError.message
-                : "Payment verification failed. Please contact MIRAVIKA support.",
-            );
-          }
+              navigate({
+                to: "/thank-you",
+                search: Object.fromEntries(params.entries()),
+              });
+            },
+          });
         },
       });
 
       razorpay.open();
     } catch (checkoutError) {
+      submitting.current.release();
       setLoading(false);
       setError(
-        checkoutError instanceof Error ? checkoutError.message : "Checkout could not be completed.",
+        // A transient verification failure must not read as a failed payment:
+        // the customer is told to wait and given a way to check the order, and
+        // they are never charged a second time.
+        isRetryableVerificationFailure(checkoutError)
+          ? "Your payment is being confirmed. Please don't pay again — check your order " +
+              "status in a few minutes using your order number and email."
+          : checkoutError instanceof Error
+            ? checkoutError.message
+            : "Checkout could not be completed. Please try again.",
       );
     }
   };
 
-  if (isLoading && !items.length) {
+  if ((isLoading || isSyncing) && !items.length) {
     return (
       <main className="min-h-[60vh] flex items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin" />
@@ -566,10 +523,10 @@ function CheckoutPage() {
             <Button
               type="button"
               onClick={() => void submitCheckout()}
-              disabled={loading}
+              disabled={loading || !isHydrated}
               className="mt-8 h-12 w-full bg-[#2B2B2B] text-white hover:bg-[#2B2B2B]/90"
             >
-              {loading ? (
+              {loading || isSyncing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Processing Securely…

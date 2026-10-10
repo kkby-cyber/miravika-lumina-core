@@ -78,3 +78,12 @@ export function useCollection(slug: string, first = 24) {
     staleTime: 60_000,
   });
 }
+
+/** Live, ACTIVE Nexus collections (used to hide navigation for collections that don't exist). */
+export function useCollections() {
+  return useQuery({
+    queryKey: ["nexus-collections"],
+    queryFn: async () => (await getNexusCollections()).collections,
+    staleTime: 5 * 60_000,
+  });
+}

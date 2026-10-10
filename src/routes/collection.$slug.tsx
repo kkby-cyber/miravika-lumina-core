@@ -8,36 +8,52 @@ import type { FrontendProduct } from "@/lib/nexus-product";
 import { itemFromProduct, trackViewItemList } from "@/lib/analytics";
 import { useShopRatings } from "@/hooks/useReviews";
 
-// Editorial copy for the canonical storefront categories
+// Editorial fallback copy for canonical Nexus collections. The live collection
+// description from Nexus takes precedence when present.
 const HANDLE_COPY: Record<string, { title: string; sub: string }> = {
-  "signature-collection": {
-    title: "Signature Collection",
-    sub: "The definitive Miravika edit — iconic pieces, hand-finished and made to be remembered.",
-  },
   "new-arrivals": {
     title: "New Arrivals",
-    sub: "Fresh from the ateliers — the newest additions to the Miravika boutique.",
+    sub: "The newest additions to the Miravika boutique.",
   },
-  "ready-to-wear": {
-    title: "Ready-to-Wear",
-    sub: "Considered silhouettes, elevated for every day and every occasion.",
+  "trending-now": {
+    title: "Trending Now",
+    sub: "The pieces everyone is reaching for this season.",
   },
-  "accessories-fine-goods": {
-    title: "Accessories Fine Goods",
-    sub: "Sterling silver, moissanite and heirloom-inspired finishing pieces.",
+  "best-sellers": {
+    title: "Best Sellers",
+    sub: "The Miravika pieces our customers return to again and again.",
   },
-  "curated-sets": {
-    title: "Curated Sets",
-    sub: "Thoughtfully composed sets — considered gifting for every occasion.",
+  "jewelry-accessories": {
+    title: "Earrings & Jewelry",
+    sub: "Studs, hoops, huggies and chains — everyday shine, thoughtfully finished.",
+  },
+  "womens-fashion": {
+    title: "Hair Accessories",
+    sub: "Claws, clips, bows and scrunchies designed to finish every look.",
+  },
+  "beauty-personal-care": {
+    title: "Beauty & Personal Care",
+    sub: "Soft, considered tools for your everyday beauty ritual.",
+  },
+  gifts: {
+    title: "Rakhi & Gifts",
+    sub: "Festive keepsakes and gifts, presented with care.",
   },
 };
 
+function copyFor(slug: string) {
+  const canonical = resolveCollectionHandle(slug);
+  return (
+    HANDLE_COPY[canonical] ?? {
+      title: canonical.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      sub: "Curated by Miravika.",
+    }
+  );
+}
+
 export const Route = createFileRoute("/collection/$slug")({
   head: ({ params }) => {
-    const copy = HANDLE_COPY[params.slug] ?? {
-      title: params.slug.replace(/-/g, " "),
-      sub: "Curated by Miravika.",
-    };
+    const copy = copyFor(params.slug);
     // Canonical URL is the category slug itself — legacy variants redirect here
     const canonical = `https://miravika.com/collection/${params.slug}`;
     return {
@@ -97,7 +113,8 @@ export const Route = createFileRoute("/collection/$slug")({
   // Retired / legacy slugs redirect to their canonical category so no URL 404s.
   loader: ({ params }) => {
     const target = LEGACY_SLUG_REDIRECTS[params.slug];
-    if (target) {
+    // Some map entries are identities; redirecting those would loop forever.
+    if (target && target !== params.slug) {
       throw redirect({ href: `/collection/${target}`, replace: true });
     }
   },
@@ -105,14 +122,17 @@ export const Route = createFileRoute("/collection/$slug")({
 });
 
 type Sort = "featured" | "price-asc" | "price-desc" | "title" | "rating";
-type PriceBand = "all" | "under-2500" | "2500-7500" | "7500-15000" | "over-15000";
+type PriceBand = "all" | "under-199" | "199-299" | "299-499" | "over-499";
 
 function CollectionPage() {
   const { slug } = Route.useParams();
   const handle = resolveCollectionHandle(slug);
-  const copy = HANDLE_COPY[handle] ?? { title: slug.replace(/-/g, " "), sub: "" };
-
   const { data: collection, isLoading: colLoading } = useCollection(handle, 100);
+  const fallbackCopy = copyFor(handle);
+  const copy = {
+    title: fallbackCopy.title,
+    sub: collection?.description?.trim() || fallbackCopy.sub,
+  };
   // Fallback to tag search if collection is empty / unknown
   const { data: fallback = [], isLoading: fbLoading } = useProducts(
     !colLoading && (!collection || collection.products.length === 0) ? slug : undefined,
@@ -129,7 +149,7 @@ function CollectionPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { data: shopRatings } = useShopRatings();
 
-  // Category options come from the real Shopify product types inside this collection
+  // Category options come from the real Nexus product types inside this collection
   const categories = useMemo(() => {
     const set = new Set<string>();
     source.forEach((p) => p.productType && set.add(p.productType));
@@ -147,10 +167,10 @@ function CollectionPage() {
     if (band !== "all") {
       arr = arr.filter((p) => {
         const price = parseFloat(p.priceRange.minVariantPrice.amount);
-        if (band === "under-2500") return price < 2500;
-        if (band === "2500-7500") return price >= 2500 && price < 7500;
-        if (band === "7500-15000") return price >= 7500 && price < 15000;
-        if (band === "over-15000") return price >= 15000;
+        if (band === "under-199") return price < 199;
+        if (band === "199-299") return price >= 199 && price < 299;
+        if (band === "299-499") return price >= 299 && price < 499;
+        if (band === "over-499") return price >= 499;
         return true;
       });
     }
@@ -247,10 +267,10 @@ function CollectionPage() {
               {(
                 [
                   ["all", "All prices"],
-                  ["under-2500", "Under ₹2,500"],
-                  ["2500-7500", "₹2,500 – ₹7,500"],
-                  ["7500-15000", "₹7,500 – ₹15,000"],
-                  ["over-15000", "Over ₹15,000"],
+                  ["under-199", "Under ₹199"],
+                  ["199-299", "₹199 – ₹299"],
+                  ["299-499", "₹299 – ₹499"],
+                  ["over-499", "₹499 & above"],
                 ] as [PriceBand, string][]
               ).map(([v, l]) => (
                 <label key={v} className="flex items-center gap-2">
@@ -339,7 +359,7 @@ function CollectionPage() {
           {isLoading ? (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-6">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="aspect-[4/5] animate-pulse rounded-md bg-beige" />
+                <div key={i} className="skeleton-lux aspect-[3/4] rounded-xl" />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -353,6 +373,7 @@ function CollectionPage() {
                   onClick={() => {
                     setBand("all");
                     setInStock(false);
+                    setCategory("all");
                   }}
                   className="rounded-full border border-foreground/20 px-6 py-2.5 text-[11px] uppercase tracking-[0.22em] hover:border-gold hover:text-gold"
                 >

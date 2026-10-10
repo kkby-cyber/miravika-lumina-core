@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { X } from "lucide-react";
-import { toast } from "sonner";
-import { trackGenerateLead } from "@/lib/analytics";
+import { useNewsletterSignup } from "@/hooks/useNewsletterSignup";
+
+// Never interrupt a purchase or an account task.
+const QUIET_PATHS = ["/checkout", "/cart", "/thank-you", "/auth", "/account", "/track-order"];
 
 const KEY = "miravika-exit-offer-seen";
 
@@ -12,10 +15,12 @@ const KEY = "miravika-exit-offer-seen";
  */
 export function ExitIntent() {
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
+  const { email, setEmail, submitting, submit: subscribe } = useNewsletterSignup("exit_intent");
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const quiet = QUIET_PATHS.some((p) => pathname.startsWith(p));
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || quiet) return;
     try {
       if (localStorage.getItem(KEY)) return;
     } catch {
@@ -58,20 +63,30 @@ export function ExitIntent() {
       window.clearTimeout(arm);
       cleanup();
     };
-  }, []);
+  }, [quiet]);
 
-  if (!open) return null;
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    trackGenerateLead("exit_intent_offer");
-    toast.success("Welcome to MIRAVIKA", { description: "Your 10% welcome code is on its way." });
-    setOpen(false);
+  if (!open || quiet) return null;
+
+  const submit = async (e: React.FormEvent) => {
+    if (await subscribe(e)) setOpen(false);
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-noir/60 p-4 backdrop-blur-sm animate-in fade-in duration-300 sm:items-center">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="exit-intent-title"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-noir/60 p-4 backdrop-blur-sm animate-in fade-in duration-300 sm:items-center"
+    >
       <div className="relative w-full max-w-md overflow-hidden rounded-lg border border-gold/30 bg-ivory p-8 text-center shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
         <button
           onClick={() => setOpen(false)}
@@ -81,10 +96,12 @@ export function ExitIntent() {
           <X className="h-4 w-4" />
         </button>
         <p className="text-[10px] uppercase tracking-[0.32em] text-gold">Before you go</p>
-        <h3 className="mt-2 font-display text-3xl">Enjoy 10% off</h3>
+        <h3 id="exit-intent-title" className="mt-2 font-display text-3xl">
+          Join The Miravika List
+        </h3>
         <div className="mx-auto mt-3 h-px w-16 gold-line" />
         <p className="mt-3 text-sm text-muted-foreground">
-          Join The MIRAVIKA List for private access to new drops — and 10% off your first order.
+          Be the first to discover new arrivals and festive edits. No spam — unsubscribe anytime.
         </p>
         <form onSubmit={submit} className="mt-5 flex flex-col gap-2">
           <input
@@ -94,13 +111,16 @@ export function ExitIntent() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Your email address"
             aria-label="Email address"
+            autoFocus
             className="w-full rounded-full border border-border bg-background px-5 py-3 text-sm focus:border-gold focus:outline-none"
           />
           <button
             type="submit"
-            className="w-full rounded-full bg-foreground py-3 text-[11px] uppercase tracking-[0.22em] text-ivory transition hover:bg-foreground/90"
+            disabled={submitting}
+            aria-busy={submitting}
+            className="w-full rounded-full bg-foreground py-3 disabled:cursor-wait disabled:opacity-70 text-[11px] uppercase tracking-[0.22em] text-ivory transition hover:bg-foreground/90"
           >
-            Claim my 10%
+            {submitting ? "Subscribing…" : "Subscribe"}
           </button>
         </form>
         <button

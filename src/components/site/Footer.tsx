@@ -9,10 +9,9 @@ import {
   Undo2,
   Headphones,
 } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 import logoAsset from "@/assets/miravika-logo.png.asset.json";
-import { trackGenerateLead, trackSignUp } from "@/lib/analytics";
+import { useNewsletterSignup } from "@/hooks/useNewsletterSignup";
+import { FREE_SHIPPING_THRESHOLD_INR, RETURN_WINDOW_DAYS } from "@/lib/store-policy";
 
 // Pinterest icon (lucide doesn't include it in the default export)
 const PinterestIcon = ({
@@ -39,24 +38,27 @@ const PinterestIcon = ({
 );
 
 const TRUST = [
-  { icon: Truck, title: "Free Worldwide Shipping", sub: "On orders ₹2999+ / $49+" },
-  { icon: Undo2, title: "Easy 7-Day Returns", sub: "No questions asked" },
-  { icon: ShieldCheck, title: "Secure Checkout", sub: "SSL · Trusted gateways" },
-  { icon: Headphones, title: "24/7 Support", sub: "We're here to help" },
+  {
+    icon: Truck,
+    title: "Free Shipping in India",
+    sub: `On orders above ₹${FREE_SHIPPING_THRESHOLD_INR}`,
+  },
+  {
+    icon: Undo2,
+    title: `Easy ${RETURN_WINDOW_DAYS}-Day Returns`,
+    sub: "On eligible, unused items",
+  },
+  { icon: ShieldCheck, title: "Secure Checkout", sub: "Payments by Razorpay" },
+  { icon: Headphones, title: "Customer Care", sub: "support@miravika.com" },
 ];
 
 export function Footer() {
-  const [email, setEmail] = useState("");
-  const onSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    trackGenerateLead("newsletter_footer");
-    trackSignUp("newsletter");
-    toast.success("Welcome to Miravika", {
-      description: "Check your inbox for 10% off your first order.",
-    });
-    setEmail("");
-  };
+  const {
+    email,
+    setEmail,
+    submitting,
+    submit: onSubscribe,
+  } = useNewsletterSignup("newsletter_footer");
 
   return (
     <footer className="mt-24">
@@ -82,7 +84,7 @@ export function Footer() {
             <p className="text-[10px] uppercase tracking-[0.32em] text-gold">The Miravika List</p>
             <h3 className="font-display text-3xl md:text-4xl">Everyday Luxury, Delivered.</h3>
             <p className="max-w-lg text-sm text-ivory/70">
-              Private access to new drops, editorial stories and 10% off your first order.
+              Be the first to discover new arrivals, festive edits and stories from the house.
             </p>
             <form
               onSubmit={onSubscribe}
@@ -99,9 +101,11 @@ export function Footer() {
               />
               <button
                 type="submit"
-                className="rounded-full bg-gold px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-noir transition hover:bg-gold/90"
+                disabled={submitting}
+                aria-busy={submitting}
+                className="rounded-full bg-gold px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-noir transition hover:bg-gold/90 disabled:cursor-wait disabled:opacity-70"
               >
-                Subscribe
+                {submitting ? "Subscribing…" : "Subscribe"}
               </button>
             </form>
           </div>
@@ -116,8 +120,8 @@ export function Footer() {
               loading="lazy"
             />
             <p className="mt-4 max-w-sm text-sm text-ivory/70">
-              A premium global lifestyle brand — fashion, jewelry, beauty, home and lifestyle
-              essentials, thoughtfully curated for the modern customer. Worldwide shipping.
+              Hair accessories, earrings, jewelry, rakhi and beauty essentials — thoughtfully
+              designed, quality-checked and delivered with care across India.
             </p>
             <div className="mt-5 flex items-center gap-2">
               {[
@@ -268,7 +272,7 @@ export function Footer() {
         <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-5 text-[11px] tracking-wider text-ivory/50 md:flex-row">
             <p>© {new Date().getFullYear()} MIRAVIKA · Luxury Redefined</p>
-            <p>Crafted worldwide · Delivered with care</p>
+            <p>Thoughtfully made · Delivered with care</p>
           </div>
         </div>
       </div>

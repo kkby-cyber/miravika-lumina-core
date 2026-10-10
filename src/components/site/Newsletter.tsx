@@ -1,21 +1,8 @@
-import { useState } from "react";
-import { toast } from "sonner";
-import { trackGenerateLead, trackSignUp } from "@/lib/analytics";
+import { useNewsletterSignup } from "@/hooks/useNewsletterSignup";
 
 /** Quiet, editorial email capture — no popup, no urgency devices. */
 export function Newsletter() {
-  const [email, setEmail] = useState("");
-
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    trackGenerateLead("newsletter_home");
-    trackSignUp("newsletter");
-    toast.success("Welcome to MIRAVIKA", {
-      description: "Check your inbox for 10% off your first order.",
-    });
-    setEmail("");
-  };
+  const { email, setEmail, submitting, submit: onSubmit } = useNewsletterSignup("newsletter_home");
 
   return (
     <section aria-labelledby="newsletter-heading" className="border-y border-border/50 bg-beige/40">
@@ -29,7 +16,7 @@ export function Newsletter() {
         </h2>
         <div className="mx-auto mt-5 h-px w-16 gold-line" />
         <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-muted-foreground">
-          Private access to new arrivals, editorial stories and 10% off your first order.
+          Be the first to discover new arrivals, festive edits and stories from the house.
         </p>
         <form
           onSubmit={onSubmit}
@@ -49,9 +36,11 @@ export function Newsletter() {
           />
           <button
             type="submit"
-            className="min-h-12 rounded-full bg-noir px-10 text-[11px] uppercase tracking-[0.24em] text-ivory transition-colors duration-300 hover:bg-foreground/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            disabled={submitting}
+            aria-busy={submitting}
+            className="min-h-12 rounded-full bg-noir disabled:cursor-wait disabled:opacity-70 px-10 text-[11px] uppercase tracking-[0.24em] text-ivory transition-colors duration-300 hover:bg-foreground/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
-            Subscribe
+            {submitting ? "Subscribing…" : "Subscribe"}
           </button>
         </form>
         <p className="mt-4 text-[11px] text-muted-foreground">No spam. Unsubscribe anytime.</p>

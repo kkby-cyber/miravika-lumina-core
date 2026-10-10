@@ -47,7 +47,7 @@ export const Route = createFileRoute("/product/$handle")({
     const readable = titleCase(params.handle);
     const url = `https://miravika.com/product/${params.handle}`;
     // Unique description per product handle so no two PDPs share the same meta description
-    const description = `Shop ${readable} at MIRAVIKA — a curated piece from our premium global lifestyle edit. Worldwide shipping, 7-day easy returns and a secure encrypted checkout.`;
+    const description = `Shop ${readable} at MIRAVIKA — thoughtfully designed and quality-checked. Delivered across India with 7-day easy returns and a secure Razorpay checkout.`;
     return {
       meta: [
         { title: `${readable} | MIRAVIKA` },
@@ -562,7 +562,7 @@ function ProductPage() {
               )}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Inclusive of all taxes · Free shipping on orders ₹2999+
+              Inclusive of all taxes · Free shipping in India on orders above ₹999
             </p>
 
             {/* Options */}
@@ -702,7 +702,7 @@ function ProductPage() {
             <div className="mt-6 grid grid-cols-3 gap-3 rounded-lg border border-border/60 bg-beige/40 p-4 text-center">
               <div>
                 <Truck className="mx-auto mb-1 h-4 w-4 text-gold" />
-                <p className="text-[10px] uppercase tracking-wider">Free ₹2999+</p>
+                <p className="text-[10px] uppercase tracking-wider">Free ₹999+</p>
               </div>
               <div>
                 <Undo2 className="mx-auto mb-1 h-4 w-4 text-gold" />
@@ -735,8 +735,8 @@ function ProductPage() {
                 <AccordionContent className="text-sm text-muted-foreground">
                   <ul className="list-disc space-y-1 pl-4">
                     <li>Dispatched within 24–48 hours from our warehouse.</li>
-                    <li>India: 3–7 business days · Worldwide: 7–14 business days.</li>
-                    <li>Free shipping on orders ₹2,999+ (India) and $49+ (International).</li>
+                    <li>Delivered across India in 3–7 business days.</li>
+                    <li>Free shipping on orders above ₹999; a flat ₹79 applies below that.</li>
                     <li>Secure checkout — UPI, cards, net banking and wallets.</li>
                   </ul>
                 </AccordionContent>

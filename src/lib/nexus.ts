@@ -225,6 +225,15 @@ export async function mutateNexusCustomerWishlist(input: {
   });
 }
 
+/** Persists a newsletter subscription in Nexus. Idempotent for an existing subscriber. */
+export async function subscribeToNewsletter(email: string) {
+  return nexusRequest<unknown>("/api/public/newsletter", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email.trim() }),
+  });
+}
+
 export async function getNexusCollections() {
   return nexusRequest<{
     collections: NexusCollection[];

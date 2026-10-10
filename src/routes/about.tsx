@@ -8,7 +8,7 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "MIRAVIKA is a premium global lifestyle brand curating fashion, jewelry, beauty, home and lifestyle essentials for the modern customer. Worldwide shipping.",
+          "MIRAVIKA designs and curates hair accessories, earrings, jewelry, rakhi and beauty essentials — quality-checked and delivered across India.",
       },
       { property: "og:title", content: "About MIRAVIKA — Premium Global Lifestyle Brand" },
       {
@@ -65,9 +65,9 @@ function About() {
           after-sales support before it earns a place in the MIRAVIKA edit.
         </p>
         <p>
-          We ship worldwide, keep checkout secure and encrypted, and stand behind every order with
-          easy 7-day returns and a support team that actually replies. Thank you for shopping with
-          us — you're the reason we obsess over the details.
+          We deliver across India, keep checkout secure and encrypted, and stand behind every order
+          with easy 7-day returns and a support team that actually replies. Thank you for shopping
+          with us — you're the reason we obsess over the details.
         </p>
       </div>
 

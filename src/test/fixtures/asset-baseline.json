@@ -1,0 +1,33 @@
+{
+  "files": {
+    "public/favicon.png": "f2c41526e4fed762f2ab3b8df9a84d7eb0baa2ccc5136f8883b28b26e0574618",
+    "public/miravika-logo-gold.png": "5e6997fc3d55d097b1101f67051b8fb681b6b2bec08debe96169dc2b90e95791",
+    "public/video/miravika-rakhi-poster.jpg": "bd31b3d67475886056a5119d1b21dc03a1ffad0014de7b5b86be75339353ea5b",
+    "public/video/miravika-rakhi.mp4": "c5b40dd6c3c6271c70f1b5ae7b9a18cf518182c70947bea4068d87a0d697900b",
+    "public/video/miravika-signature-poster.jpg": "9085f0c7a7f439ce44d932edb4963ac08828a779aa06f0e0b15c045a79954311",
+    "public/video/miravika-signature.mp4": "52304807df5db89a678bfe2b62a982eb8cdeba74568b4a1987cca6e47be2d19e",
+    "src/assets/IMG-20260709-WA0008.jpg.asset.json": "7f5795c09cd4702727c8804f1969a71876105e32b08b73270f97de8348cd8643",
+    "src/assets/IMG-20260709-WA0009.jpg.asset.json": "c33e3aa5eb94f688e062e38de7023da754c53c16f014fa8d6c5f939bfe8e8725",
+    "src/assets/IMG-20260709-WA0010.jpg.asset.json": "e102a934f84f54d770cbb3fd910902a6446709c81aa878e7524aae524beff054",
+    "src/assets/IMG-20260709-WA0012.jpg.asset.json": "ab6cf86a0d01e4adf4998b1432909d5230e422b81bfe4e34a218dfed2eed6a6c",
+    "src/assets/IMG-20260709-WA0013.jpg.asset.json": "b7529a69199e3a1081a5ea6ac53ae754ff4197df02484fa59d1ddcc3f060f605",
+    "src/assets/IMG-20260709-WA0014.jpg.asset.json": "11445163139570d7b71e81539ea1871a77fb67f76b36592f48afee1581139b10",
+    "src/assets/IMG-20260709-WA0015.jpg.asset.json": "6336220bcf0008aab4111ccb671654fa0489e7841f8b2c7723473ff0fa72cbf3",
+    "src/assets/IMG-20260709-WA0017.jpg.asset.json": "ad1543423b1c945bc604fbe8ccd7ebeb33b37cab59bf2bf36daed33b0e561e00",
+    "src/assets/IMG-20260709-WA0018.jpg.asset.json": "ddbbb20fe5f6eabcb577813d7afaa9dd865966c6e4e03108fb9271a5f101cd1c",
+    "src/assets/cat-beauty.jpg.asset.json": "48fcf5a6c36e98781b96f17d5fac5bf48dfe2d19539f315a2f7f1a2169031fac",
+    "src/assets/cat-fashion.jpg.asset.json": "5f4dd420f7207864f5f615f2e0f88e5f541fa3ae608be9645ff0e630bfc40dee",
+    "src/assets/cat-gifts.jpg.asset.json": "a145cfd0cdaf2359deb40961124ddb8b0ca6bc00b2d73c83109aa5801ba8ce29",
+    "src/assets/cat-home.jpg.asset.json": "f3cb81cfa8e672b4f8941526e4a11b91d4d91d88ef0a5b07e3c7212fa7378e5d",
+    "src/assets/cat-jewelry.jpg.asset.json": "5b13f785ded5e0adc4181aa74b13a0970e586243f619293332aaf694b43b755b",
+    "src/assets/cat-tech.jpg.asset.json": "ba7f7830b682dd73256ac5b1c2de6c1cfb4ccf2854b2fd3db9893dee01f78e98",
+    "src/assets/miravika-logo-transparent.png.asset.json": "aba06ebc6435680aa7f0ea06a096c0d8ebeab835ad5b8847c380060b7eed7947",
+    "src/assets/miravika-logo.png.asset.json": "1df74b2d4b4a709f9d3bfb61f8950cb852acc47a4aefe72a396052f93100b322"
+  },
+  "productPhotos": {
+    "dir": ".mira-img",
+    "count": 404,
+    "totalBytes": 197685534,
+    "namesSha256": "b7d39ee6afbfd0e4fd593d99ebe80e424bc7c89e79ef9a482a2d7d371a476f85"
+  }
+}

@@ -1,0 +1,61 @@
+name: CI
+
+# Quality gate for the storefront. Production hosting is Lovable, which builds from main;
+# this workflow does not deploy, it blocks merges that would break the build.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    name: Format, lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Format check
+        run: npx prettier --check "src/**/*.{ts,tsx,css}" --ignore-unknown
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit, regression and asset-preservation tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: No localhost API or server secrets in the client bundle
+        run: |
+          set -euo pipefail
+          # Real key shapes only (a bare "sb_secret_" prefix appears in supabase-js itself):
+          # sb_secret_ API keys, service_role JWTs (base64 of "role":"service_role"), Razorpay secrets.
+          if grep -rlE 'localhost:8080|sb_secret_[A-Za-z0-9_-]{16,}|cm9sZSI6InNlcnZpY2Vfcm9sZSI|RAZORPAY_KEY_SECRET|SHIPROCKET_PASSWORD' .output/public; then
+            echo "::error::Client bundle references a local API or a server secret"; exit 1
+          fi
+      - name: Dependency audit (high and critical)
+        run: npm audit --omit=dev --audit-level=high
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

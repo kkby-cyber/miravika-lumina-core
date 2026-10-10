@@ -96,7 +96,7 @@ const SECTIONS: { heading: string; items: [string, string][] }[] = [
       ],
       [
         "How long does delivery take?",
-        "Within India: 3–7 business days, depending on your PIN code. Exact estimates appear at checkout and on each product page.",
+        "Within India: 4–7 business days, depending on your PIN code. Exact estimates appear at checkout and on each product page.",
       ],
       [
         "How do I track my order?",

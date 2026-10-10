@@ -41,7 +41,7 @@ export function ProductHighlights({ highlights }: { highlights: string[] }) {
   );
 }
 
-/** Estimated delivery window, computed from today — India and international. */
+/** Estimated delivery window across India, computed from today. */
 export function EstimatedDelivery() {
   const fmt = (days: number) => {
     const d = new Date();
@@ -56,7 +56,7 @@ export function EstimatedDelivery() {
           Estimated delivery {fmt(4)} – {fmt(9)}
         </p>
         <p className="mt-0.5 text-[11px] text-muted-foreground">
-          Delivered across India in 3–7 business days. Order today and we dispatch within 24–48
+          Delivered across India in 4–7 business days. Order today and we dispatch within 24–48
           hours.
         </p>
       </div>

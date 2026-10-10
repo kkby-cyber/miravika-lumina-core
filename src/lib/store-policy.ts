@@ -6,7 +6,8 @@
  */
 export const FREE_SHIPPING_THRESHOLD_INR = 999;
 export const FLAT_SHIPPING_INR = 79;
-export const DELIVERY_WINDOW = "3–7 business days";
+// Matches the live Nexus "Standard Delivery" method (min_days 4, max_days 7).
+export const DELIVERY_WINDOW = "4–7 business days";
 export const RETURN_WINDOW_DAYS = 7;
 export const SHIPPING_REGION = "India";
 

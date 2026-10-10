@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, isNotFound, Link, notFound } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { Heart, Loader2, Minus, Plus, ShieldCheck, Truck, Undo2, Share2, Play } from "lucide-react";
-import { useProduct, useCollection } from "@/hooks/useProducts";
+import { productQueryOptions, useProduct, useCollection } from "@/hooks/useProducts";
 import { formatPrice } from "@/lib/format-price";
 import { toggleWishlistItem } from "@/lib/wishlist-actions";
 import { useCartStore } from "@/stores/cartStore";
@@ -87,12 +87,23 @@ export const Route = createFileRoute("/product/$handle")({
       ],
     };
   },
+  // Ask Nexus up front so a product that does not exist is a real 404 (no soft-404s in
+  // search results). Network/server errors never block the page; it retries client-side.
+  loader: async ({ params, context }) => {
+    try {
+      const product = await context.queryClient.ensureQueryData(productQueryOptions(params.handle));
+      if (!product) throw notFound();
+    } catch (error) {
+      if (isNotFound(error)) throw error;
+    }
+  },
+  notFoundComponent: ProductNotFound,
   component: ProductPage,
 });
 
 function ProductPage() {
   const { handle } = Route.useParams();
-  const { data: product, isLoading } = useProduct(handle);
+  const { data: product, isLoading, isError, refetch, isRefetching } = useProduct(handle);
   const { data: bestSellers } = useCollection("best-sellers", 8);
   const { data: recentProducts = [] } = useProducts(undefined, 30);
   const { data: reviewData } = useProductReviews(handle);
@@ -210,22 +221,25 @@ function ProductPage() {
       </div>
     );
   }
-  if (!product) {
+  if (isError && !product) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="font-display text-3xl">Product not found</h1>
+      <div className="mx-auto max-w-2xl px-4 py-24 text-center" role="alert">
+        <h1 className="font-display text-3xl">We couldn't load this piece</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          The piece you're looking for may have moved or sold out.
+          Please check your connection and try again.
         </p>
-        <Link
-          to="/shop"
-          className="mt-8 inline-block rounded-full bg-noir px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/85"
+        <button
+          type="button"
+          onClick={() => void refetch()}
+          disabled={isRefetching}
+          className="mt-8 inline-block rounded-full bg-noir px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/85 disabled:opacity-60"
         >
-          Continue Shopping
-        </Link>
+          {isRefetching ? "Retrying…" : "Try again"}
+        </button>
       </div>
     );
   }
+  if (!product) return <ProductNotFound />;
 
   const images = product.images.edges;
   const aggregate = reviewData?.aggregate ?? null;
@@ -735,7 +749,7 @@ function ProductPage() {
                 <AccordionContent className="text-sm text-muted-foreground">
                   <ul className="list-disc space-y-1 pl-4">
                     <li>Dispatched within 24–48 hours from our warehouse.</li>
-                    <li>Delivered across India in 3–7 business days.</li>
+                    <li>Delivered across India in 4–7 business days.</li>
                     <li>Free shipping on orders above ₹999; a flat ₹79 applies below that.</li>
                     <li>Secure checkout — UPI, cards, net banking and wallets.</li>
                   </ul>
@@ -887,5 +901,32 @@ function ProductPage() {
         </div>
       </div>
     </>
+  );
+}
+
+function ProductNotFound() {
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <p className="text-[10px] uppercase tracking-[0.34em] text-gold">404</p>
+      <h1 className="mt-3 font-display text-4xl">This piece isn't here</h1>
+      <p className="mt-3 text-sm text-muted-foreground">
+        It may have moved or is no longer available. Explore the boutique for our current edit.
+      </p>
+      <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <Link
+          to="/shop"
+          className="inline-block rounded-full bg-noir px-8 py-3 text-[11px] uppercase tracking-[0.22em] text-ivory hover:bg-foreground/85"
+        >
+          Continue Shopping
+        </Link>
+        <Link
+          to="/collection/$slug"
+          params={{ slug: "new-arrivals" }}
+          className="inline-block rounded-full border border-foreground/20 px-8 py-3 text-[11px] uppercase tracking-[0.22em] hover:border-gold hover:text-gold"
+        >
+          New Arrivals
+        </Link>
+      </div>
+    </div>
   );
 }

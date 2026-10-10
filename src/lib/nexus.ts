@@ -38,10 +38,10 @@ export class NexusApiError extends Error {
 }
 
 async function nexusRequest<T>(path: string, init?: RequestInit): Promise<T> {
-  const { supabase } = await import("@/integrations/supabase/client");
+  const { customerSupabase } = await import("@/lib/customer-supabase");
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await customerSupabase().auth.getSession();
 
   const headers = new Headers(init?.headers);
   headers.set("Accept", "application/json");

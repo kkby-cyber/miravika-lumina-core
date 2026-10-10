@@ -3,8 +3,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const fetchMock = vi.fn();
 const getSession = vi.fn();
 
-vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { auth: { getSession: (...args: unknown[]) => getSession(...args) } },
+vi.mock("@/lib/customer-supabase", () => ({
+  customerSupabase: () => ({
+    auth: { getSession: (...args: unknown[]) => getSession(...args) },
+  }),
 }));
 
 const { createNexusCheckout, NexusApiError } = await import("../lib/nexus");

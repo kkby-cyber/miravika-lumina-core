@@ -2,7 +2,10 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * Subtle luxury reveal: fades + lifts content into view once.
- * Respects prefers-reduced-motion (renders instantly).
+ *
+ * Content is only hidden under `html.js` (see styles.css), so server-rendered HTML stays
+ * readable to crawlers and to visitors whose JavaScript fails. Reduced-motion visitors get
+ * the content immediately with no transition.
  */
 export function Reveal({
   children,
@@ -21,7 +24,10 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      typeof IntersectionObserver === "undefined"
+    ) {
       setShown(true);
       return;
     }
@@ -41,10 +47,8 @@ export function Reveal({
   return (
     <Tag
       ref={ref as never}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        shown ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-      } ${className}`}
+      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      className={`reveal ${shown ? "" : "reveal-pending"} ${className}`}
     >
       {children}
     </Tag>

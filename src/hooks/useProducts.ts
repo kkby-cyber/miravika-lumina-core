@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import {
+  NexusApiError,
   getNexusCollections,
   getNexusProduct,
   getNexusProducts,
@@ -26,16 +27,29 @@ export function useProducts(query?: string, first = 50, enabled = true) {
   });
 }
 
-export function useProduct(slug: string) {
-  return useQuery({
+/**
+ * Resolves to `null` only when Nexus says the product does not exist (404). Network and
+ * server failures still throw, so an outage is never presented as "product not found".
+ */
+export function productQueryOptions(slug: string) {
+  return queryOptions({
     queryKey: ["nexus-product", slug],
-    queryFn: async () => {
-      const data = await getNexusProduct(slug);
-      return data.product ? toFrontendProduct(data.product) : null;
+    queryFn: async (): Promise<FrontendProduct | null> => {
+      try {
+        const data = await getNexusProduct(slug);
+        return data.product ? toFrontendProduct(data.product) : null;
+      } catch (error) {
+        if (error instanceof NexusApiError && (error.status === 404 || error.code === "NOT_FOUND"))
+          return null;
+        throw error;
+      }
     },
-    enabled: !!slug,
     staleTime: 60_000,
   });
+}
+
+export function useProduct(slug: string) {
+  return useQuery({ ...productQueryOptions(slug), enabled: !!slug });
 }
 
 export function useCollection(slug: string, first = 24) {
@@ -76,5 +90,14 @@ export function useCollection(slug: string, first = 24) {
     },
     enabled: !!slug,
     staleTime: 60_000,
+  });
+}
+
+/** Live, ACTIVE Nexus collections (used to hide navigation for collections that don't exist). */
+export function useCollections() {
+  return useQuery({
+    queryKey: ["nexus-collections"],
+    queryFn: async () => (await getNexusCollections()).collections,
+    staleTime: 5 * 60_000,
   });
 }

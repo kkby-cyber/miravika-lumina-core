@@ -88,98 +88,121 @@ export function ProductCard({
     setOpen(true);
   };
 
+  const toggleWish = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (wishlistBusy) return;
+    setWishlistBusy(true);
+    try {
+      const result = await toggleWishlistItem(p, variant?.id ?? null);
+      const ga = [itemFromProduct(p, { variantId: variant?.id })];
+      const cur = p.priceRange.minVariantPrice.currencyCode;
+      if (result.wished) trackAddToWishlist(ga, cur);
+      else trackRemoveFromWishlist(ga, cur);
+    } catch (error) {
+      console.error("Wishlist update failed:", error);
+      toast.error("We couldn't update your wishlist", {
+        description: "Please try again in a moment.",
+      });
+    } finally {
+      setWishlistBusy(false);
+    }
+  };
+
   return (
-    <div className="group block">
-      <Link to="/product/$handle" params={{ handle: p.handle }} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-beige shadow-[0_14px_36px_-30px_rgba(17,17,17,0.55)] transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1 group-hover:shadow-[0_30px_56px_-28px_rgba(17,17,17,0.42)]">
-          {img && (
-            <img
-              src={img.url}
-              alt={img.altText ?? p.title}
-              loading={priority ? "eager" : "lazy"}
-              fetchPriority={priority ? "high" : "auto"}
-              decoding="async"
-              className="h-full w-full object-cover transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06] group-hover:opacity-0"
-            />
-          )}
-          {img2 && (
-            <img
-              src={img2.url}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              className="absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06] group-hover:opacity-100"
-            />
-          )}
+    <div className="group relative block">
+      {/* Image + overlay controls. Buttons are siblings of the link (never nested inside
+          it) so keyboard and screen-reader users get two distinct, valid controls. */}
+      <div className="relative">
+        <Link
+          to="/product/$handle"
+          params={{ handle: p.handle }}
+          className="block rounded-xl"
+          aria-label={p.title}
+        >
+          <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-beige shadow-[0_14px_36px_-30px_rgba(31,30,28,0.55)] transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1 group-hover:shadow-[0_30px_56px_-28px_rgba(31,30,28,0.42)]">
+            {img ? (
+              <img
+                src={img.url}
+                alt={img.altText ?? p.title}
+                loading={priority ? "eager" : "lazy"}
+                fetchPriority={priority ? "high" : "auto"}
+                decoding="async"
+                className={`h-full w-full object-cover transition-[transform,opacity] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05] ${
+                  img2 ? "group-hover:opacity-0" : ""
+                }`}
+              />
+            ) : (
+              <div className="grid h-full w-full place-items-center">
+                <span className="font-display text-lg tracking-[0.3em] text-foreground/30">
+                  MIRAVIKA
+                </span>
+              </div>
+            )}
+            {img2 && (
+              <img
+                src={img2.url}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover opacity-0 transition-[transform,opacity] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.05] group-hover:opacity-100"
+              />
+            )}
 
-          {/* Quiet status label only — no discount stickers */}
-          {soldOut && (
-            <span className="absolute left-3 top-3 rounded-full bg-ivory/90 px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-foreground/70 backdrop-blur">
-              Sold Out
-            </span>
-          )}
-
-          <div className="absolute right-3 top-3 flex flex-col gap-2">
-            <button
-              aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-              disabled={wishlistBusy}
-              onClick={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                if (wishlistBusy) return;
-
-                setWishlistBusy(true);
-
-                try {
-                  const result = await toggleWishlistItem(p, variant?.id ?? null);
-                  const ga = [itemFromProduct(p, { variantId: variant?.id })];
-                  const cur = p.priceRange.minVariantPrice.currencyCode;
-
-                  if (result.wished) {
-                    trackAddToWishlist(ga, cur);
-                  } else {
-                    trackRemoveFromWishlist(ga, cur);
-                  }
-                } catch (error) {
-                  console.error("Wishlist update failed:", error);
-                } finally {
-                  setWishlistBusy(false);
-                }
-              }}
-              className="grid h-9 w-9 place-items-center rounded-full bg-ivory/90 backdrop-blur transition-transform duration-300 hover:bg-ivory active:scale-90 disabled:cursor-wait disabled:opacity-60"
-            >
-              {wishlistBusy ? (
-                <Loader2 className="h-4 w-4 animate-spin text-foreground/70" />
-              ) : (
-                <Heart
-                  className={`h-4 w-4 transition-transform duration-300 ${wished ? "scale-110 fill-gold text-gold" : "text-foreground/70"}`}
-                  strokeWidth={1.5}
-                />
-              )}
-            </button>
-            <button
-              aria-label="Quick view"
-              onClick={goToPdp}
-              className="hidden h-9 w-9 translate-x-2 place-items-center rounded-full bg-ivory/90 opacity-0 backdrop-blur transition-all duration-500 hover:bg-ivory group-hover:translate-x-0 group-hover:opacity-100 md:grid"
-            >
-              <Eye className="h-4 w-4 text-foreground/70" strokeWidth={1.5} />
-            </button>
+            {/* Quiet status label only — no discount stickers */}
+            {soldOut && (
+              <span className="absolute left-3 top-3 rounded-full bg-ivory/90 px-3 py-1 text-[9px] uppercase tracking-[0.2em] text-foreground/70 backdrop-blur">
+                Sold Out
+              </span>
+            )}
           </div>
-        </div>
+        </Link>
 
+        <div className="absolute right-3 top-3 flex flex-col gap-2">
+          <button
+            type="button"
+            aria-label={wished ? `Remove ${p.title} from wishlist` : `Add ${p.title} to wishlist`}
+            aria-pressed={wished}
+            disabled={wishlistBusy}
+            onClick={toggleWish}
+            className="grid h-9 w-9 place-items-center rounded-full bg-ivory/90 backdrop-blur transition-transform duration-300 hover:bg-ivory active:scale-90 disabled:cursor-wait disabled:opacity-60"
+          >
+            {wishlistBusy ? (
+              <Loader2 className="h-4 w-4 animate-spin text-foreground/70" />
+            ) : (
+              <Heart
+                key={wished ? "on" : "off"}
+                className={`h-4 w-4 ${wished ? "animate-lux-pop fill-gold text-gold" : "text-foreground/70"}`}
+                strokeWidth={1.5}
+              />
+            )}
+          </button>
+          <button
+            type="button"
+            aria-label={`View details of ${p.title}`}
+            onClick={goToPdp}
+            tabIndex={-1}
+            className="hidden h-9 w-9 translate-x-2 place-items-center rounded-full bg-ivory/90 opacity-0 backdrop-blur transition-[transform,opacity] duration-500 hover:bg-ivory group-hover:translate-x-0 group-hover:opacity-100 md:grid"
+          >
+            <Eye className="h-4 w-4 text-foreground/70" strokeWidth={1.5} />
+          </button>
+        </div>
+      </div>
+
+      <Link to="/product/$handle" params={{ handle: p.handle }} className="block" tabIndex={-1}>
         <div className="mt-3 px-0.5">
-          <h3 className="line-clamp-2 text-[13px] leading-snug font-medium text-foreground transition-colors duration-300 group-hover:text-gold md:text-sm">
+          <h3 className="line-clamp-2 font-body text-[13px] leading-snug font-normal tracking-[0.01em] text-foreground transition-colors duration-300 group-hover:text-gold md:text-sm">
             {p.title}
           </h3>
           <InlineRating average={rating?.average} count={rating?.count} />
 
           <div className="mt-1 flex items-baseline gap-2">
-            <p className="text-[13px] text-foreground transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 md:text-sm">
+            <p className="text-[13px] text-foreground md:text-sm">
               {formatPrice(priceAmt, currency)}
             </p>
             {onSale && compareAmt && (
               <p className="text-[11px] text-muted-foreground line-through md:text-xs">
+                <span className="sr-only">Original price </span>
                 {formatPrice(compareAmt, currency)}
               </p>
             )}

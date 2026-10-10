@@ -96,10 +96,10 @@ async function nexusCartRequest(
   method: "GET" | "POST",
   body?: Record<string, unknown>,
 ): Promise<NexusCartResponse> {
-  const { supabase } = await import("@/integrations/supabase/client");
+  const { customerSupabase } = await import("@/lib/customer-supabase");
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await customerSupabase().auth.getSession();
 
   const token = getCartToken();
 

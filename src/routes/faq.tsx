@@ -92,11 +92,11 @@ const SECTIONS: { heading: string; items: [string, string][] }[] = [
     items: [
       [
         "Where do you ship?",
-        "We ship worldwide, including India, USA, UK, Canada, Australia, UAE and Europe. Customs duties, if any, are borne by the customer for international orders.",
+        "We currently deliver to serviceable PIN codes across India. You can check delivery to your PIN code at checkout.",
       ],
       [
         "How long does delivery take?",
-        "Within India: 3–7 business days. International: 7–14 business days depending on destination and customs clearance. Exact estimates appear at checkout and on each product page.",
+        "Within India: 4–7 business days, depending on your PIN code. Exact estimates appear at checkout and on each product page.",
       ],
       [
         "How do I track my order?",
@@ -176,7 +176,7 @@ const SECTIONS: { heading: string; items: [string, string][] }[] = [
       ],
       [
         "Do you have a physical store?",
-        "MIRAVIKA is online-first and ships worldwide from our fulfilment partners.",
+        "MIRAVIKA is online-first and delivers across India through our shipping partners.",
       ],
     ],
   },

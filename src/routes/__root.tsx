@@ -85,12 +85,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#111111" },
+      { name: "theme-color", content: "#1f1e1c" },
       { title: "MIRAVIKA — Luxury Redefined" },
       {
         name: "description",
         content:
-          "MIRAVIKA — a premium international lifestyle house of fashion, jewelry, beauty and home essentials. Worldwide shipping and secure encrypted checkout.",
+          "MIRAVIKA — premium hair accessories, earrings, jewelry, rakhi and beauty essentials. Delivered across India with a secure Razorpay checkout.",
       },
       { name: "author", content: "MIRAVIKA" },
       { property: "og:site_name", content: "MIRAVIKA" },
@@ -104,10 +104,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Poppins:wght@300;400;500;600&display=swap",
       },
     ],
     scripts: [
+      {
+        // Marks JS as available before first paint so scroll reveals can hide content
+        // without ever hiding it from crawlers or no-JS visitors.
+        children: "document.documentElement.classList.add('js');",
+      },
       {
         // Consent Mode v2 defaults — must run before the GTM container loads.
         children:
@@ -148,7 +153,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
@@ -186,14 +191,32 @@ function SiteShell() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <a
+        href="#main-content"
+        className="sr-only z-[60] rounded-full bg-noir px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-ivory focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Skip to content
+      </a>
       <Header />
-      <main className="flex-1">
-        <Outlet />
+      <main id="main-content" className="flex-1">
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
       <CartDrawer />
       <ExitIntent />
       <Toaster position="top-center" richColors />
+    </div>
+  );
+}
+
+/** Soft fade/lift on route change. Keyed by pathname so search-param updates don't replay it. */
+function PageTransition({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <div key={pathname} className="animate-page-in">
+      {children}
     </div>
   );
 }

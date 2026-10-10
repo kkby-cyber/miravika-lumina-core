@@ -1,27 +1,35 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Heart, Menu, Search, ShoppingBag, User, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
+import { useCollections } from "@/hooks/useProducts";
+import { NAV_COLLECTIONS } from "@/lib/collections";
+import { STORE_PROMISES } from "@/lib/store-policy";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { syncCustomerWishlist } from "@/lib/customer-wishlist-sync";
 
-type NavItem = { label: string; slug: string };
+// Only verifiable service facts — see lib/store-policy.ts.
+const ANNOUNCEMENTS = [STORE_PROMISES.shipping, STORE_PROMISES.returns, STORE_PROMISES.payments];
 
-// Canonical MIRAVIKA categories — backed by live Shopify collections (see COLLECTION_HANDLE_MAP).
-const NAV: NavItem[] = [
-  { label: "Signature Collection", slug: "signature-collection" },
-  { label: "New Arrivals", slug: "new-arrivals" },
-  { label: "Ready-to-Wear", slug: "ready-to-wear" },
-  { label: "Accessories Fine Goods", slug: "accessories-fine-goods" },
-  { label: "Curated Sets", slug: "curated-sets" },
-];
+/** Keeps nav to collections Nexus actually serves; falls back to the seeded list offline. */
+function useNavItems() {
+  const { data } = useCollections();
+  if (!data) return NAV_COLLECTIONS;
+  const live = new Set(data.map((c) => c.slug));
+  const items = NAV_COLLECTIONS.filter((n) => live.has(n.slug));
+  return items.length ? items : NAV_COLLECTIONS;
+}
 
-const ANNOUNCEMENTS = [
-  "Complimentary Worldwide Shipping on Orders ₹2999+ / $49+",
-  "Easy 7-Day Returns · Hassle-Free Exchange",
-  "Secure Encrypted Checkout · UPI, Cards & Net Banking",
-  "Discover the New Season — Curated with Care",
-];
+/** Restarts a CSS pop animation whenever `value` grows. */
+function usePopOnIncrease(value: number) {
+  const prev = useRef(value);
+  const [pop, setPop] = useState(0);
+  useEffect(() => {
+    if (value > prev.current) setPop((n) => n + 1);
+    prev.current = value;
+  }, [value]);
+  return pop;
+}
 
 export function Header() {
   const totalItems = useCartStore((s) => s.items.reduce((a, b) => a + b.quantity, 0));
@@ -30,6 +38,10 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [announceIdx, setAnnounceIdx] = useState(0);
+  const [announcePaused, setAnnouncePaused] = useState(false);
+  const NAV = useNavItems();
+  const cartPop = usePopOnIncrease(totalItems);
+  const wishPop = usePopOnIncrease(wishlistCount);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isHome = pathname === "/";
 
@@ -47,16 +59,29 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    if (announcePaused) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => setAnnounceIdx((i) => (i + 1) % ANNOUNCEMENTS.length), 6500);
     return () => clearInterval(id);
-  }, []);
+  }, [announcePaused]);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
     };
   }, [menuOpen]);
+
+  // Close the mobile menu whenever the route changes.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   const transparent = isHome && !scrolled;
 
@@ -73,15 +98,22 @@ export function Header() {
       <div
         className={`overflow-hidden border-b transition-colors duration-700 ${transparent ? "border-white/10 bg-noir/45 text-ivory" : "border-border/40 bg-noir text-ivory"}`}
       >
-        <div className="relative mx-auto h-9 max-w-7xl px-4" aria-live="polite">
+        <div
+          className="relative mx-auto h-9 max-w-7xl px-4"
+          onMouseEnter={() => setAnnouncePaused(true)}
+          onMouseLeave={() => setAnnouncePaused(false)}
+          onFocus={() => setAnnouncePaused(true)}
+          onBlur={() => setAnnouncePaused(false)}
+        >
           {ANNOUNCEMENTS.map((msg, i) => (
             <p
               key={i}
               aria-hidden={i !== announceIdx}
-              className={`absolute inset-0 flex items-center justify-center text-center text-[10px] font-light uppercase tracking-[0.3em] transition-all duration-1000 ease-[cubic-bezier(0.16,1,0.3,1)] md:text-[10.5px] ${
+              className={`absolute inset-0 flex items-center justify-center text-center text-[10px] font-light uppercase tracking-[0.3em] transition-[opacity,transform] ease-[cubic-bezier(0.16,1,0.3,1)] md:text-[10.5px] ${
                 i === announceIdx
-                  ? "opacity-100 translate-y-0"
-                  : "pointer-events-none -translate-y-1 opacity-0"
+                  ? // Incoming waits for the outgoing message to clear — no overlapping text.
+                    "translate-y-0 opacity-100 delay-500 duration-700"
+                  : "pointer-events-none -translate-y-1 opacity-0 duration-400"
               }`}
             >
               {msg}
@@ -96,6 +128,8 @@ export function Header() {
         <div className="flex min-w-0 items-center gap-1">
           <button
             aria-label="Open menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
             className="-ml-2 grid h-11 w-11 place-items-center lg:hidden"
             onClick={() => setMenuOpen(true)}
           >
@@ -137,7 +171,10 @@ export function Header() {
           >
             <Heart className="h-[18px] w-[18px]" strokeWidth={1.25} />
             {wishlistCount > 0 && (
-              <span className="absolute right-1 top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground">
+              <span
+                key={wishPop}
+                className="animate-lux-pop absolute right-1 top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground"
+              >
                 {wishlistCount}
               </span>
             )}
@@ -149,7 +186,10 @@ export function Header() {
           >
             <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.25} />
             {totalItems > 0 && (
-              <span className="absolute right-1 top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground">
+              <span
+                key={cartPop}
+                className="animate-lux-pop absolute right-1 top-1.5 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-gold px-1 text-[9px] font-medium text-gold-foreground"
+              >
                 {totalItems}
               </span>
             )}
@@ -180,6 +220,12 @@ export function Header() {
 
       {/* MOBILE FULL-SCREEN MENU */}
       <div
+        id="mobile-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Site menu"
+        aria-hidden={!menuOpen}
+        inert={!menuOpen}
         className={`fixed inset-0 z-50 bg-ivory transition-opacity duration-500 lg:hidden ${
           menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}

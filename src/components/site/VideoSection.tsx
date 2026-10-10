@@ -5,7 +5,9 @@ import { Reveal } from "@/components/site/Reveal";
 
 /**
  * Cinematic full-bleed video band. Autoplays muted in view, pauses out of view,
- * and lets the visitor unmute. Poster keeps LCP fast.
+ * and lets the visitor unmute. Poster keeps LCP fast; nothing downloads until the band
+ * is near the viewport. Visitors who prefer reduced motion get the poster and a play
+ * button instead of autoplay.
  */
 export function VideoSection({
   src,
@@ -27,17 +29,21 @@ export function VideoSection({
   align?: "left" | "right";
 }) {
   const ref = useRef<HTMLVideoElement | null>(null);
-  const [playing, setPlaying] = useState(true);
+  // Reflects the element's real state (via play/pause events), not an assumption.
+  const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
+  // Once the visitor pauses, scrolling must not restart the film behind their back.
+  const userPaused = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const io = new IntersectionObserver(
       (entries) => {
         const visible = entries[0]?.isIntersecting;
-        if (visible) void el.play().catch(() => undefined);
-        else el.pause();
+        if (visible && !userPaused.current) void el.play().catch(() => undefined);
+        else if (!visible) el.pause();
       },
       { threshold: 0.35 },
     );
@@ -49,11 +55,11 @@ export function VideoSection({
     const el = ref.current;
     if (!el) return;
     if (el.paused) {
+      userPaused.current = false;
       void el.play().catch(() => undefined);
-      setPlaying(true);
     } else {
+      userPaused.current = true;
       el.pause();
-      setPlaying(false);
     }
   };
 
@@ -73,6 +79,9 @@ export function VideoSection({
             loop
             playsInline
             preload="none"
+            onPlay={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
+            aria-label={`${eyebrow} — MIRAVIKA film`}
             className="h-full w-full object-cover"
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-noir/55 via-transparent to-transparent" />

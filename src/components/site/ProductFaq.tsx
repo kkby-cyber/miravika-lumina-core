@@ -29,7 +29,7 @@ export function faqsForProduct(tags: string[] | undefined, hasSize: boolean): Fa
   const base: Faq[] = [
     {
       q: "How long will delivery take?",
-      a: "Orders are dispatched within 24–48 hours. Delivery is 3–7 business days across India and 7–14 business days internationally. You'll receive a tracking link by email as soon as your parcel ships.",
+      a: "Orders are dispatched within 24–48 hours. Delivery is 4–7 business days across India. You'll receive a tracking link by email as soon as your parcel ships.",
     },
     {
       q: "Which payment methods are accepted?",

@@ -6,7 +6,7 @@ import { Reveal } from "@/components/site/Reveal";
 import type { FrontendProduct } from "@/lib/nexus-product";
 
 /**
- * Editorial horizontal carousel for a live Shopify collection.
+ * Editorial horizontal carousel for a live Nexus collection.
  * Snap-scroll on mobile, arrow controls on desktop, staggered reveal on entry.
  */
 export function ProductCarousel({
@@ -95,7 +95,7 @@ export function ProductCarousel({
           {isLoading
             ? Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="w-[46%] shrink-0 snap-start md:w-[calc((100%-4.5rem)/4)]">
-                  <div className="aspect-[4/5] animate-pulse rounded-xl bg-beige" />
+                  <div className="skeleton-lux aspect-[3/4] rounded-xl" />
                 </div>
               ))
             : products.map((p, i) => (

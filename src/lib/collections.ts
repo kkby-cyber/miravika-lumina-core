@@ -50,9 +50,22 @@ export const LIVE_COLLECTIONS = [
 ] as const;
 
 /**
- * Nexus uses the actual collection slug directly.
- * Kept as a neutral helper so routes don't depend on a commerce platform.
+ * Maps any storefront slug — including retired campaign slugs still linked from old
+ * pages, emails and ads — to the canonical Nexus collection slug.
  */
 export function resolveCollectionHandle(slug: string) {
-  return slug;
+  return LEGACY_SLUG_REDIRECTS[slug] ?? slug;
 }
+
+/**
+ * Primary navigation. Only collections seeded in Nexus are listed; the header further
+ * hides any that the live API does not return, so shoppers never land on a missing edit.
+ */
+export const NAV_COLLECTIONS = [
+  { slug: "new-arrivals", label: "New Arrivals" },
+  { slug: "best-sellers", label: "Best Sellers" },
+  { slug: "jewelry-accessories", label: "Earrings & Jewelry" },
+  { slug: "womens-fashion", label: "Hair Accessories" },
+  { slug: "beauty-personal-care", label: "Beauty" },
+  { slug: "gifts", label: "Rakhi & Gifts" },
+] as const;

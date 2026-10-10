@@ -17,8 +17,10 @@ import { useCartStore } from "@/stores/cartStore";
 import { formatPrice } from "@/lib/format-price";
 import { itemFromProduct, trackBeginCheckout, trackViewCart } from "@/lib/analytics";
 import { CartSuggestions, CouponField } from "@/components/site/CartSuggestions";
+import { FREE_SHIPPING_THRESHOLD_INR } from "@/lib/store-policy";
 
-const FREE_SHIP_INR = 2999;
+// Mirrors the Nexus India shipping rule; the server quote at checkout stays authoritative.
+const FREE_SHIP_INR = FREE_SHIPPING_THRESHOLD_INR;
 const FREE_SHIP_USD = 49;
 
 export function CartDrawer() {

@@ -70,7 +70,6 @@ function CheckoutPage() {
     postal_code: "",
   });
 
-  const [cod, setCod] = useState(false);
   const [shippingQuote, setShippingQuote] = useState<{
     serviceable: boolean;
     shipping_charge: number;
@@ -500,8 +499,9 @@ function CheckoutPage() {
 
                         {shippingQuote.etd && <p>Expected by: {shippingQuote.etd}</p>}
 
-                        {shippingQuote.cod_available !== undefined && (
-                          <p>COD: {shippingQuote.cod_available ? "Available" : "Not available"}</p>
+                        {/* Only the store-level flag from Nexus may advertise COD. */}
+                        {shippingQuote.cod_available === true && (
+                          <p>Cash on Delivery available for this PIN code</p>
                         )}
                       </div>
                     </div>
@@ -537,7 +537,7 @@ function CheckoutPage() {
             </Button>
 
             <p className="mt-3 text-center text-xs text-muted-foreground">
-              Secure Checkout · Cash on Delivery in India
+              Secure checkout by Razorpay · UPI, cards &amp; net banking
             </p>
           </section>
 

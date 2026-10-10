@@ -38,10 +38,10 @@ export class NexusApiError extends Error {
 }
 
 async function nexusRequest<T>(path: string, init?: RequestInit): Promise<T> {
-  const { supabase } = await import("@/integrations/supabase/client");
+  const { customerSupabase } = await import("@/lib/customer-supabase");
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await customerSupabase().auth.getSession();
 
   const headers = new Headers(init?.headers);
   headers.set("Accept", "application/json");
@@ -222,6 +222,15 @@ export async function mutateNexusCustomerWishlist(input: {
       product_id: input.product_id,
       variant_id: input.variant_id ?? null,
     }),
+  });
+}
+
+/** Persists a newsletter subscription in Nexus. Idempotent for an existing subscriber. */
+export async function subscribeToNewsletter(email: string) {
+  return nexusRequest<unknown>("/api/public/newsletter", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email: email.trim() }),
   });
 }
 
